@@ -28,12 +28,32 @@ const postSchema = new mongoose.Schema(
     },
     location_description: {
       type: String,
-      required: true,
+      required: false,
+    },
+    location_link: {
+      type: String,
+      required: false,
+    },
+    trip_date: {
+      type: Date,
+      required: false,
+    },
+    trip_duration: {
+      type: String,
+      required: false,
+    },
+    trip_cost: {
+      type: Number,
+      required: false,
+    },
+    image: {
+      type: String,
+      required: false,
     },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },
-  }
+  },
 );
 
 export default mongoose.model("Post", postSchema);
