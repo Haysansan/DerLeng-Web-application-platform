@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import EmailVerification from "../models/EmailVerification.js";
 import sendVerificationEmail from "./email.service.js";
@@ -9,7 +10,7 @@ const login = async ({ email, password }) => {
     throw new Error("Invalid email or password");
   }
 
-  const isMatch = bcrypt.compare(password, user.password_hash);
+  const isMatch = await bcrypt.compare(password, user.password_hash);
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
@@ -34,16 +35,19 @@ const login = async ({ email, password }) => {
 const sendCode = async (email) => {
   const userExists = await User.findOne({ email });
   if (userExists) throw new Error("Email already registered");
+
   const code = Math.floor(1000 + Math.random() * 9000).toString();
+
   await EmailVerification.findOneAndUpdate(
     { email },
     {
       email,
       code,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     },
     { upsert: true },
   );
+
   await sendVerificationEmail(email, code);
 };
 
@@ -53,13 +57,17 @@ const verifyCodeAndRegister = async ({ email, code, username, password }) => {
   if (!record) throw new Error("No verification code found");
   if (record.code !== code) throw new Error("Invalid verification code");
   if (record.expiresAt < new Date()) throw new Error("Code expired");
+
   const hashedPassword = await bcrypt.hash(password, 10);
+
   const user = await User.create({
     username,
     email,
     password_hash: hashedPassword,
   });
+
   await EmailVerification.deleteOne({ email });
+
   return {
     id: user._id,
     username: user.username,
