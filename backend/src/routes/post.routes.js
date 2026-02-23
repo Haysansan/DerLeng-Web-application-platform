@@ -15,7 +15,7 @@ const router = express.Router();
 router.post("/", protect, upload.single("image"), createPost);
 
 // Get all posts
-router.get("/", getAllPosts);
+router.get("/", protect, adminAuthorize, getAllPosts);
 
 // Get single post
 router.get("/:id", getPostById);

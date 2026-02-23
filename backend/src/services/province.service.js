@@ -10,14 +10,30 @@ const create = async ({ name }) => {
   return await Province.create({ province_name: name });
 };
 
-const remove = async ({ name }) => {
-  const province = await Province.findOne({ province_name: name });
+const remove = async (id) => {
+  const province = await Province.findById(id);
 
   if (!province) {
-    throw new Error("Province not exist");
+    throw new Error("Province not found");
   }
 
-  await Province.deleteOne({ province_name: name });
+  await Province.findByIdAndDelete(id);
 };
 
-export default { create, remove };
+const getAll = async () => {
+  return await Province.find().sort({ province_name: 1 });
+};
+
+const update = async (id, { name }) => {
+  const province = await Province.findById(id);
+
+  if (!province) {
+    throw new Error("Province not found");
+  }
+
+  province.province_name = name;
+
+  return await province.save();
+};
+
+export default { create, getAll, update, remove };

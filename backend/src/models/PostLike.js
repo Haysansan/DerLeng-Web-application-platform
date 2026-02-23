@@ -15,10 +15,10 @@ const postLikeSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },
-  }
+  },
 );
 
-// Prevent duplicate likes by same user on same post
+// Prevent duplicate likes (same user cannot like twice)
 postLikeSchema.index({ post_id: 1, user_id: 1 }, { unique: true });
 
 export default mongoose.model("PostLike", postLikeSchema);
