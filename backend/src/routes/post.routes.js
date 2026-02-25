@@ -8,7 +8,7 @@ import {
 
 import protect from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
-
+import adminAuthorize from "../middlewares/adminAuthorize.js";
 const router = express.Router();
 
 // Create post (Protected + Image upload)

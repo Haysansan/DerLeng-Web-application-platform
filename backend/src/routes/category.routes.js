@@ -6,6 +6,7 @@ import {
   updateCategory,
 } from "../controllers/category.controller.js";
 import adminAuthorize from "../middlewares/adminAuthorize.js";
+import protect from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
