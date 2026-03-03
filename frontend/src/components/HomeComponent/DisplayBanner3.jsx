@@ -47,7 +47,7 @@ export const DisplayBanner3 = () => {
             {/* Button */}
             <button
               onClick={handleAboutUs}
-              className="bg-black hover:bg-gray-900 text-[#CCFF00] font-bold px-6 py-2 rounded transition-colors duration-200 w-fit"
+              className="px-5 py-2 border-2 border-black text-black font-semibold rounded-lg hover:bg-black hover:text-[#CCFF00] transition-colors duration-200 w-fit text-sm"
             >
               About us
             </button>
