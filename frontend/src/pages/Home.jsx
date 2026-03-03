@@ -4,10 +4,13 @@ import { DisplayBanner2 } from "../components/HomeComponent/DisplayBanner2";
 import Title from "../components/HomeComponent/Title";
 import { Title2 } from "../components/HomeComponent/Title2";
 import { Title3 } from "../components/HomeComponent/Title3";
+import { Title4 } from "../components/HomeComponent/Title4";
 import InterestPanel from "../components/HomeComponent/InterestPanel";
 import InterestPanel2 from "../components/HomeComponent/InterestPanel2";
 import InterestPanel3 from "../components/HomeComponent/InterestPanel3";
+import InterestPanel4 from "../components/HomeComponent/InterestPanel4";
 import { Advertise } from "../components/HomeComponent/Advertise";
+import { SubHeader } from "../components/HomeComponent/SubHeader";
 
 
 export default function Home() {
@@ -63,6 +66,15 @@ export default function Home() {
 
       {/* Interest Panel */}
       <InterestPanel3 />
+
+      {/* Title 4 - Under Banner 3 */}
+      <Title4 />
+
+      {/* Interest Panel */}
+      <InterestPanel4 />
+
+      {/* Sub header - Under Banner 4 */}
+      <SubHeader />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
