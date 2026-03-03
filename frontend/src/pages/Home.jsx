@@ -11,6 +11,7 @@ import InterestPanel3 from "../components/HomeComponent/InterestPanel3";
 import InterestPanel4 from "../components/HomeComponent/InterestPanel4";
 import InterestPanel5 from "../components/HomeComponent/InterestPanel5";
 import { Advertise } from "../components/HomeComponent/Advertise";
+import { DisplayBanner3 } from "../components/HomeComponent/DisplayBanner3";
 import { SubHeader } from "../components/HomeComponent/SubHeader";
 
 
@@ -79,6 +80,12 @@ export default function Home() {
 
       {/* Interest Panel */}
       <InterestPanel5 />
+
+      {/* Spacing between InterestPanel5 and DisplayBanner3 */}
+      <div className="w-full h-8"></div>
+
+      {/* Interest Panel */}
+      <DisplayBanner3 />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
