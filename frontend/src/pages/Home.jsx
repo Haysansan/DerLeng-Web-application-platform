@@ -5,6 +5,7 @@ import Title from "../components/HomeComponent/Title";
 import { Title2 } from "../components/HomeComponent/Title2";
 import InterestPanel from "../components/HomeComponent/InterestPanel";
 import InterestPanel2 from "../components/HomeComponent/InterestPanel2";
+import { Advertise } from "../components/HomeComponent/Advertise";
 
 
 export default function Home() {
@@ -51,6 +52,9 @@ export default function Home() {
       
       {/* Interest Panel */}
       <InterestPanel2 />
+
+      {/* Interest Panel */}
+      <Advertise />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
