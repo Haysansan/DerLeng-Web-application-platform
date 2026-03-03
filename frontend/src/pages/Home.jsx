@@ -2,7 +2,10 @@ import SearchBar from "../components/HomeComponent/SearchBar";
 import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
 import { DisplayBanner2 } from "../components/HomeComponent/DisplayBanner2";
 import Title from "../components/HomeComponent/Title";
+import { Title2 } from "../components/HomeComponent/Title2";
 import InterestPanel from "../components/HomeComponent/InterestPanel";
+import InterestPanel2 from "../components/HomeComponent/InterestPanel2";
+
 
 export default function Home() {
   return (
@@ -42,6 +45,12 @@ export default function Home() {
           <DisplayBanner2 />
         </div>
       </div>
+
+      {/* Title 2 - Under Banner 2 */}
+      <Title2 />
+      
+      {/* Interest Panel */}
+      <InterestPanel2 />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
