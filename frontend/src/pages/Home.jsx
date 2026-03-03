@@ -1,5 +1,6 @@
 import SearchBar from "../components/HomeComponent/SearchBar";
 import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
+import { DisplayBanner2 } from "../components/HomeComponent/DisplayBanner2";
 import Title from "../components/HomeComponent/Title";
 import InterestPanel from "../components/HomeComponent/InterestPanel";
 
@@ -34,6 +35,13 @@ export default function Home() {
 
       {/* Interest Panel */}
       <InterestPanel />
+
+      {/* Display Banner 2 */}
+      <div className="w-full px-6 bg-white flex justify-center py-8">
+        <div className="w-full max-w-7xl">
+          <DisplayBanner2 />
+        </div>
+      </div>
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
