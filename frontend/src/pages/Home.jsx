@@ -3,8 +3,10 @@ import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
 import { DisplayBanner2 } from "../components/HomeComponent/DisplayBanner2";
 import Title from "../components/HomeComponent/Title";
 import { Title2 } from "../components/HomeComponent/Title2";
+import { Title3 } from "../components/HomeComponent/Title3";
 import InterestPanel from "../components/HomeComponent/InterestPanel";
 import InterestPanel2 from "../components/HomeComponent/InterestPanel2";
+import InterestPanel3 from "../components/HomeComponent/InterestPanel3";
 import { Advertise } from "../components/HomeComponent/Advertise";
 
 
@@ -55,6 +57,12 @@ export default function Home() {
 
       {/* Interest Panel */}
       <Advertise />
+
+      {/* Title 3 - Under Banner 3 */}
+      <Title3 />
+
+      {/* Interest Panel */}
+      <InterestPanel3 />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
