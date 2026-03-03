@@ -2,6 +2,7 @@
 import { Route, Routes } from "react-router-dom";
 import Master from "./layout/Master";
 import AuthModals from "./components/AuthModals";
+import Home from "./pages/Home";
 import About from "./pages/About";
 import Post from "./pages/Post";
 import Discover from "./pages/DiscoverPage";
@@ -16,7 +17,7 @@ const App = () => {
       <AuthModals />
       <Routes>
         <Route path="/" element={<Master />}>
-          <Route path="/" element={<div>Home</div>} />
+          <Route path="/" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
           <Route
             path="/post"
