@@ -1,5 +1,7 @@
 import SearchBar from "../components/HomeComponent/SearchBar";
 import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
+import Title from "../components/HomeComponent/Title";
+import InterestPanel from "../components/HomeComponent/InterestPanel";
 
 export default function Home() {
   return (
@@ -26,6 +28,12 @@ export default function Home() {
           <DisplayBanner />
         </div>
       </div>
+
+      {/* Find Things To Do Title - Under Banner */}
+      <Title />
+
+      {/* Interest Panel */}
+      <InterestPanel />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
