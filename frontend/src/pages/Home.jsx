@@ -9,6 +9,7 @@ import InterestPanel from "../components/HomeComponent/InterestPanel";
 import InterestPanel2 from "../components/HomeComponent/InterestPanel2";
 import InterestPanel3 from "../components/HomeComponent/InterestPanel3";
 import InterestPanel4 from "../components/HomeComponent/InterestPanel4";
+import InterestPanel5 from "../components/HomeComponent/InterestPanel5";
 import { Advertise } from "../components/HomeComponent/Advertise";
 import { SubHeader } from "../components/HomeComponent/SubHeader";
 
@@ -75,6 +76,9 @@ export default function Home() {
 
       {/* Sub header - Under Banner 4 */}
       <SubHeader />
+
+      {/* Interest Panel */}
+      <InterestPanel5 />
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">
