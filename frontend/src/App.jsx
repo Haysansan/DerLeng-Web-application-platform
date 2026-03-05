@@ -1,4 +1,3 @@
-// App.jsx
 import { Route, Routes } from "react-router-dom";
 import Master from "./layout/Master";
 import AuthModals from "./components/AuthModals";
@@ -10,34 +9,57 @@ import TravelStories from "./pages/TravalStories";
 import FAQ from "./pages/FAQ.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
+import Dashboard from "./pages/admin/Dashboard.jsx";
+import AdminLayout from "./layout/admin/AdminLayout.jsx";
+import Users from "./pages/admin/Users.jsx";
+import Posts from "./pages/admin/Posts.jsx";
+import Products from "./pages/admin/Products.jsx";
+
 const App = () => {
   return (
     <div>
       <AuthModals />
+
       <Routes>
         <Route path="/" element={<Master />}>
-          <Route path="/" element={<div>Home</div>} />
-          <Route path="/discover" element={<Discover />} />
+          <Route index element={<div>Home</div>} />
+          <Route path="discover" element={<Discover />} />
+
           <Route
-            path="/post"
+            path="post"
             element={
               <ProtectedRoute>
                 <Post />
               </ProtectedRoute>
             }
           />
+
           <Route
-            path="/profile"
+            path="profile"
             element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
             }
           />
-          <Route path="/stories" element={<div>Stories</div>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/TravelStories" element={<TravelStories />} />
-          <Route path="/faq" element={<FAQ />} />
+
+          <Route path="stories" element={<TravelStories />} />
+          <Route path="about" element={<About />} />
+          <Route path="faq" element={<FAQ />} />
+        </Route>
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="posts" element={<Posts />} />
+          <Route path="products" element={<Products />} />
         </Route>
       </Routes>
     </div>

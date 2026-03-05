@@ -4,10 +4,10 @@ import { Eye, EyeOff } from "lucide-react";
 import logo from "../assets/logo.svg";
 import api from "../services/api.js";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function Login({ isOpen, onClose, switchToRegister }) {
-  const { login } = useContext(AuthContext); // ✅ get login function
+  const { login } = useContext(AuthContext); 
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,33 +16,39 @@ export default function Login({ isOpen, onClose, switchToRegister }) {
 
   if (!isOpen) return null;
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Please enter email and password");
-      return;
-    }
+const handleLogin = async () => {
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const res = await api.post("/auth/login", { email, password });
+  setLoading(true);
+  try {
+    const res = await api.post("/auth/login", { email, password });
 
-      const { token, user } = res.data.data;
+    const { token, user } = res.data.data;
 
-      // ✅ Update context and localStorage
-      login(user, token);
+    // Save to context + localStorage
+    login(user, token);
 
-      alert("Login successful!");
-      onClose();
+    alert("Login successful!");
+    onClose();
 
-      // Optional: redirect to dashboard/home
+  
+    if (user.role === "admin") {
+      navigate("/admin");
+    } else {
       navigate("/profile");
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Login failed. Check your credentials.");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert(
+      err.response?.data?.message || "Login failed. Check your credentials.",
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">

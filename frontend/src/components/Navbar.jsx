@@ -15,8 +15,16 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleUserClick = () => {
-    if (user) navigate("/profile");
-    else setIsLoginOpen(true);
+    if (!user) {
+      setIsLoginOpen(true);
+      return;
+    }
+
+    if (user.role === "Admin") {
+      navigate("/admin");
+    } else {
+      navigate("/profile");
+    }
   };
 
   return (
