@@ -8,12 +8,31 @@ const create = async ({ title }) => {
   return Category.create({ category_name: title });
 };
 
-const remove = async ({ title }) => {
-  const category = await Category.findOne({ title });
+const remove = async (id) => {
+  const category = await Category.findById(id);
+
   if (!category) {
-    throw new Error("Category not exist");
+    throw new Error("Category not found");
   }
-  return;
+
+  await Category.findByIdAndDelete(id);
 };
 
-export default { create, remove };
+
+const getAll = async () => {
+  return await Category.find().sort({ category_name: 1 });
+};
+
+const update = async (id, { title }) => {
+  const category = await Category.findById(id);
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  category.category_name = title;
+
+  return await category.save();
+};
+
+export default { create, getAll, update, remove };
