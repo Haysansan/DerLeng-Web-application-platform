@@ -8,6 +8,12 @@ export const createPost = async (req, res) => {
     console.log("FILE:", req.file);
     const image = req.file ? req.file.path : null;
 
+    if (!req.body.title || !req.body.content) {
+      return res.status(400).json({
+        message: "Title and content are required",
+      });
+    }
+
     const post = await postService.create({
       user_id: req.user._id, // from JWT middleware
       category_id: req.body.category_id,
@@ -27,7 +33,7 @@ export const createPost = async (req, res) => {
       data: post,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       message: error.message,
     });
   }

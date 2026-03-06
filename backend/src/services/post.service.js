@@ -31,7 +31,7 @@ const create = async ({
 // Get all posts
 const getAll = async () => {
   return await Post.find()
-    .populate("user_id", "username email")
+    .populate("user_id", "username email role")
     .populate("category_id", "category_name")
     .populate("province_id", "province_name")
     .sort({ created_at: -1 });
@@ -40,7 +40,8 @@ const getAll = async () => {
 // Get single post
 const getById = async (id) => {
   const post = await Post.findById(id)
-    .populate("user_id", "username email")
+    
+    .populate("user_id", "username email role")
     .populate("category_id", "category_name")
     .populate("province_id", "province_name");
 
