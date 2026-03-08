@@ -3,19 +3,16 @@ import postService from "../services/post.service.js";
 // Create Post
 export const createPost = async (req, res) => {
   try {
-    console.log("CONTENT-TYPE:", req.headers["content-type"]);
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-    const image = req.file ? req.file.path : null;
-
     if (!req.body.title || !req.body.content) {
       return res.status(400).json({
         message: "Title and content are required",
       });
     }
 
+    const imageUrls = req.files.map((file) => file.path);
+
     const post = await postService.create({
-      user_id: req.user._id, // from JWT middleware
+      user_id: req.user._id,
       category_id: req.body.category_id,
       province_id: req.body.province_id,
       title: req.body.title,
@@ -25,7 +22,7 @@ export const createPost = async (req, res) => {
       trip_date: req.body.trip_date,
       trip_duration: req.body.trip_duration,
       trip_cost: req.body.trip_cost,
-      image,
+      images: imageUrls,
     });
 
     res.status(201).json({
@@ -72,10 +69,30 @@ export const getPostById = async (req, res) => {
 // Delete Post
 export const deletePost = async (req, res) => {
   try {
-    await postService.remove(req.params.id, req.user._id);
+    await postService.remove(req.params.id, req.user._id,req.user.role);
 
     res.status(200).json({
       message: "Post deleted successfully",
+    });
+  } catch (error) {
+    res.status(403).json({
+      message: error.message,
+    });
+  }
+};
+
+export const updatePost = async (req, res) => {
+  try {
+    const updatedPost = await postService.update(
+      req.params.id,
+      req.user._id,
+      req.user.role,
+      req.body,
+    );
+
+    res.status(200).json({
+      message: "Post updated successfully",
+      data: updatedPost,
     });
   } catch (error) {
     res.status(403).json({

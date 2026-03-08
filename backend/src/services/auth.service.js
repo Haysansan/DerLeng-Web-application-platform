@@ -75,8 +75,33 @@ const verifyCodeAndRegister = async ({ email, code, username, password }) => {
   };
 };
 
+const adminCreateUser = async ({ username, email, password, role }) => {
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    throw new Error("Email already registered");
+  }
+
+  const allowedRoles = ["normal_user", "admin"];
+  if (role && !allowedRoles.includes(role)) {
+    throw new Error("Invalid role");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
+    username,
+    email,
+    password_hash: hashedPassword,
+    role: role || "normal_user",
+  });
+
+  return user;
+};
+
 export default {
   login,
   sendCode,
   verifyCodeAndRegister,
+  adminCreateUser,
 };

@@ -34,3 +34,18 @@ export const verifyCodeAndRegister = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const adminCreateUser = async (req, res) => {
+  try {
+    const user = await authService.adminCreateUser(req.body);
+
+    res.status(201).json({
+      message: "User created successfully by admin",
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};

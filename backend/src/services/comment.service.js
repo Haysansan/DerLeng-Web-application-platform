@@ -34,8 +34,27 @@ const remove = async (comment_id, user_id) => {
   await PostComment.findByIdAndDelete(comment_id);
 };
 
+const update = async (comment_id, user_id, content) => {
+  const comment = await PostComment.findById(comment_id);
+
+  if (!comment) {
+    throw new Error("Comment not found");
+  }
+
+  // Only owner can update
+  if (comment.user_id.toString() !== user_id.toString()) {
+    throw new Error("Not authorized to update this comment");
+  }
+
+  comment.content = content;
+  await comment.save();
+
+  return comment;
+};
+
 export default {
   create,
   getByPost,
   remove,
+  update,
 };
