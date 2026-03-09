@@ -4,6 +4,7 @@ import {
   getAllPosts,
   getPostById,
   deletePost,
+  updatePost,
 } from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -12,15 +13,17 @@ import adminAuthorize from "../middlewares/adminAuthorize.js";
 const router = express.Router();
 
 // Create post (Protected + Image upload)
-router.post("/", protect, upload.single("image"), createPost);
+router.post("/", protect, upload.array("images", 5), createPost);
 
 // Get all posts
-router.get("/", protect, adminAuthorize, getAllPosts);
+router.get("/", getAllPosts);
 
 // Get single post
 router.get("/:id", getPostById);
 
-// Delete post (Owner only)
+// Delete post
 router.delete("/:id", protect, deletePost);
+
+router.put("/:id", protect, updatePost);
 
 export default router;

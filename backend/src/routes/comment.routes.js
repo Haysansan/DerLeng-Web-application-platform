@@ -3,6 +3,7 @@ import {
   createComment,
   getCommentsByPost,
   deleteComment,
+  updateComment,
 } from "../controllers/comment.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -17,5 +18,8 @@ router.get("/post/:post_id", getCommentsByPost);
 
 // Delete comment (Owner only)
 router.delete("/:id", protect, deleteComment);
+
+// Update comment (Owner only)
+router.put("/:id", protect, updateComment);
 
 export default router;

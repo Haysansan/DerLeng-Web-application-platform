@@ -46,8 +46,8 @@ const postSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
-    image: {
-      type: String,
+    images: {
+      type: [String],
       required: false,
     },
   },

@@ -9,6 +9,11 @@ const emailVerificationSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   expiresAt: {
     type: Date,
     require: true,
