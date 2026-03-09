@@ -26,6 +26,7 @@
     "nodemailer": "^7.0.12"
   },
   "devDependencies": {
+    "@types/multer": "^2.1.0",
     "nodemon": "^3.0.1"
   }
 }
