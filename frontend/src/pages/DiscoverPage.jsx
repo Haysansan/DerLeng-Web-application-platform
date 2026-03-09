@@ -39,6 +39,7 @@ export default function DiscoverPage() {
               return (
                 <div
                   key={cat._id}
+                  onClick={() => navigate(`/posts/category/${cat._id}`)}
                   className="flex flex-col items-center min-w-[90px]"
                 >
                   <div className="w-20 h-20 rounded-full overflow-hidden shadow">
@@ -69,7 +70,7 @@ export default function DiscoverPage() {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {provinces.map((prov) => {
               const key = normalize(prov.province_name);
 

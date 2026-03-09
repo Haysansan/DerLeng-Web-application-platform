@@ -17,9 +17,13 @@ const App = () => {
         <Route path="/" element={<Master />}>
           <Route path="/" element={<div>Home</div>} />
           <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/post" element={<ProtectedRoute><Post /></ProtectedRoute>}/>
+          <Route path="/post" element={<Post />}/>
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/posts/province/:provinceId" element={<PostListPage />} />
+                  {/* CATEGORY FILTER */}
+        <Route path="/posts/category/:categoryId" element={<PostListPage />} />
+
+        {/* PROVINCE FILTER */}
+        <Route path="/posts/province/:provinceId" element={<PostListPage />} />
           <Route path="/stories" element={<div>Stories</div>} />
           <Route path="/about" element={<About />} />
           <Route path="/TravelStories" element={<TravelStories />} />

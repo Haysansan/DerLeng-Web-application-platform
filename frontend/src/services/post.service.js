@@ -1,16 +1,16 @@
 import api from "./api";
 
 export const getPostsByCategory = async (categoryId) => {
-  const res = await api.get("/posts"); // we'll filter on frontend or add query params backend
-  return res.data.data.filter(post => post.category_id._id === categoryId);
+  const res = await api.get(`/posts/category/${categoryId}`);
+  return res.data;
 };
 
 export const getPostsByProvince = async (provinceId) => {
-  const res = await api.get("/posts");
-  return res.data.data.filter(post => post.province_id._id === provinceId);
+  const res = await api.get(`/posts/province/${provinceId}`);
+  return res.data;
 };
 
 export const getAllPosts = async () => {
   const res = await api.get("/posts");
-  return res.data.data;
+  return res.data;
 };
