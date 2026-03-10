@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import Master from "./layout/Master";
+import Home from "./pages/Home";
 import About from "./pages/About";
 import Post from "./pages/Post";
 import DiscoverPage from "./pages/DiscoverPage";
@@ -26,7 +27,7 @@ const App = () => {
       {/* Main Layout */}
       <Route path="/" element={<Master />}>
 
-        <Route index element={<div>Home</div>} />
+        <Route index element={<Home />} />
 
         <Route path="shop" element={<Shop />} />
         <Route path="shop/:id" element={<ProductDetail />} />
