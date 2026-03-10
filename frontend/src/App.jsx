@@ -1,69 +1,25 @@
-import { Route, Routes } from "react-router-dom";
-import Master from "./layout/Master";
-import AuthModals from "./components/AuthModals";
+import { Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Shop from "./pages/Shop";
+import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
-import Post from "./pages/Post";
-import Discover from "./pages/DiscoverPage";
-import Profile from "./pages/Profile";
-import TravelStories from "./pages/TravalStories";
-import FAQ from "./pages/FAQ.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import FAQ from "./pages/FAQ";
 
-import Dashboard from "./pages/admin/Dashboard.jsx";
-import AdminLayout from "./layout/admin/AdminLayout.jsx";
-import Users from "./pages/admin/Users.jsx";
-import Posts from "./pages/admin/Posts.jsx";
-import Products from "./pages/admin/Products.jsx";
-
-const App = () => {
+function App() {
   return (
-    <div>
-      <AuthModals />
-
+    <>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Master />}>
-          <Route index element={<div>Home</div>} />
-          <Route path="discover" element={<Discover />} />
-
-          <Route
-            path="post"
-            element={
-              <ProtectedRoute>
-                <Post />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="stories" element={<TravelStories />} />
-          <Route path="about" element={<About />} />
-          <Route path="faq" element={<FAQ />} />
-        </Route>
-
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="posts" element={<Posts />} />
-          <Route path="products" element={<Products />} />
-        </Route>
+        <Route path="/" element={<Home />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:id" element={<ProductDetail />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/faq" element={<FAQ />} />
       </Routes>
-    </div>
+    </>
   );
-};
+}
 
 export default App;
