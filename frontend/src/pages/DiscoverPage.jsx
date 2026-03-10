@@ -77,7 +77,8 @@ export default function DiscoverPage() {
               return (
                 <div
                   key={prov._id}
-                  className="rounded-lg shadow"
+                  onClick={() => navigate(`/posts/province/${prov._id}`)}
+                  className="rounded-lg shadow cursor-pointer"
                 >
                   <div className="h-55 overflow-hidden rounded-t-lg">
                     <img

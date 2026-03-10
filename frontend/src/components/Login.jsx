@@ -145,11 +145,20 @@ export default function Login({ isOpen, onClose, switchToRegister }) {
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="hidden md:flex w-[35%] bg-[#002B11] items-center justify-center">
-              <h1 className="text-white text-2xl italic">
+            <div className="relative hidden md:flex w-[35%] h-full bg-[#002B11] overflow-hidden items-center justify-center rounded-l-[50%]">
+            <div className="absolute inset-0 bg-[#002B11]" />
+            <svg className="absolute right-0 top-0 h-full w-[100%]" viewBox="0 0 500 800" preserveAspectRatio="none">
+              <path d="M200 0 C 400 200, 100 600, 300 800 L 500 800 L 500 0 Z" fill="#1A3B28" />
+            </svg>
+            <svg className="absolute right-0 top-0 h-full w-[100%]" viewBox="0 0 500 800" preserveAspectRatio="none">
+              <path d="M350 0 C 500 300, 150 500, 450 800 L 500 800 L 500 0 Z" fill="#3D5A43" />
+            </svg>
+            <div className="relative z-10 text-center px-4">
+              <h1 className="text-white text-3xl italic opacity-80 leading-tight" style={{ fontFamily: "Georgia, serif", textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}>
                 Welcome to our website
               </h1>
             </div>
+          </div>
 
             <button
               onClick={onClose}

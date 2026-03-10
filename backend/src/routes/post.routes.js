@@ -5,6 +5,7 @@ import {
   getPostById,
   deletePost,
   updatePost,
+  getPostsByUser
 } from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -18,6 +19,9 @@ router.post("/", protect, upload.array("images", 5), createPost);
 // Get all posts
 router.get("/", getAllPosts);
 
+// Get all posts by a user
+router.get("/user/:userId", protect, getPostsByUser);
+
 // Get single post
 router.get("/:id", getPostById);
 
@@ -25,5 +29,7 @@ router.get("/:id", getPostById);
 router.delete("/:id", protect, deletePost);
 
 router.put("/:id", protect, updatePost);
+
+
 
 export default router;
