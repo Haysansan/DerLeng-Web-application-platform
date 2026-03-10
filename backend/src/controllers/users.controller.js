@@ -1,5 +1,39 @@
 import userService from "../services/user.service.js";
 
+
+export const requestEmailChange = async (req, res) => {
+  try {
+    const result = await userService.requestEmailChange(
+      req.user._id,
+      req.body.new_email,
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const verifyEmailChange = async (req, res) => {
+  try {
+    const updatedUser = await userService.verifyEmailChange(
+      req.user._id,
+      req.body.code,
+    );
+
+    res.status(200).json({
+      message: "Email updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await userService.getAllUsers();
