@@ -4,11 +4,13 @@ import api from "../../services/api.js";
 import { useState, useEffect } from "react";
 import { Users, FileText, ShoppingBag } from "lucide-react";
 
+
 export default function Dashboard() {
   const [usersCount, setUsersCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
     const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
