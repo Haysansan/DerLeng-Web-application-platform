@@ -1,4 +1,5 @@
 import postService from "../services/post.service.js";
+import Post from "../models/Post.js";
 
 // Create Post
 export const createPost = async (req, res) => {
@@ -98,5 +99,23 @@ export const updatePost = async (req, res) => {
     res.status(403).json({
       message: error.message,
     });
+  }
+};
+
+// Controller to get posts by user
+export const getPostsByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const posts = await Post.find({ user_id: userId }) // <-- use user_id
+      .sort({ created_at: -1 }) // your schema uses created_at
+      .populate("user_id", "username email role") // populate correct field
+      .populate("category_id", "category_name")
+      .populate("province_id", "province_name");
+
+    res.status(200).json({ data: posts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch user posts" });
   }
 };

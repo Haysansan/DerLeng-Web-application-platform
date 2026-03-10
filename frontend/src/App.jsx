@@ -1,13 +1,17 @@
 import { Route, Routes } from "react-router-dom";
+
 import Master from "./layout/Master";
-import AuthModals from "./components/AuthModals";
 import About from "./pages/About";
 import Post from "./pages/Post";
-import Discover from "./pages/DiscoverPage";
+import DiscoverPage from "./pages/DiscoverPage";
 import Profile from "./pages/Profile";
-import TravelStories from "./pages/TravalStories";
+import TravelStories from "./pages/TravalStories.jsx";
 import FAQ from "./pages/FAQ.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PostListPage from "./pages/PostListpage.jsx";
+import Shop from "./pages/Shop";
+import ProductDetail from "./pages/ProductDetail";
+import PostDetail from "./pages/PostDetail.jsx";
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";
@@ -17,52 +21,58 @@ import Products from "./pages/admin/Products.jsx";
 
 const App = () => {
   return (
-    <div>
-      <AuthModals />
+    <Routes>
 
-      <Routes>
-        <Route path="/" element={<Master />}>
-          <Route index element={<div>Home</div>} />
-          <Route path="discover" element={<Discover />} />
+      {/* Main Layout */}
+      <Route path="/" element={<Master />}>
 
-          <Route
-            path="post"
-            element={
-              <ProtectedRoute>
-                <Post />
-              </ProtectedRoute>
-            }
-          />
+        <Route index element={<div>Home</div>} />
 
-          <Route
-            path="profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+        <Route path="shop" element={<Shop />} />
+        <Route path="shop/:id" element={<ProductDetail />} />
 
-          <Route path="stories" element={<TravelStories />} />
-          <Route path="about" element={<About />} />
-          <Route path="faq" element={<FAQ />} />
-        </Route>
+        <Route path="about" element={<About />} />
+        <Route path="faq" element={<FAQ />} />
+
+        <Route path="discover" element={<DiscoverPage />} />
+
+        <Route path="post" element={<Post />} />
 
         <Route
-          path="/admin"
+          path="profile"
           element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminLayout />
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="posts" element={<Posts />} />
-          <Route path="products" element={<Products />} />
-        </Route>
-      </Routes>
-    </div>
+        />
+
+        {/* Posts */}
+        <Route path="posts/:id" element={<PostDetail />} />
+        <Route path="posts/category/:categoryId" element={<PostListPage />} />
+        <Route path="posts/province/:provinceId" element={<PostListPage />} />
+
+        <Route path="stories" element={<div>Stories</div>} />
+        <Route path="TravelStories" element={<TravelStories />} />
+
+      </Route>
+
+      {/* Admin Layout */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="users" element={<Users />} />
+        <Route path="posts" element={<Posts />} />
+        <Route path="products" element={<Products />} />
+      </Route>
+
+    </Routes>
   );
 };
 
