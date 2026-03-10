@@ -8,12 +8,12 @@ import {
 } from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/upload.middleware.js";
+import uploadPost from "../middlewares/upload.middleware.js";
 import adminAuthorize from "../middlewares/adminAuthorize.js";
 const router = express.Router();
 
 // Create post (Protected + Image upload)
-router.post("/", protect, upload.array("images", 5), createPost);
+router.post("/", protect, uploadPost.array("images", 5), createPost);
 
 // Get all posts
 router.get("/", getAllPosts);

@@ -18,7 +18,6 @@ const remove = async (id) => {
   return { message: "Category deleted" };
 };
 
-
 const getAll = async () => {
   return await ProductCategory.find().sort({ product_category_name: 1 });
 };

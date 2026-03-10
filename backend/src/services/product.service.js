@@ -35,6 +35,12 @@ const update = async (id, updateData) => {
 }
 
 const remove = async (id) => {
+  const linkedProducts = await Product.findOne({ product_category: id });
+  
+  if (linkedProducts) {
+    throw new Error("Cannot delete: This category still has products linked to it.")
+  }
+
   const product = await Product.findById(id);
 
   if (!product) {

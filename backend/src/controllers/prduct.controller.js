@@ -1,6 +1,6 @@
 import productService from "../services/product.service"
 
-export const getProduct = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const product = await productService.getAll(req.query);
     res.status(200).json({
@@ -33,10 +33,19 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const product = await productService.create(req.body);
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "Product image is required" });
+    }
+
+    const imageUrl = req.file.map((file) => file.path);
+
+    const product = await productService.create({
+      ...req.body,
+      image: imageUrl,
+    });
     res.status(201).json({ success: true, data: product });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 

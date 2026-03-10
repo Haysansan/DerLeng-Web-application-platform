@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   description: String,
-  image: String,
+  image: { type: [String], required: true, validate: [arrayLimit, 'Product must have at least one image']},
   product_category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ProductCategory',
@@ -13,5 +13,9 @@ const productSchema = new mongoose.Schema({
   },
   isAvailable: { type: Boolean, default: true }
 });
+
+function arrayLimit(val) {
+  return val.length > 0;
+}
 
 export default mongoose.model("Product", productSchema);
