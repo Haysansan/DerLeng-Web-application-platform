@@ -1,6 +1,7 @@
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import api from "../../services/api.js";
+import CreateUserModal from "../../components/admin/createUser.jsx";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -12,13 +13,18 @@ export default function Users() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
 
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await api.get("/users"); 
-        setUsers(response.data.data);
+        setUsers(
+          response.data.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.created_at),
+          ),
+        );
       } catch (err) {
         console.error(err);
         setError("Failed to fetch users");
@@ -32,7 +38,7 @@ export default function Users() {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.name?.toLowerCase().includes(search.toLowerCase()) ||
+      user.username?.toLowerCase().includes(search.toLowerCase()) ||
       user.email?.toLowerCase().includes(search.toLowerCase());
 
     const matchesRole = roleFilter === "All" || user.role === roleFilter;
@@ -70,7 +76,10 @@ export default function Users() {
           <p className="text-gray-500">Manage all registered users</p>
         </div>
 
-        <button className="flex items-center gap-2 bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-xl shadow">
+        <button
+          onClick={() => setShowCreateUser(true)}
+          className="flex items-center gap-2 bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-xl shadow"
+        >
           <Plus size={18} />
           Add User
         </button>
@@ -98,8 +107,8 @@ export default function Users() {
           onChange={(e) => setRoleFilter(e.target.value)}
         >
           <option value="All">All Roles</option>
-          <option value="Admin">Admin</option>
-          <option value="User">User</option>
+          <option value="admin">Admin</option>
+          <option value="normal_user">User</option>
         </select>
       </div>
 
@@ -216,6 +225,13 @@ export default function Users() {
           </div>
         )}
       </div>
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+        onUserCreated={(newUser) => {
+          setUsers((prev) => [newUser, ...prev]);
+        }}
+      />
     </div>
   );
 }

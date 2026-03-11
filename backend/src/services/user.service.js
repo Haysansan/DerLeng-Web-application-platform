@@ -70,7 +70,7 @@ const verifyEmailChange = async (userId, code) => {
 };
 
 const getAllUsers = async () => {
-  return await User.find().select("-password_hash");
+  return await User.find().select("-password_hash").sort({ created_at: -1 });
 };
 
 const getUserById = async (id) => {

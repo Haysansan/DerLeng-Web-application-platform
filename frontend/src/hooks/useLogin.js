@@ -34,7 +34,7 @@ export const useLogin = (onClose) => {
       toast.success("Login successful!", { duration: 2000 });
 
       onClose();
-      if (user.role === "Admin") {
+      if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/profile");
