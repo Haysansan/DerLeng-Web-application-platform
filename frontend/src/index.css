@@ -88,4 +88,13 @@ input:-webkit-autofill:active {
   button {
     background-color: 00852F;
   }
-} 
+}
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
