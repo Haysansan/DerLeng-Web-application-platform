@@ -11,9 +11,6 @@ const productCategorySchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  image: {
-    type: String 
-  }
 }, { timestamps: true }); 
 
 export default mongoose.model("ProductCategory", productCategorySchema);

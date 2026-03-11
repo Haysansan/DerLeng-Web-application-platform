@@ -1,17 +1,17 @@
 import ProductCategory from "../models/ProductCategory";
 
 const create = async ({ title }) => {
-  const product_category = await ProductCategory.findOne({ title });
-  if (product_category) {
+  const productCategory = await ProductCategory.findOne({ title });
+  if (productCategory) {
     throw new Error("Catagory already exist");
   }
   return ProductCategory.create({ product_category_name: title });
 };
 
 const remove = async (id) => {
-  const product_category = await ProductCategory.findByIdAndDelete(id);
+  const productCategory = await ProductCategory.findByIdAndDelete(id);
 
-  if (!product_category) {
+  if (!productCategory) {
     throw new Error("Category not found");
   }
 
@@ -23,15 +23,15 @@ const getAll = async () => {
 };
 
 const update = async (id, { title }) => {
-  const product_category = await ProductCategory.findById(id);
+  const productCategory = await ProductCategory.findById(id);
 
-  if (!product_category) {
+  if (!productCategory) {
     throw new Error("Category not found");
   }
 
-  product_category.product_category_name = title;
+  productCategory.product_category_name = title;
 
-  return await product_category.save();
+  return await productCategory.save();
 };
 
 export default { create, getAll, update, remove };
