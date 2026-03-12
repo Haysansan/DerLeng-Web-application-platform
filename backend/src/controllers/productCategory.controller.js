@@ -1,5 +1,4 @@
-import Category from "../models/Category";
-import productCategoryService from "../services/productCategory.service"
+import productCategoryService from "../services/productCategory.service.js"
 
 export const createProductCategory = async (req, res) => {
   try {

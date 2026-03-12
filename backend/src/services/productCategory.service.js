@@ -1,4 +1,4 @@
-import ProductCategory from "../models/ProductCategory";
+import ProductCategory from "../models/ProductCategory.js";
 
 const create = async ({ title }) => {
   const productCategory = await ProductCategory.findOne({ title });
