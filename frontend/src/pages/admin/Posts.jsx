@@ -220,6 +220,11 @@ export default function Posts() {
     }
   };
 
+  const handlePostCreated = (newPost) => {
+    setPosts((prev) => [newPost, ...prev]); 
+    setShowPostModal(false); 
+  };
+
   return (
     <div>
       {/* HEADER */}
@@ -320,8 +325,8 @@ export default function Posts() {
           >
             <img
               src={
-                post.image
-                  ? `http://localhost:5000/${post.image}`
+                post.images && post.images.length > 0
+                  ? post.images[0]
                   : "/placeholder.jpg"
               }
               alt={post.title}
@@ -446,7 +451,7 @@ export default function Posts() {
               ✕
             </button>
 
-            <PostForm />
+            <PostForm onPostCreated={handlePostCreated} />
           </div>
         </div>
       )}

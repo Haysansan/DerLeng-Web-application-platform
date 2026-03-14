@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -8,10 +8,20 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
+  LogOut,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); 
+    navigate("/"); 
+  };
 
   return (
     <div
@@ -69,10 +79,20 @@ export default function Sidebar() {
         />
       </nav>
 
-      {!collapsed && <div className="pt-6">Logout</div>}
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className={`flex items-center ${
+          collapsed ? "justify-center" : "gap-3"
+        } px-4 py-3 rounded-2xl hover:bg-green-800 transition`}
+      >
+        <LogOut size={20} />
+        {!collapsed && <span>Logout</span>}
+      </button>
     </div>
   );
 }
+
 
 function SidebarItem({ to, icon: Icon, text, collapsed }) {
   const isDashboard = to === ".";
@@ -97,4 +117,4 @@ function SidebarItem({ to, icon: Icon, text, collapsed }) {
       {!collapsed && <span>{text}</span>}
     </NavLink>
   );
-}
+} 

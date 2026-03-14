@@ -2,7 +2,7 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
 
-const storage = new CloudinaryStorage({
+const postStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "posts",
@@ -10,6 +10,13 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+const productStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "products",
+    allowed_formats: ["jpg", "png", "jpeg"],
+  }
+})
 
-export default upload;
+export const uploadPost = multer({ storage: postStorage, limits: { fileSize: 5 * 1024 * 1024 } });
+export const uploadProduct = multer({ storage: productStorage, limits: { fileSize: 5 * 1024 * 1024 } });
