@@ -7,6 +7,7 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  MapPin,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -37,6 +38,12 @@ export default function Sidebar() {
           to="."
           icon={LayoutDashboard}
           text="Dashboard"
+          collapsed={collapsed}
+        />
+        <SidebarItem
+          to="communities"
+          icon={MapPin}
+          text="Manage Community"
           collapsed={collapsed}
         />
 

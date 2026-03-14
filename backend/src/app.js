@@ -8,6 +8,8 @@ import categoryRoutes from "./routes/category.routes.js";
 import provinceRoutes from "./routes/province.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import likeRoutes from "./routes/like.routes.js";
+import communityPostRoutes from "./routes/communityPost.routes.js";
+import serviceRoutes from "./routes/service.routes.js";
 
 const app = express();
 
@@ -24,5 +26,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/provinces", provinceRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
+app.use("/api/community-posts", communityPostRoutes);
+app.use("/api/services", serviceRoutes);
 
 export default app;
