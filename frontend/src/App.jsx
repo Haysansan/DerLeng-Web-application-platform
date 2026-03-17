@@ -19,14 +19,13 @@ import AdminLayout from "./layout/admin/AdminLayout.jsx";
 import Users from "./pages/admin/Users.jsx";
 import Posts from "./pages/admin/Posts.jsx";
 import Products from "./pages/admin/Products.jsx";
+import Communities from "./pages/admin/Community.jsx";
 
 const App = () => {
   return (
     <Routes>
-
       {/* Main Layout */}
       <Route path="/" element={<Master />}>
-
         <Route index element={<Home />} />
 
         <Route path="shop" element={<Shop />} />
@@ -55,7 +54,6 @@ const App = () => {
 
         <Route path="stories" element={<div>Stories</div>} />
         <Route path="TravelStories" element={<TravelStories />} />
-
       </Route>
 
       {/* Admin Layout */}
@@ -71,8 +69,8 @@ const App = () => {
         <Route path="users" element={<Users />} />
         <Route path="posts" element={<Posts />} />
         <Route path="products" element={<Products />} />
+        <Route path="communities" element={<Communities />} />
       </Route>
-
     </Routes>
   );
 };

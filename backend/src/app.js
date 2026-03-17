@@ -8,13 +8,10 @@ import categoryRoutes from "./routes/category.routes.js";
 import provinceRoutes from "./routes/province.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import likeRoutes from "./routes/like.routes.js";
-<<<<<<< HEAD
 import communityPostRoutes from "./routes/communityPost.routes.js";
 import serviceRoutes from "./routes/service.routes.js";
-=======
 import productRoutes from "./routes/product.routes.js";
 import productCategoryRoutes from "./routes/productCategory.routes.js"
->>>>>>> main
 
 const app = express();
 
@@ -34,12 +31,9 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/provinces", provinceRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
-<<<<<<< HEAD
 app.use("/api/community-posts", communityPostRoutes);
 app.use("/api/services", serviceRoutes);
-=======
 app.use("/api/products", productRoutes);
 app.use("/api/productCategories", productCategoryRoutes);
->>>>>>> main
 
 export default app;

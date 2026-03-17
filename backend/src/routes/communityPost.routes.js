@@ -10,7 +10,7 @@ import {
 
 import protect from "../middlewares/auth.middleware.js";
 import adminAuthorize from "../middlewares/adminAuthorize.js";
-import upload from "../middlewares/upload.middleware.js";
+import { uploadCommunity } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ router.post(
   "/",
   protect,
   adminAuthorize,
-  upload.array("images", 5),
+  uploadCommunity.array("images", 10),
   createCommunityPost,
 );
 
@@ -34,7 +34,7 @@ router.put(
   "/:id",
   protect,
   adminAuthorize,
-  upload.array("images", 5),
+  uploadCommunity.array("images", 10),
   updateCommunityPost,
 );
 

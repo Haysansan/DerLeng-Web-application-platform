@@ -41,6 +41,10 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    transaction_image: {
+      type: String,
+      required: true,
+    },
 
     status: {
       type: String,
