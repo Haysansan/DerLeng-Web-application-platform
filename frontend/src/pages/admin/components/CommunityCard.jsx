@@ -17,7 +17,7 @@ export default function CommunityCard({ community, onEdit, onDelete }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+    <div className="bg-white rounded-2xl  shadow-md overflow-hidden">
       <img
         src={community.images?.[0] || "/placeholder.jpg"}
         className="h-48 w-full object-cover"

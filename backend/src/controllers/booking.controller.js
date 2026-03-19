@@ -13,11 +13,21 @@ export const createBooking = async (req, res) => {
         message: "Transaction image is required",
       });
     }
+    const services = Array.isArray(req.body.services)
+      ? req.body.services
+      : JSON.parse(req.body.services);
 
     const booking = await createBookingService({
       user_id: req.user._id,
       community_post_id: req.body.community_post_id,
-      services: req.body.services,
+      services,
+
+      name: req.body.name,
+      age: req.body.age,
+      gender: req.body.gender,
+      current_location: req.body.current_location,
+      trip_duration: req.body.trip_duration,
+
       number_of_people: req.body.number_of_people,
       booking_date: req.body.booking_date,
       note: req.body.note,
@@ -29,6 +39,8 @@ export const createBooking = async (req, res) => {
       data: booking,
     });
   } catch (error) {
+    console.error("Create booking error:", error);
+
     res.status(500).json({
       message: error.message,
     });

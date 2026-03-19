@@ -1,37 +1,32 @@
 import express from "express";
-
 import {
-  createBooking,
-  getAllBookings,
-  getBookingById,
-  updateBookingStatus,
-  deleteBooking,
-} from "../controllers/booking.controller.js";
+  createPost,
+  getAllPosts,
+  getPostById,
+  deletePost,
+  updatePost,
+  getPostsByUser,
+} from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
-import adminAuthorize from "../middlewares/adminAuthorize.js";
-import { uploadBooking } from "../middlewares/upload.middleware.js";
-
+import { uploadPost } from "../middlewares/upload.middleware.js";
 const router = express.Router();
 
-// user create booking
-router.post(
-  "/",
-  protect,
-  uploadBooking.single("transaction_image"),
-  createBooking,
-);
+// Create post (Protected + Image upload)
+router.post("/", protect, uploadPost.array("images", 5), createPost);
 
-// admin get all bookings
-router.get("/", protect, adminAuthorize, getAllBookings);
+// Get all posts
+router.get("/", getAllPosts);
 
-// get single booking
-router.get("/:id", protect, getBookingById);
+// Get all posts by a user
+router.get("/user/:userId", protect, getPostsByUser);
 
-// admin update booking status
-router.put("/:id/status", protect, adminAuthorize, updateBookingStatus);
+// Get single post
+router.get("/:id", getPostById);
 
-// admin delete booking
-router.delete("/:id", protect, adminAuthorize, deleteBooking);
+// Delete post
+router.delete("/:id", protect, deletePost);
+
+router.put("/:id", protect, updatePost);
 
 export default router;

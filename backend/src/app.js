@@ -12,6 +12,8 @@ import communityPostRoutes from "./routes/communityPost.routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import productCategoryRoutes from "./routes/productCategory.routes.js"
+import bookingRoutes from "./routes/booking.routes.js"
+import favoriteRoutes from "./routes/favorite.routes.js";
 
 const app = express();
 
@@ -35,5 +37,7 @@ app.use("/api/community-posts", communityPostRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/productCategories", productCategoryRoutes);
+app.use("/api/booking", bookingRoutes);
+app.use("/api/favorites", favoriteRoutes);
 
 export default app;

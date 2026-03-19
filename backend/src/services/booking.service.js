@@ -5,6 +5,11 @@ export const createBookingService = async ({
   user_id,
   community_post_id,
   services,
+  name,
+  age,
+  gender,
+  current_location,
+  trip_duration,
   number_of_people,
   booking_date,
   note,
@@ -36,6 +41,14 @@ export const createBookingService = async ({
     user_id,
     community_post_id,
     services,
+
+    // new fields
+    name,
+    age,
+    gender,
+    current_location,
+    trip_duration,
+
     number_of_people,
     booking_date,
     total_price: totalPrice,

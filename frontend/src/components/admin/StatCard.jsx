@@ -30,6 +30,11 @@ export default function StatCard({
       iconBg: "bg-orange-200",
       iconColor: "text-orange-700",
     },
+    rose: {
+      bg: "bg-rose-50",
+      iconBg: "bg-rose-200",
+      iconColor: "text-rose-700",
+    },
   };
 
   const style = accentStyles[accent];

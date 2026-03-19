@@ -58,6 +58,13 @@ export default function Sidebar() {
         />
 
         <SidebarItem
+          to="bookings"
+          icon={MapPin}
+          text="Manage Booking"
+          collapsed={collapsed}
+        />
+
+        <SidebarItem
           to="products"
           icon={Package}
           text="Manage Product"

@@ -1,16 +1,34 @@
-//C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\pages\DiscoverPage.jsx
 import { useDiscover } from "../hooks/useDiscover";
 import { categoryImages, provinceImages } from "../data/imageMap";
 import { normalize } from "../utils/normalize";
 import discoverBanner from "../assets/discover.png";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import communityService from "../services/community.service";
+import CommunityCard from "../components/CommunityCard";
 
 export default function DiscoverPage() {
   const { categories, provinces, loading } = useDiscover();
   const navigate = useNavigate();
+
+  const [communities, setCommunities] = useState([]);
+
+  useEffect(() => {
+    const fetchCommunityPosts = async () => {
+      try {
+        const data = await communityService.getAllCommunityPosts();
+        setCommunities(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCommunityPosts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* HERO */}
       <section className="relative w-full h-[250px]">
         <img
@@ -26,35 +44,49 @@ export default function DiscoverPage() {
       </section>
 
       {/* CATEGORY SECTION */}
+      {/* SEARCH BAR */}
       <section className="px-6 py-6 bg-white">
-        <h2 className="text-xl font-bold mb-4">Type of Place</h2>
+        <div className="max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Search Community Tourism..."
+            className="w-full border border-gray-300 rounded-full px-5 py-2
+      focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+          />
+        </div>
+      </section>
+
+      {/* PROVINCE (ROUND IMAGE ONLY) */}
+      <section className="px-6 py-6 bg-white">
+        <h2 className="text-xl font-semibold mb-4">Explore by Province</h2>
 
         {loading ? (
           <p>Loading...</p>
         ) : (
           <div className="flex space-x-4 overflow-x-auto">
-            {categories.map((cat) => {
-              const key = normalize(cat.category_name);
+            {provinces.map((prov) => {
+              const key = normalize(prov.province_name);
 
               return (
                 <div
-                  key={cat._id}
-                  onClick={() => navigate(`/posts/category/${cat._id}`)}
-                  className="flex flex-col items-center min-w-[90px]"
+                  key={prov._id}
+                  onClick={() => navigate(`/community/province/${prov._id}`)}
+                  className="flex flex-col items-center min-w-[90px] cursor-pointer"
                 >
-                  <div className="w-20 h-20 rounded-full overflow-hidden shadow">
+                  {/* ROUND IMAGE */}
+                  <div className="w-20 h-20 rounded-full overflow-hidden shadow hover:scale-105 transition">
                     <img
                       src={
-                        categoryImages[key] ||
-                        "https://via.placeholder.com/150"
+                        provinceImages[key] || "https://via.placeholder.com/150"
                       }
-                      alt={cat.category_name}
+                      alt={prov.province_name}
                       className="w-full h-full object-cover"
                     />
                   </div>
 
-                  <span className="mt-2 text-sm text-center">
-                    {cat.category_name}
+                  {/* NAME */}
+                  <span className="mt-2 text-sm text-center text-gray-700">
+                    {prov.province_name}
                   </span>
                 </div>
               );
@@ -62,41 +94,21 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+      {/* COMMUNITY SECTION */}
+      <section className="px-6 py-8">
+        <h2 className="text-2xl font-bold mb-6">Community Tourism</h2>
 
-      {/* PROVINCE SECTION */}
-      <section className="px-6 py-6 bg-white">
-        <h2 className="text-xl font-bold mb-4">Provinces</h2>
-
-        {loading ? (
-          <p>Loading...</p>
+        {communities.length === 0 ? (
+          <p className="text-gray-400">No community posts yet.</p>
         ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {provinces.map((prov) => {
-              const key = normalize(prov.province_name);
-
-              return (
-                <div
-                  key={prov._id}
-                  onClick={() => navigate(`/posts/province/${prov._id}`)}
-                  className="rounded-lg shadow cursor-pointer"
-                >
-                  <div className="h-55 overflow-hidden rounded-t-lg">
-                    <img
-                      src={
-                        provinceImages[key] ||
-                        "https://via.placeholder.com/200"
-                      }
-                      alt={prov.province_name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="text-center py-5 font-semibold">
-                    {prov.province_name}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {communities.map((post) => (
+              <CommunityCard
+                key={post._id}
+                post={post}
+                onClick={() => navigate(`/community/${post._id}`)}
+              />
+            ))}
           </div>
         )}
       </section>

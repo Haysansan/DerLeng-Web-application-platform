@@ -43,6 +43,10 @@ export default function Communities() {
 
   return (
     <div>
+      <div>
+        <h1 className="text-3xl font-bold text-green-900">Manage Community</h1>
+        <p className="text-gray-500 mb-5">Manage all Community</p>
+      </div>
       <CommunitySearch
         search={search}
         setSearch={setSearch}

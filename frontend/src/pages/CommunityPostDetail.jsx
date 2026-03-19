@@ -15,7 +15,7 @@ export default function CommunityPostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState({});
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -29,7 +29,8 @@ export default function CommunityPostDetail() {
         setPost(postData);
 
         const servicesData = await serviceService.getByCommunity(id);
-        setServices(servicesData);
+        setServices(servicesData.data || servicesData.services || servicesData);
+        // setServices(servicesData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -41,13 +42,13 @@ export default function CommunityPostDetail() {
   }, [id]);
 
   const nextImage = () => {
-    if (post.images?.length > 0) {
+    if (post?.images?.length > 0) {
       setCurrentImageIndex((prev) => (prev + 1) % post.images.length);
     }
   };
 
   const prevImage = () => {
-    if (post.images?.length > 0) {
+    if (post?.images?.length > 0) {
       setCurrentImageIndex(
         (prev) => (prev - 1 + post.images.length) % post.images.length,
       );
@@ -61,7 +62,8 @@ export default function CommunityPostDetail() {
       </div>
     );
 
-  if (!post) return <div className="text-center mt-20">Post not found</div>;
+  if (!post || Object.keys(post).length === 0)
+    return <div className="text-center mt-20">Post not found</div>;
 
   return (
     <>
@@ -101,14 +103,14 @@ export default function CommunityPostDetail() {
                 <div
                   className="absolute inset-0 bg-cover bg-center blur-xl scale-110"
                   style={{
-                    backgroundImage: `url(${post.images[currentImageIndex]})`,
+                    backgroundImage: `url(${post?.images[currentImageIndex]})`,
                   }}
                 />
 
                 <div className="absolute inset-0 bg-black/30"></div>
 
                 <img
-                  src={post.images[currentImageIndex]}
+                  src={post?.images[currentImageIndex]}
                   alt="community"
                   className="relative w-full h-full object-contain"
                 />
@@ -190,42 +192,46 @@ export default function CommunityPostDetail() {
         </div>
 
         {/* SERVICES */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-[#002B11]">
+        <div className="p-4 border border-green-500 rounded-xl bg-white shadow-md space-y-4">
+          <h2 className="text-xl font-bold text-gray-800">
             Community Services
           </h2>
 
-          {services.length === 0 ? (
+          {!Array.isArray(services) || services.length === 0 ? (
             <p className="text-gray-400 italic">No services available</p>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {services.map((service) => (
-                <div
-                  key={service._id}
-                  className="border rounded-xl p-4 shadow-sm hover:shadow-md transition"
-                >
-                  <h3 className="font-bold text-lg text-gray-800">
-                    {service.name}
-                  </h3>
-
-                  <p className="text-gray-500 text-sm mb-2">
-                    {service.description}
-                  </p>
-
-                  <div className="flex items-center gap-1 font-bold text-green-600">
-                    <DollarSign size={16} />
-                    {service.price}
-                  </div>
-
-                  <button
-                    onClick={() => navigate(`/booking/${service._id}`)}
-                    className="mt-3 w-full bg-[#002B11] text-white py-2 rounded-lg hover:bg-green-700 transition"
+            <>
+              {/* Service List */}
+              <div className="space-y-3">
+                {services.map((service) => (
+                  <div
+                    key={service._id}
+                    className="border-b border-gray-300 last:border-none pb-3"
                   >
-                    Book Now
-                  </button>
-                </div>
-              ))}
-            </div>
+                    <h3 className="font-semibold text-gray-800">
+                      {service.name}
+                    </h3>
+
+                    <p className="text-sm text-gray-500">
+                      {service.description}
+                    </p>
+
+                    <div className="flex items-center gap-1 text-green-600 font-bold text-sm">
+                      <DollarSign size={14} />
+                      {service.price}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Single Booking Button */}
+              <button
+                onClick={() => navigate(`/booking/${post._id}`)}
+                className="w-full mt-3 bg-[#002B11] text-white py-2 rounded-lg hover:bg-green-700 transition"
+              >
+                Book Now
+              </button>
+            </>
           )}
         </div>
       </div>

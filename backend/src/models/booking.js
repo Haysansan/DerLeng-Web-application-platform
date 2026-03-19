@@ -21,6 +21,37 @@ const bookingSchema = new mongoose.Schema(
       },
     ],
 
+    // Customer information
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    age: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+      required: true,
+    },
+
+    current_location: {
+      type: String,
+      required: true,
+    },
+
+    // Trip information
+    trip_duration: {
+      type: Number, // number of days
+      required: true,
+      min: 1,
+    },
+
     number_of_people: {
       type: Number,
       required: true,
@@ -41,6 +72,7 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+
     transaction_image: {
       type: String,
       required: true,

@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import Master from "./layout/Master";
 import Home from "./pages/Home";
@@ -20,8 +21,14 @@ import Users from "./pages/admin/Users.jsx";
 import Posts from "./pages/admin/Posts.jsx";
 import Products from "./pages/admin/Products.jsx";
 import Communities from "./pages/admin/Community.jsx";
+import CommunityPostDetail from "./pages/CommunityPostDetail.jsx";
+import BookingPage from "./pages/BookingPage";
+import CommunityByProvince from "./pages/CommunityByProvince.jsx";
+import CommunityBooking from "./pages/admin/CommunityBooking";
 
 const App = () => {
+  const location = useLocation();
+  const state = location.state;
   return (
     <Routes>
       {/* Main Layout */}
@@ -51,10 +58,21 @@ const App = () => {
         <Route path="posts/:id" element={<PostDetail />} />
         <Route path="posts/category/:categoryId" element={<PostListPage />} />
         <Route path="posts/province/:provinceId" element={<PostListPage />} />
+        <Route path="community/:id" element={<CommunityPostDetail />} />
+        <Route path="booking/:id" element={<BookingPage />} />
+        <Route
+          path="community/province/:provinceId"
+          element={<CommunityByProvince />}
+        />
 
         <Route path="stories" element={<div>Stories</div>} />
         <Route path="TravelStories" element={<TravelStories />} />
       </Route>
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/booking/:id" element={<BookingPage />} />
+        </Routes>
+      )}
 
       {/* Admin Layout */}
       <Route
@@ -70,6 +88,7 @@ const App = () => {
         <Route path="posts" element={<Posts />} />
         <Route path="products" element={<Products />} />
         <Route path="communities" element={<Communities />} />
+        <Route path="bookings" element={<CommunityBooking />} />
       </Route>
     </Routes>
   );

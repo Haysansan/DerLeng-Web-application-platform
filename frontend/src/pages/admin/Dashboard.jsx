@@ -2,25 +2,31 @@ import Sidebar from "../../components/admin/Sidebar.jsx";
 import StatCard from "../../components/admin/StatCard.jsx";
 import api from "../../services/api.js";
 import { useState, useEffect } from "react";
-import { Users, FileText, ShoppingBag } from "lucide-react";
+import { Users, FileText, ShoppingBag, MapPin } from "lucide-react";
 
 
 export default function Dashboard() {
   const [usersCount, setUsersCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
+   const [ProductCount, setProductCount] = useState(0);
+   const [CommunityCount, setCommunityCount] = useState(0);
     const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [usersRes, postsRes] = await Promise.all([
-          api.get("/users"), 
-          api.get("/posts"), 
+        const [usersRes, postsRes, proRes, commRes] = await Promise.all([
+          api.get("/users"),
+          api.get("/posts"),
+          api.get("/products"),
+          api.get("/community-posts"),
         ]);
 
         setUsersCount(usersRes.data.data.length);
         setPostsCount(postsRes.data.data.length);
+        setProductCount(proRes.data.data.length);
+        setCommunityCount(commRes.data.data.length);
       } catch (err) {
         console.error(err);
         setError("Failed to load dashboard data");
@@ -51,7 +57,7 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold text-green-900">Admin Dashboard</h1>
         <p className="text-gray-600 mb-8">Welcome back, Admin!</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Users"
             value={usersCount}
@@ -69,9 +75,15 @@ export default function Dashboard() {
 
           <StatCard
             title="Total Products"
-            value={30}
+            value={ProductCount}
             icon={ShoppingBag}
             accent="purple"
+          />
+          <StatCard
+            title="Total Community Post"
+            value={CommunityCount}
+            icon={MapPin}
+            accent="rose"
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
