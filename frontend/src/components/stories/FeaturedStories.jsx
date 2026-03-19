@@ -1,165 +1,153 @@
-//C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\components\stories\FeaturedStories.jsx
-// src/components/stories/FeaturedStories.jsx
-//
-// frontend/src/components/stories/FeaturedStories.jsx
-// import { useState, useEffect } from "react";
-// import { Heart } from "lucide-react";
-// import { toggleLike, getLikesCount } from "../../services/post.service.js";
+//frontend\src\components\stories\FeaturedStories.jsx
+import { ChevronRight, Heart, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import postService from "../../services/post.service";
 
-// export default function FeaturedStoryCard({ story, userToken }) {
-//   const [liked, setLiked] = useState(false);
-//   const [likesCount, setLikesCount] = useState(story.likes || 0);
+const FeaturedStories = ({ posts = [], onFavorite }) => {
+  const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const fetchLikes = async () => {
-//       try {
-//         const count = await getLikesCount(story._id);
-//         setLikesCount(count);
-//       } catch (err) {
-//         console.error(err);
-//       }
-//     };
-//     fetchLikes();
-//   }, [story._id]);
+  const [hovered, setHovered] = useState(null);
+  const [indexMap, setIndexMap] = useState({});
+  const [localPosts, setLocalPosts] = useState([]);
 
-//   const handleLike = async () => {
-//     if (!userToken) return alert("Please login to like this post");
+  const token = localStorage.getItem("token");
 
-//     try {
-//       const res = await toggleLike(story._id, userToken);
-//       setLiked(res.liked);
-//       setLikesCount((prev) => (res.liked ? prev + 1 : prev - 1));
-//     } catch (err) {
-//       console.error(err);
-//     }
-//   };
+  // sync posts
+  useEffect(() => {
+    setLocalPosts(posts);
+  }, [posts]);
 
-//   return (
-//     <div className="relative group overflow-hidden rounded-xl">
-//       <img
-//         src={story.images?.[0] || story.image}
-//         alt={story.title}
-//         className="w-full h-[450px] object-cover opacity-80 group-hover:scale-105 transition duration-500"
-//       />
+  // Top 3 liked posts
+  const featured = useMemo(() => {
+    return [...localPosts]
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+      .slice(0, 3);
+  }, [localPosts]);
 
-//       {/* Like button on top-right */}
-//       <div className="absolute top-4 right-4 flex items-center space-x-1 z-10">
-//         <Heart
-//           size={24}
-//           className={`cursor-pointer transition-colors duration-300 ${
-//             liked ? "text-red-500" : "text-gray-400"
-//           }`}
-//           onClick={handleLike}
-//         />
-//         <span className="text-white font-medium">{likesCount}</span>
-//       </div>
+  // Image slider on hover
+  useEffect(() => {
+    if (!hovered) return;
 
-//       {/* Story info */}
-//       <div className="absolute bottom-8 left-8 right-8 text-white z-10">
-//         <h2 className="text-2xl font-bold">{story.title}</h2>
-//         <p className="text-sm">By {story.user_id?.username || story.author}</p>
-//       </div>
-//     </div>
-//   );
-// }
+    const post = featured.find((p) => p._id === hovered);
+    const images = post?.images || [];
 
-// const FeaturedStories = ({ posts }) => {
-//   const featured = posts.slice(0, 3);
+    if (images.length <= 1) return;
 
-//   return (
-//     <section className="grid grid-cols-1 md:grid-cols-3 gap mb-8">
-//       {featured.map((post) => (
-//         <div key={post._id} className="relative overflow-hidden rounded-md">
-//           <img
-//             src={post.images[0] || "https://via.placeholder.com/400x250"}
-//             alt={post.title}
-//             className="w-full h-64 object-cover"
-//           />
-//           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 text-white">
-//             <h2 className="text-xl font-bold">{post.title}</h2>
-//             <p className="text-sm">By {post.user_id?.username || "Unknown"}</p>
-//           </div>
-//         </div>
-//       ))}
-//     </section>
-//   );
-// };
+    const interval = setInterval(() => {
+      setIndexMap((prev) => ({
+        ...prev,
+        [hovered]: ((prev[hovered] || 0) + 1) % images.length,
+      }));
+    }, 2000);
 
-// export default FeaturedStories;
-// import { ChevronRight } from "lucide-react";
+    return () => clearInterval(interval);
+  }, [hovered, featured]);
 
-// const FeaturedStories = ({ posts }) => {
-//   const featured = posts.slice(0, 3);
+  // LIKE FUNCTION (same logic as PostDetail)
+  const handleLike = async (postId) => {
+    if (!token) return alert("Please log in to like posts");
 
-//   return (
-//     <section className="grid grid-cols-1 md:grid-cols-3 h-[450px] w-full">
-//       {featured.map((post) => (
-//         <div
-//           key={post._id}
-//           className="relative group cursor-pointer overflow-hidden rounded-md"
-//         >
-//           {/* Image */}
-//           <img
-//             src={post.images[0] || "https://via.placeholder.com/800x450"}
-//             alt={post.title}
-//             className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-500"
-//           />
+    try {
+      const res = await postService.toggleLike(postId);
 
-//           {/* Gradient Overlay */}
-//           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-//           {/* Text Content */}
-//           <div className="absolute bottom-8 left-8 right-8 text-white">
-//             <h2 className="text-2xl font-bold leading-tight mb-2">{post.title}</h2>
-//             <div className="flex items-center text-sm opacity-90">
-//               <span>By {post.user_id?.username || "Unknown"}</span>
-//               <ChevronRight size={16} className="ml-1" />
-//             </div>
-//           </div>
-//         </div>
-//       ))}
-//     </section>
-//   );
-// };
-
-// export default FeaturedStories;
-import { ChevronRight } from "lucide-react";
-
-const FeaturedStories = ({ posts }) => {
-  // Take the first 3 posts to fit the 3-column grid
-  const featured = [...posts]
-  .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-  .slice(0, 3);
+      setLocalPosts((prev) =>
+        prev.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                liked: res.liked,
+                likes: res.liked
+                  ? (post.likes || 0) + 1
+                  : (post.likes || 0) - 1,
+              }
+            : post
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 h-[450px] w-full bg-black">
-      {featured.map((post) => (
-        <div
-          key={post._id}
-          className="relative group cursor-pointer overflow-hidden"
-        >
-          {/* Image - Scaled on hover */}
-          <img
-            src={post.images?.[0] || "https://via.placeholder.com/800x450"}
-            alt={post.title}
-            className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-500"
-          />
+      {featured.map((post) => {
+        const images = post.images || [];
+        const index = indexMap[post._id] || 0;
 
-          {/* Gradient Overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        return (
+          <div
+            key={post._id}
+            className="relative group cursor-pointer overflow-hidden"
+            onMouseEnter={() => setHovered(post._id)}
+            onMouseLeave={() => {
+              setHovered(null);
+              setIndexMap((prev) => ({ ...prev, [post._id]: 0 }));
+            }}
+            onClick={() => navigate(`/posts/${post._id}`)}
+          >
+            {/* Image */}
+            <img
+              src={images[index] || "https://via.placeholder.com/800x450"}
+              alt={post.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+            />
 
-          {/* Text Content */}
-          <div className="absolute bottom-8 left-8 right-8 text-white">
-            <h2 className="text-2xl font-bold leading-tight mb-2">
-              {post.title}
-            </h2>
-            <div className="flex items-center text-sm opacity-90">
-              <span>By {post.user_id?.username || "Unknown Author"}</span>
-              <ChevronRight size={16} className="ml-1" />
+            {/* LIKE BUTTON */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike(post._id);
+              }}
+              className="absolute top-4 left-4 z-40 flex items-center gap-2 px-3 py-2 bg-black/40 rounded-full backdrop-blur-md hover:bg-black/60 transition"
+            >
+              <Heart
+                size={18}
+                fill={post.liked ? "#ef4444" : "none"}
+                className={post.liked ? "text-red-500" : "text-white"}
+              />
+              <span className="text-sm text-white font-semibold">
+                {post.likes || 0}
+              </span>
+            </button>
+
+            {/* FAVORITE BUTTON */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onFavorite?.(post._id);
+              }}
+              className="absolute top-4 right-4 z-40 p-2 bg-black/40 rounded-full backdrop-blur-md hover:bg-black/60 transition"
+            >
+              <Star
+                size={18}
+                fill={post.isFavorite ? "#FFD700" : "none"}
+                stroke={post.isFavorite ? "#FFD700" : "white"}
+              />
+            </button>
+
+            {/* Image count */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 right-4 bg-black/40 text-white text-xs px-2 py-1 rounded-xl backdrop-blur">
+                {index + 1}/{images.length}
+              </div>
+            )}
+
+            {/* Text */}
+            <div className="absolute bottom-8 left-8 right-8 text-white z-30">
+              <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
+
+              <div className="flex items-center text-sm opacity-90">
+                <span>By {post.user_id?.username || "Unknown Author"}</span>
+                <ChevronRight size={16} className="ml-1" />
+              </div>
             </div>
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 };

@@ -6,7 +6,7 @@ import registerImg from "../assets/register.svg";
 import { useRegister } from "../hooks/useRegister";
 import OTPInput from "./OTPInput";
 
-export default function RegisterUI({ isOpen, onClose, switchToLogin }) {
+export default function Register({ isOpen, onClose, switchToLogin }) {
   const { form, errors, step, loading, handleChange, handleSendCode,resendCooldown, handleRegister } = useRegister(switchToLogin);
 
   const [showPassword, setShowPassword] = useState(false);

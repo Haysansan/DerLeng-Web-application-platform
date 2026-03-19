@@ -5,18 +5,19 @@ import EditProfileModal from "../components/EditProfile.jsx";
 import ChangePasswordModal from "../components/ChangePassword.jsx";
 import { AuthContext } from "../context/AuthContext";
 import postService from "../services/post.service.js";
+import { formatDate } from "../utils/formatDate.js";
+import StoryCard from "../components/stories/StoryCard";
 
 export default function Profile() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const defaultUser = {
-    name: "N/A",
     username: "N/A",
     email: "N/A",
     bio: "No bio yet",
     location: "N/A",
-    joined: "N/A",
+    created_at: "N/A",
     website: "N/A",
   };
   const currentUser = { ...defaultUser, ...user };
@@ -28,22 +29,35 @@ export default function Profile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-  // Fetch posts by user
-  const fetchUserPosts = async () => {
-    console.log("Current user:", user);
-    if (!user?.id || !user?.token) return;
-    setLoadingPosts(true);
-    try {
-      const posts = await postService.getPostsByUser(user.id, user.token);
-      console.log("Fetched posts:", posts);
-      setUserPosts(posts);
-    } catch (err) {
-      console.error(err.response?.data || err.message);
-    } finally {
-      setLoadingPosts(false);
-    }
-  };
+    const fetchUserPosts = async () => {
+  if (!user?.id || !user?.token) return;
 
+  setLoadingPosts(true);
+  try {
+    const posts = await postService.getPostsByUser(user.id, user.token);
+
+    const postsWithLikes = await Promise.all(
+      posts.map(async (post) => {
+        const id = post._id || post.id;
+        const likes = await postService.getLikesCount(id);
+
+        return {
+          ...post,
+          _id: id,
+          images: post.images || [],
+          likes: likes || 0,
+          liked: false, // same behavior as TravelStories
+        };
+      })
+    );
+
+    setUserPosts(postsWithLikes); // ✅ THIS LINE CHANGED
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  } finally {
+    setLoadingPosts(false);
+  }
+};
   useEffect(() => {
     if (user?.id) fetchUserPosts();
   }, [user]);
@@ -54,7 +68,34 @@ export default function Profile() {
     logout();
     navigate("/login");
   };
+  const navigateToDetail = (postId) => {
+  navigate(`/posts/${postId}`); // make sure your route matches
+  };
+  const handleLike = async (postId) => {
+  const result = await postService.toggleLike(postId);
+  setUserPosts(prev =>
+    prev.map(p =>
+      (p._id || p.id) === postId
+        ? {
+            ...p,
+            liked: result.liked,
+            likes: result.liked ? (p.likes || 0) + 1 : (p.likes || 0) - 1
+          }
+        : p
+    )
+  );
+};
 
+const handleFavorite = (postId) => {
+  setUserPosts(prev =>
+    prev.map(p =>
+      (p._id || p.id) === postId
+        ? { ...p, isFavorite: !p.isFavorite }
+        : p
+    )
+  );
+  };
+  
   if (!user) return <p className="text-center mt-20 text-gray-500">Please login first!</p>;
 
   return (
@@ -92,9 +133,8 @@ export default function Profile() {
       </div>
 
       {/* USER INFO */}
-      <div className="max-w-6xl mx-auto px-6 mt-14">
-        <h1 className="text-2xl font-bold">{currentUser.name}</h1>
-        <p className="text-gray-500">{currentUser.username}</p>
+      <div className="max-w-6xl mx-auto px-6 mt-10 sm:mt-12 md:mt-16 lg:mt-1">
+        <h1 className="text-2xl font-bold">{currentUser.username}</h1>
 
         <div className="flex justify-start mt-2">
           <p className="text-gray-600 text-sm">
@@ -175,7 +215,7 @@ export default function Profile() {
             <p className="text-sm text-gray-600 mb-4">{currentUser.bio}</p>
             <ul className="text-sm text-gray-500 space-y-2">
               <li>📍 {currentUser.location}</li>
-              <li>🗓 {currentUser.joined}</li>
+              <li>🗓 {formatDate(currentUser.created_at)}</li>
               <li>🔗 {currentUser.website}</li>
             </ul>
 
@@ -210,32 +250,43 @@ export default function Profile() {
                 ) : userPosts.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">No posts yet! Start creating your first travel story.</p>
                 ) : (
-                  <div className="space-y-6">
+                  // <div className="space-y-6">
+                  //   {userPosts.map((post) => (
+                  //     <div key={post.id} className="border rounded-lg p-4 shadow-sm bg-green">
+                  //       <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+                  //       <p className="mb-2 whitespace-pre-line">{post.content}</p>
+                  //       {post.location_description && (
+                  //         <p className="text-gray-600 mb-2">📍 {post.location_description}</p>
+                  //       )}
+                  //       {post.trip_date && (
+                  //         <p className="text-gray-500 text-sm">
+                  //           🗓 {new Date(post.trip_date).toLocaleDateString()} | ⏱ {post.trip_duration} days | 💰 ${post.trip_cost}
+                  //         </p>
+                  //       )}
+                  //       {post.images && post.images.length > 0 && (
+                  //         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  //           {post.images.map((img, i) => (
+                  //             <img
+                  //               key={i}
+                  //               src={img}
+                  //               alt={`post-${post.title}-${i}`}
+                  //               className="w-full h-40 object-cover rounded-md"
+                  //             />
+                  //           ))}
+                  //         </div>
+                  //       )}
+                  //     </div>
+                  //   ))}
+                      // </div>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {userPosts.map((post) => (
-                      <div key={post.id} className="border rounded-lg p-4 shadow-sm bg-green">
-                        <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
-                        <p className="mb-2 whitespace-pre-line">{post.content}</p>
-                        {post.location_description && (
-                          <p className="text-gray-600 mb-2">📍 {post.location_description}</p>
-                        )}
-                        {post.trip_date && (
-                          <p className="text-gray-500 text-sm">
-                            🗓 {new Date(post.trip_date).toLocaleDateString()} | ⏱ {post.trip_duration} days | 💰 ${post.trip_cost}
-                          </p>
-                        )}
-                        {post.images && post.images.length > 0 && (
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                            {post.images.map((img, i) => (
-                              <img
-                                key={i}
-                                src={img}
-                                alt={`post-${post.title}-${i}`}
-                                className="w-full h-40 object-cover rounded-md"
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <StoryCard
+                        key={post._id || post.id}
+                        post={post}
+                        onClick={() => navigateToDetail(post._id || post.id)}
+                        onLike={handleLike}
+                        onFavorite={handleFavorite}
+                      />
                     ))}
                   </div>
                 )}
