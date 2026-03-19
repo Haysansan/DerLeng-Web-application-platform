@@ -1,34 +1,4 @@
-// //C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\hooks\useTravelStories.js
-// import { useEffect, useState } from "react";
-// import { getAllPosts } from "../services/post.service.js";
-
-// export const useTravelStories = () => {
-//   const [stories, setStories] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   const fetchStories = async () => {
-//     try {
-//       setLoading(true);
-//       const stories = await getAllPosts();
-
-//       // Sort newest first
-//       const sorted = stories.sort(
-//         (a, b) => new Date(b.created_at) - new Date(a.created_at)
-//       );
-//       setStories(sorted);
-//     } catch (error) {
-//       console.error("Error fetching stories:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchStories();
-//   }, []);
-
-//   return { stories, loading };
-// };
+// frontend\src\hooks\useTravelStories.js
 import { useState, useEffect } from "react";
 import postService from "../services/post.service";
 
