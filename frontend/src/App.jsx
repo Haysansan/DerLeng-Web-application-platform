@@ -1,9 +1,8 @@
+//frontend\src\App.jsx
 import { Route, Routes } from "react-router-dom";
-
 import Master from "./layout/Master";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import Post from "./pages/Post";
 import DiscoverPage from "./pages/DiscoverPage";
 import Profile from "./pages/Profile";
 import TravelStories from "./pages/TravalStories.jsx";
@@ -12,13 +11,14 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
-import PostDetail from "./pages/PostDetail.jsx";
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";
 import Users from "./pages/admin/Users.jsx";
 import Posts from "./pages/admin/Posts.jsx";
 import Products from "./pages/admin/Products.jsx";
+import PostPageWrapper from "./components/PostPageWrapper.jsx";
+import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 
 const App = () => {
   return (
@@ -37,8 +37,7 @@ const App = () => {
 
         <Route path="discover" element={<DiscoverPage />} />
 
-        <Route path="post" element={<Post />} />
-
+        <Route path="post" element={<PostPageWrapper />} />
         <Route
           path="profile"
           element={
@@ -49,7 +48,7 @@ const App = () => {
         />
 
         {/* Posts */}
-        <Route path="posts/:id" element={<PostDetail />} />
+        <Route path="posts/:id" element={<DetailPageWrapper />} />
         <Route path="posts/category/:categoryId" element={<PostListPage />} />
         <Route path="posts/province/:provinceId" element={<PostListPage />} />
 

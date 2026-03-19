@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import postService from "../services/post.service";
 import commentService from "../services/comment.service";
-import { Heart, ChevronLeft, ChevronRight, MapPin, Send, Trash2, Calendar, Clock, DollarSign } from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight, MapPin, Send, Trash2, ArrowLeft } from "lucide-react";
+import PostLoginPromptModal from "../components/PostLoginPromptModal";
 
 export default function PostDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
@@ -13,6 +15,7 @@ export default function PostDetail() {
   const [newComment, setNewComment] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false); 
 
   const token = localStorage.getItem("token");
   const currentUser = token ? JSON.parse(atob(token.split('.')[1])) : null;
@@ -51,7 +54,10 @@ export default function PostDetail() {
   };
 
   const handleLike = async () => {
-    if (!token) return alert("Please log in to like posts");
+      if (!token) {
+      setShowLoginModal(true);
+      return;
+    }
     try {
       const res = await postService.toggleLike(id);
       setLiked(res.liked);
@@ -62,7 +68,10 @@ export default function PostDetail() {
   };
 
   const handleAddComment = async () => {
-    if (!token) return alert("Please log in to comment");
+    if (!token) {
+    setShowLoginModal(true);
+    return;
+    }
     if (!newComment.trim()) return;
     try {
       const comment = await commentService.addComment(id, newComment, token);
@@ -86,8 +95,24 @@ export default function PostDetail() {
   if (!post) return <div className="text-center mt-20">Post not found</div>;
 
   return (
+    <>
+      <PostLoginPromptModal
+  isOpen={showLoginModal}
+  onClose={() => setShowLoginModal(false)}
+  onLogin={() => {
+    setShowLoginModal(false);
+    navigate("/login"); // redirect to login page
+  }}
+/>
+      <button
+        onClick={() => navigate(-1)}
+        className="fixed top-20 right-4 md:left-6 md:right-auto z-50 bg-white shadow-md p-3 rounded-full hover:bg-gray-100 transition"
+      >
+        <ArrowLeft size={22} />
+      </button>
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
       {/* --- HEADER --- */}
+      
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div className="flex-1 space-y-2">
           <h1 className="text-3xl font-bold text-[#002B11]">{post.title}</h1>
@@ -97,31 +122,48 @@ export default function PostDetail() {
             <span>By <span className="font-semibold text-gray-800">{post.user_id?.username || "Traveler"}</span></span>
           </div>
         </div>
-        <button 
-          onClick={handleLike} 
-          className="flex items-center gap-2 bg-gray-50  px-4 py-2 rounded-full border transition duration-300 self-start"
+        <button
+          onClick={handleLike}
+          className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full  transition duration-300 self-start"
         >
           <Heart size={24} className={liked ? "fill-red-500 text-red-500" : "text-gray-400"} />
           <span className={`font-bold ${liked ? "text-red-500" : "text-gray-600"}`}>{likes}</span>
         </button>
       </div>
 
-      {/* --- IMAGE CAROUSEL --- */}
+      {/* --- IMAGE CAROUSEL WITH BLUR EFFECT --- */}
       <div className="relative flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1 h-[500px] bg-black rounded-2xl overflow-hidden shadow-lg">
+        <div className="relative flex-1 h-[600px] rounded-2xl overflow-hidden shadow-lg bg-black">
           {post.images && post.images.length > 0 ? (
             <>
+              {/* Blurred Background */}
+              <div
+                className="absolute inset-0 bg-center bg-cover filter blur-xl scale-110"
+                style={{ backgroundImage: `url(${post.images[currentImageIndex]})` }}
+              />
+              {/* Optional: dark overlay */}
+              <div className="absolute inset-0 bg-black/30"></div>
+
+              {/* Main Image */}
               <img
                 src={post.images[currentImageIndex]}
                 alt="Travel"
-                className="w-full h-full object-cover transition duration-700 ease-in-out rounded-2xl"
+                className="relative w-full h-full object-contain transition duration-700 rounded-2xl"
               />
+
+              {/* Navigation */}
               {post.images.length > 1 && (
                 <>
-                  <button onClick={handlePrevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-3 rounded-full">
+                  <button
+                    onClick={handlePrevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-3 rounded-full"
+                  >
                     <ChevronLeft size={28} />
                   </button>
-                  <button onClick={handleNextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-3 rounded-full">
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-3 rounded-full"
+                  >
                     <ChevronRight size={28} />
                   </button>
                 </>
@@ -132,7 +174,7 @@ export default function PostDetail() {
           )}
         </div>
 
-        {/* --- Thumbnails --- */}
+        {/* Thumbnails */}
         {post.images?.length > 1 && (
           <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-hidden md:w-20">
             {post.images.map((img, idx) => (
@@ -148,71 +190,67 @@ export default function PostDetail() {
         )}
       </div>
 
-      {/* --- OVERVIEW & TRIP DETAILS (Compact) --- */}
+      {/* --- OVERVIEW & TRIP DETAILS --- */}
       <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Overview */}
         <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-gray-800">Overview</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Trip Story</h2>
           <p className="text-gray-600 leading-relaxed whitespace-pre-line">{post.content}</p>
         </div>
 
         {/* Trip Details */}
-       <div className="p-4 bg-white border border-green-500 rounded-xl shadow-md space-y-3">
-  <h2 className="text-base font-bold text-gray-800">Trip Details</h2>
+        <div className="p-4 bg-white border border-green-500 rounded-xl shadow-md space-y-3">
+          <h2 className="text-xl font-bold text-gray-800">Trip Details</h2>
 
-  {/* Top row: Date, Duration, Cost */}
-  <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-    <div className="flex-1 min-w-[80px] flex flex-col gap-1">
-      <span className="uppercase font-semibold">Trip Date</span>
-      <span className="font-semibold text-gray-800">
-        {post.trip_date
-          ? new Date(post.trip_date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
-          : "N/A"}
-      </span>
-    </div>
+          <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+            <div className="flex-1 min-w-[80px] flex flex-col gap-1">
+              <span className="uppercase font-semibold ">Trip Date</span>
+              <span className="font-semibold text-gray-800">
+                {post.trip_date
+                  ? new Date(post.trip_date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                  : "N/A"}
+              </span>
+            </div>
+            <div className="flex-1 min-w-[80px] flex flex-col gap-1">
+              <span className="uppercase font-semibold">Duration</span>
+              <span className="font-semibold text-gray-800">{post.trip_duration ? `${post.trip_duration} Days` : "N/A"}</span>
+            </div>
+            <div className="flex-1 min-w-[80px] flex flex-col gap-1">
+              <span className="uppercase font-semibold">Cost</span>
+              <span className="font-semibold text-gray-800">{post.trip_cost ? `$${post.trip_cost}` : "N/A"}</span>
+            </div>
+          </div>
 
-    <div className="flex-1 min-w-[80px] flex flex-col gap-1">
-      <span className="uppercase font-semibold">Duration</span>
-      <span className="font-semibold text-gray-800">{post.trip_duration ? `${post.trip_duration} Days` : "N/A"}</span>
-    </div>
-
-    <div className="flex-1 min-w-[80px] flex flex-col gap-1">
-      <span className="uppercase font-semibold">Cost</span>
-      <span className="font-semibold text-gray-800">{post.trip_cost ? `$${post.trip_cost}` : "N/A"}</span>
-    </div>
-  </div>
-
-  {/* Location: always below */}
-  <div className="flex flex-col gap-1 text-xs text-gray-500">
-    <span className="uppercase font-semibold">Location</span>
-    {post.location_description ? (
-      <span className="text-gray-800">
-        {post.location_description}{" "}
-        {post.location_link && (
-          <a
-            href={post.location_link}
-            target="_blank"
-            rel="noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            (View Map)
-          </a>
-        )}
-      </span>
-    ) : post.location_link ? (
-      <a
-        href={post.location_link}
-        target="_blank"
-        rel="noreferrer"
-        className="text-blue-600 hover:underline font-semibold"
-      >
-        View Map
-      </a>
-    ) : (
-      <span className="font-semibold text-gray-800">N/A</span>
-    )}
-  </div>
-</div>
+          <div className="flex flex-col gap-1 text-xs text-gray-500">
+            <span className="uppercase font-semibold">Location</span>
+            {post.location_description ? (
+              <span className="text-gray-800">
+                {post.location_description}{" "}
+                {post.location_link && (
+                  <a
+                    href={post.location_link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block px-4 py-2 bg-green-400 text-white font-medium rounded-lg shadow-md hover:bg-green-700 hover:shadow-lg transition duration-300"
+                  >
+                    View Map
+                  </a>
+                )}
+              </span>
+            ) : post.location_link ? (
+              <a
+                href={post.location_link}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 hover:underline font-semibold"
+              >
+                View Map
+              </a>
+            ) : (
+              <span className="font-semibold text-gray-800">N/A</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* --- COMMENTS --- */}
@@ -223,13 +261,13 @@ export default function PostDetail() {
         </div>
 
         {/* Add Comment */}
-        <div className="relative group ">
+        <div className="relative group">
           <textarea
-  value={newComment}
-  onChange={(e) => setNewComment(e.target.value)}
-  placeholder="Share your thoughts..."
-  className="w-full border-2 border-gray-100 rounded-2xl p-4 pr-16 outline-none focus:border-[#008A3D] transition min-h-[10px] bg-gray-50 group-focus-within:bg-white resize-none"
-/>
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Share your thoughts..."
+            className="w-full border-2 border-gray-100 rounded-2xl p-4 pr-16 outline-none focus:border-[#008A3D] transition min-h-[10px] bg-gray-50 group-focus-within:bg-white resize-none"
+          />
           <button
             onClick={handleAddComment}
             className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl hover:bg-[#008A3D] transition shadow-lg disabled:opacity-50"
@@ -269,6 +307,7 @@ export default function PostDetail() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
