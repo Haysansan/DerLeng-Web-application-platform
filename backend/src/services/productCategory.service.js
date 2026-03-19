@@ -1,3 +1,4 @@
+import Product from "../models/Product.js";
 import ProductCategory from "../models/ProductCategory.js";
 
 const create = async ({ title }) => {
@@ -7,8 +8,19 @@ const create = async ({ title }) => {
   }
   return ProductCategory.create({ product_category_name: title });
 };
-
+///Remove category and deal with orphan product and move it to general category when the product has no category
 const remove = async (id) => {
+  let generalCategory = await ProductCategory.findOne({ product_category_name: "General" });
+
+  if (!generalCategory) {
+    generalCategory = await ProductCategory.create({ product_category_name: "General", title: "General" });
+  }
+
+  if (generalCategory._id.toString() === id) {
+    throw new Error("The General category cannot be deleted.");
+  }
+  await Product.updateMany({ product_category: id }, { product_category: generalCategory._id });
+
   const productCategory = await ProductCategory.findByIdAndDelete(id);
 
   if (!productCategory) {

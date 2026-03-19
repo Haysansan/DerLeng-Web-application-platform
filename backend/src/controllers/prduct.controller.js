@@ -37,11 +37,11 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ success: false, message: "Product image is required" });
     }
 
-    const imageUrl = req.file.map((file) => file.path);
+    const imageUrls = req.files.map((file) => file.path);
 
     const product = await productService.create({
       ...req.body,
-      image: imageUrl,
+      image: imageUrls,
     });
     res.status(201).json({ success: true, data: product });
   } catch (error) {
