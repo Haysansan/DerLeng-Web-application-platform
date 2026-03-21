@@ -59,7 +59,7 @@ export default function PostListPage() {
   };
 
   return (
-    <div className="p-6 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="p-6 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
       {posts.map(post => (
         <StoryCard
           key={post._id}
@@ -72,3 +72,43 @@ export default function PostListPage() {
     </div>
   );
 }
+// import { useParams } from "react-router-dom";
+// import usePosts from "../hooks/usePosts";
+// import usePostActions from "../hooks/usePostActions";
+// import StoryCard from "../components/stories/StoryCard";
+
+// export default function PostListPage() {
+
+//   const { categoryId, provinceId } = useParams();
+
+//   const { posts, setPosts } = usePosts();
+//   const { toggleLike, toggleFavorite } = usePostActions(setPosts);
+
+//   const filtered = posts.filter((p) => {
+
+//     if (categoryId) {
+//       return p.category_id?._id === categoryId;
+//     }
+
+//     if (provinceId) {
+//       return p.province_id?._id === provinceId;
+//     }
+
+//     return true;
+//   });
+
+//   return (
+//     <div className="p-8 grid grid-cols-5 gap-6">
+
+//       {filtered.map((post) => (
+//         <StoryCard
+//           key={post._id}
+//           post={post}
+//           onLike={toggleLike}
+//           onFavorite={toggleFavorite}
+//         />
+//       ))}
+
+//     </div>
+//   );
+// }

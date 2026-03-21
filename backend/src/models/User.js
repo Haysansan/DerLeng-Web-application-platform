@@ -24,6 +24,14 @@ const userSchema = new mongoose.Schema(
       enum: ["normal_user", "admin"],
       default: "normal_user",
     },
+    avatar: {
+      type: String, 
+      default: "", 
+    },
+    cover: {
+      type: String, 
+      default: "", 
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },

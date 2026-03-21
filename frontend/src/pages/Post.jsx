@@ -1,11 +1,16 @@
 // src/pages/Post.jsx
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { Calendar, Clock, DollarSign, PlusCircle } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  PenLine,
+} from "lucide-react";
 import api from "../services/api.js";
 import { getCategories, getProvinces } from "../services/place.service";
 import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast"; // Toast
+import toast, { Toaster } from "react-hot-toast";
 
 export default function PostForm() {
   const { user: currentUser } = useContext(AuthContext);
@@ -23,9 +28,14 @@ export default function PostForm() {
     locations: [],
   });
 
+  const [errors, setErrors] = useState({});
   const [provinces, setProvinces] = useState([]);
   const [types, setTypes] = useState([]);
+  const [newLocation, setNewLocation] = useState({ description: "", link: "" });
+  const [showLocationForm, setShowLocationForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch provinces and types on load
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -41,32 +51,98 @@ export default function PostForm() {
     fetchOptions();
   }, []);
 
+  const getFieldLabel = (field) => {
+    switch (field) {
+      case "title":
+        return "Title";
+      case "content":
+        return "Content";
+      case "province":
+        return "Province";
+      case "type":
+        return "Type of Place";
+      case "startDate":
+        return "Start Date";
+      case "duration":
+        return "Duration";
+      case "cost":
+        return "Cost";
+      case "gallery":
+        return "Gallery";
+      default:
+        return field;
+    }
+  };
+
+  // Handle input change with real-time validation
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPost((prev) => ({ ...prev, [name]: value }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: value ? "" : `${getFieldLabel(name)} is required`,
+    }));
   };
 
+  // Gallery upload
   const handleGalleryUpload = (e) => {
     const files = Array.from(e.target.files);
-    setPost((prev) => ({ ...prev, gallery: [...prev.gallery, ...files] }));
-  };
+    const remainingSlots = 5 - post.gallery.length;
 
-  const handleAddLocation = () => {
-    const description = prompt("Enter location description:");
-    const link = prompt("Enter Google Maps link (optional):");
-    if (description) {
-      setPost((prev) => ({
-        ...prev,
-        locations: [...prev.locations, { description, link }],
-      }));
-    }
-  };
-
-  const handlePublish = async () => {
-    if (!post.title || !post.content || !post.province || !post.type) {
-      toast.error("Please fill in all required fields!");
+    if (remainingSlots <= 0) {
+      toast.error("Maximum 5 images allowed.");
       return;
     }
+
+    const allowedFiles = files.slice(0, remainingSlots);
+    setPost((prev) => ({
+      ...prev,
+      gallery: [...prev.gallery, ...allowedFiles],
+    }));
+
+    if (allowedFiles.length > 0) {
+      setErrors((prev) => ({ ...prev, gallery: "" }));
+    }
+  };
+
+  // Add new location
+  const handleSaveLocation = () => {
+    if (!newLocation.description) {
+      toast.error("Location description is required!");
+      return;
+    }
+
+    setPost((prev) => ({
+      ...prev,
+      locations: [...prev.locations, newLocation],
+    }));
+
+    setNewLocation({ description: "", link: "" });
+    setShowLocationForm(false);
+  };
+
+  // Publish post
+  const handlePublish = async () => {
+    const newErrors = {};
+
+    ["title", "content", "province", "type", "startDate", "duration", "cost"].forEach(
+      (field) => {
+        if (!post[field]) newErrors[field] = `${getFieldLabel(field)} is required`;
+      }
+    );
+
+    if (post.gallery.length === 0) {
+      newErrors.gallery = "Please add at least one image";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please complete all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const formData = new FormData();
@@ -101,26 +177,25 @@ export default function PostForm() {
         gallery: [],
         locations: [],
       });
-
-      setTimeout(() => {
-        navigate("/TravelStories");
-      }, 1000);
+      setErrors({});
+      setTimeout(() => navigate("/TravelStories"), 1000);
     } catch (err) {
       console.error(err);
       toast.error("Failed to publish post");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-
       <div className="min-h-screen bg-white font-sans text-gray-700 p-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* LEFT COLUMN */}
           <div className="md:col-span-2 space-y-8">
             <header>
-              <h1 className="text-3xl font-bold text-green-900 mb-6">
+              <h1 className="text-3xl font-bold text-[#002B11] mb-6">
                 Add an impressive title to your trip
               </h1>
               <input
@@ -129,75 +204,115 @@ export default function PostForm() {
                 placeholder="Trip Title"
                 value={post.title}
                 onChange={handleChange}
-                className="w-full text-xl border-b border-gray-300 py-3 focus:outline-none focus:border-green-500 transition-colors"
+                className={`w-full text-xl border-b py-3 focus:outline-none transition-colors ${
+                  errors.title
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-green-500"
+                }`}
               />
+              {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
             </header>
 
             <section className="space-y-4">
               <div className="flex items-center space-x-2 text-gray-500">
-                <PlusCircle size={20} className="text-green-500" />
-                <span className="font-medium">Tell a story...</span>
+                <PenLine size={20} className="text-[#008A3D]" />
+                <span className="font-medium">Tell your trip story</span>
               </div>
               <textarea
                 name="content"
                 value={post.content}
                 onChange={handleChange}
                 placeholder="Share your experience..."
-                className="w-full h-80 border border-gray-300 rounded-sm p-4 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className={`w-full h-80 border rounded-sm p-4 focus:ring-1 focus:outline-none ${
+                  errors.content ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
+                }`}
               />
+              {errors.content && <p className="text-red-500 text-xs mt-1">{errors.content}</p>}
             </section>
           </div>
 
           {/* RIGHT COLUMN */}
           <div className="space-y-8">
             {/* Trip Details */}
-            <section>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
-                Trip Details
-              </h3>
-              <div className="space-y-4 text-sm">
-                <div>
-                  <div className="flex items-start space-x-3">
-                    <Calendar size={18} className="mt-0.5" />
-                    <input
-                      type="date"
-                      name="startDate"
-                      onChange={handleChange}
-                      className="block w-full border border-gray-300 p-1 focus:ring-0 text-gray-600 rounded-sm"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-400">Add start date to your trip</p>
-                </div>
+<section>
+  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
+    Trip Details
+  </h3>
+  <div className="space-y-4 text-sm">
+    {/* Start Date */}
+    <div>
+      <div className="flex items-start space-x-3">
+        <Calendar size={18} className="mt-0.5" />
+        <input
+          type="date"
+          name="startDate"
+          value={post.startDate}
+          onChange={handleChange}
+          className={`block w-full border p-1 text-gray-600 rounded-sm ${
+            errors.startDate ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
+          }`}
+          max={new Date().toISOString().split("T")[0]}
+        />
+      </div>
+      <p
+        className={`text-xs mt-1 ${
+          errors.startDate ? "text-red-500" : "text-gray-400"
+        }`}
+      >
+        {errors.startDate ? errors.startDate : "Add start date to your trip"}
+      </p>
+    </div>
 
-                <div>
-                  <div className="flex items-start space-x-3">
-                    <Clock size={18} className="mt-0.5" />
-                    <input
-                      type="text"
-                      name="duration"
-                      placeholder="Trip Duration (e.g., 2 days)"
-                      onChange={handleChange}
-                      className="block w-full border border-gray-300 focus:ring-0 text-gray-600 rounded-sm p-1"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-400">Duration of the trip</p>
-                </div>
+    {/* Duration */}
+    <div>
+      <div className="flex items-start space-x-3">
+        <Clock size={18} className="mt-0.5" />
+        <input
+          type="text"
+          name="duration"
+          placeholder="Trip Duration (e.g., 2 days)"
+          value={post.duration}
+          onChange={handleChange}
+          className={`block w-full border p-1 text-gray-600 rounded-sm ${
+            errors.duration ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
+          }`}
+        />
+      </div>
+      <p
+        className={`text-xs mt-1 ${
+          errors.duration ? "text-red-500" : "text-gray-400"
+        }`}
+      >
+        {errors.duration ? errors.duration : "Duration of the trip"}
+      </p>
+    </div>
 
-                <div className="flex items-center space-x-3">
-                  <DollarSign size={18} />
-                  <input
-                    type="number"
-                    name="cost"
-                    placeholder="Trip cost in USD"
-                    value={post.cost}
-                    onChange={handleChange}
-                    className="border border-gray-300 rounded-sm p-1 w-full"
-                    min="0"
-                  />
-                </div>
-                <p className="text-xs text-gray-400">How much you spent</p>
-              </div>
-            </section>
+    {/* Cost */}
+    <div>
+      <div className="flex items-center space-x-3">
+        <DollarSign size={18} />
+        <input
+          type="number"
+          name="cost"
+          placeholder="Trip cost in USD"
+          value={post.cost}
+          onChange={handleChange}
+          className={`border rounded-sm p-1 w-full ${
+            errors.cost ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
+          }`}
+          min="0"
+        />
+      </div>
+      <p
+        className={`text-xs mt-1 ${
+          errors.cost ? "text-red-500" : "text-gray-400"
+        }`}
+      >
+        {errors.cost ? errors.cost : "How much you spent"}
+      </p>
+    </div>
+  </div>
+</section>
 
             {/* Province & Type */}
             <section className="space-y-4">
@@ -209,7 +324,9 @@ export default function PostForm() {
                   name="province"
                   onChange={handleChange}
                   value={post.province}
-                  className="w-full border border-gray-300 p-3 rounded-sm bg-white"
+                  className={`w-full border p-3 rounded-sm bg-white ${
+                    errors.province ? "border-red-500" : "border-gray-300"
+                  }`}
                 >
                   <option value="">Select province</option>
                   {provinces.map((p) => (
@@ -218,6 +335,7 @@ export default function PostForm() {
                     </option>
                   ))}
                 </select>
+                {errors.province && <p className="text-red-500 text-xs mt-1">{errors.province}</p>}
               </div>
 
               <div>
@@ -228,7 +346,9 @@ export default function PostForm() {
                   name="type"
                   onChange={handleChange}
                   value={post.type}
-                  className="w-full border border-gray-300 p-3 rounded-sm bg-white"
+                  className={`w-full border p-3 rounded-sm bg-white ${
+                    errors.type ? "border-red-500" : "border-gray-300"
+                  }`}
                 >
                   <option value="">Select type</option>
                   {types.map((t) => (
@@ -237,6 +357,7 @@ export default function PostForm() {
                     </option>
                   ))}
                 </select>
+                {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type}</p>}
               </div>
             </section>
 
@@ -246,11 +367,18 @@ export default function PostForm() {
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   Gallery ({post.gallery.length}/5)
                 </h3>
-                <label className="bg-[#008A3D] text-white text-[13px] font-bold px-3 py-1 rounded cursor-pointer hover:bg-green-600">
-                  + Add Images
-                  <input type="file" multiple className="hidden" onChange={handleGalleryUpload} />
+                <label className="flex items-center gap-2 bg-[#008A3D] text-white text-sm font-normal px-3 py-2 rounded-lg cursor-pointer shadow hover:bg-[#006F31] transition">
+                  Add Images
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleGalleryUpload}
+                  />
                 </label>
               </div>
+              {errors.gallery && <p className="text-red-500 text-xs mb-2">{errors.gallery}</p>}
               <div className="flex flex-wrap gap-2">
                 {post.gallery.map((file, i) => (
                   <div key={i} className="relative h-24 w-24">
@@ -284,12 +412,50 @@ export default function PostForm() {
                 </h3>
                 <button
                   type="button"
-                  onClick={handleAddLocation}
-                  className="bg-[#008A3D] text-white text-[13px] font-bold px-3 py-1 rounded hover:bg-green-600"
+                  onClick={() => setShowLocationForm(true)}
+                  className="flex items-center gap-2 bg-[#008A3D] text-white text-sm font-normal px-3 py-2 rounded-lg hover:bg-[#006F31] transition shadow"
                 >
-                  + Add Location
+                  Add Location
                 </button>
               </div>
+
+              {showLocationForm && (
+                <div className="bg-gray-50 p-4 rounded-md shadow space-y-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Location description"
+                    value={newLocation.description}
+                    onChange={(e) =>
+                      setNewLocation((prev) => ({ ...prev, description: e.target.value }))
+                    }
+                    className="w-full border border-gray-300 rounded-sm p-2"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Google Maps link (optional)"
+                    value={newLocation.link}
+                    onChange={(e) =>
+                      setNewLocation((prev) => ({ ...prev, link: e.target.value }))
+                    }
+                    className="w-full border border-gray-300 rounded-sm p-2"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowLocationForm(false)}
+                      className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveLocation}
+                      className="px-3 py-1 rounded bg-[#008A3D] text-white hover:bg-[#006F31]"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <ul className="text-sm text-gray-600 list-disc ml-5 space-y-1">
                 {post.locations.map((loc, i) => (
                   <li key={i} className="flex justify-between items-center">
@@ -313,10 +479,37 @@ export default function PostForm() {
 
             {/* Publish */}
             <button
-              className="w-full bg-[#008A3D] text-white font-bold py-3 rounded-md hover:bg-green-600 transition-colors cursor-pointer"
+              className={`w-full font-bold py-3 rounded-md flex items-center justify-center gap-2 transition-colors ${
+                isSubmitting
+                  ? "bg-[#008A3D] opacity-70 cursor-not-allowed"
+                  : "bg-[#008A3D] text-white hover:bg-[#006F31]"
+              }`}
               onClick={handlePublish}
+              disabled={isSubmitting}
             >
-              Publish Post
+              {isSubmitting && (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+              )}
+              {isSubmitting ? "Publishing..." : "Publish Post"}
             </button>
           </div>
         </div>

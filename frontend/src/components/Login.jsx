@@ -126,7 +126,7 @@ export default function Login({ isOpen, onClose, switchToRegister }) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full mt-6 bg-[#008A3D] text-white py-2 rounded-full"
+                    className="w-full max-w-[180px] mx-auto block bg-[#008A3D] text-white font-semibold py-2 text-sm rounded-full hover:bg-[#006F31] transition mt-4 cursor-pointer"
                   >
                     {loading ? "Signing in..." : "Sign In"}
                   </button>
