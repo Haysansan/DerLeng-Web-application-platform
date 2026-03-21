@@ -32,6 +32,16 @@ export const getAllProvinces = async (req, res) => {
   }
 };
 
+export const searchProvinces = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const provinces = await provinceService.search(query);
+    res.status(200).json(provinces);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 
 export const updateProvince = async (req, res) => {
   try {

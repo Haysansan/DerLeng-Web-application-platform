@@ -1,13 +1,36 @@
-//C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\pages\DiscoverPage.jsx
 import { useDiscover } from "../hooks/useDiscover";
 import { categoryImages, provinceImages } from "../data/imageMap";
 import { normalize } from "../utils/normalize";
 import discoverBanner from "../assets/discover.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function DiscoverPage() {
-  const { categories, provinces, loading } = useDiscover();
+  const { categories, provinces: allProvinces, loading } = useDiscover();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search");
+  const categoryFilter = searchParams.get("category");
+  const [provinces, setProvinces] = useState([]);
+  const [filteredProvinces, setFilteredProvinces] = useState([]);
+
+  useEffect(() => {
+    setProvinces(allProvinces);
+    if (searchQuery) {
+      const filtered = allProvinces.filter((prov) =>
+        prov.province_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProvinces(filtered);
+    } else if (categoryFilter) {
+      // Filter by category name
+      const filtered = allProvinces.filter((prov) =>
+        prov.category_name?.toLowerCase().includes(categoryFilter.toLowerCase())
+      );
+      setFilteredProvinces(filtered);
+    } else {
+      setFilteredProvinces(allProvinces);
+    }
+  }, [allProvinces, searchQuery, categoryFilter]);
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -65,13 +88,31 @@ export default function DiscoverPage() {
 
       {/* PROVINCE SECTION */}
       <section className="px-6 py-6 bg-white">
-        <h2 className="text-xl font-bold mb-4">Provinces</h2>
+        {searchQuery && (
+          <h2 className="text-xl font-bold mb-4">
+            Search results for "{searchQuery}"
+          </h2>
+        )}
+        {categoryFilter && (
+          <h2 className="text-xl font-bold mb-4">
+            {categoryFilter}
+          </h2>
+        )}
+        {!searchQuery && !categoryFilter && <h2 className="text-xl font-bold mb-4">Provinces</h2>}
 
         {loading ? (
           <p>Loading...</p>
+        ) : filteredProvinces.length === 0 ? (
+          <p className="text-gray-500">
+            {searchQuery
+              ? `No provinces found matching "${searchQuery}"`
+              : categoryFilter
+              ? `No provinces found for "${categoryFilter}"`
+              : "No provinces available"}
+          </p>
         ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {provinces.map((prov) => {
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {filteredProvinces.map((prov) => {
               const key = normalize(prov.province_name);
 
               return (
