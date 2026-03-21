@@ -1,42 +1,54 @@
-// frontend/src/services/comment.service.js
 import api from "./api";
 
-// Get all comments for a post
-export const getCommentsByPost = async (postId) => {
-  const res = await api.get(`/comments/post/${postId}`);
-  return res.data.data; // your backend returns { data: comments }
-};
-
-// Add a new comment (requires auth token)
-export const addComment = async (postId, content, token) => {
-  const res = await api.post(
-    `/comments/`,
-    { post_id: postId, content },
-    { headers: { Authorization: `Bearer ${token}` } }
+/* ---------------- GET COMMENTS ---------------- */
+export const getComments = async (targetId, targetType) => {
+  const res = await api.get(
+    `/comments?target_id=${targetId}&target_type=${targetType}`,
   );
   return res.data.data;
 };
 
-// Update a comment (owner only, requires auth token)
+/* ---------------- ADD COMMENT ---------------- */
+export const addComment = async (targetId, targetType, content, token) => {
+  const res = await api.post(
+    `/comments`,
+    {
+      target_id: targetId,
+      target_type: targetType,
+      content,
+    },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  return res.data.data;
+};
+
+/* ---------------- UPDATE COMMENT ---------------- */
 export const updateComment = async (commentId, content, token) => {
   const res = await api.put(
     `/comments/${commentId}`,
     { content },
-    { headers: { Authorization: `Bearer ${token}` } }
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
   );
+
   return res.data.data;
 };
 
-// Delete a comment (owner only, requires auth token)
+/* ---------------- DELETE COMMENT ---------------- */
 export const deleteComment = async (commentId, token) => {
   const res = await api.delete(`/comments/${commentId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return res.data.message;
 };
 
 export default {
-  getCommentsByPost,
+  getComments,
   addComment,
   updateComment,
   deleteComment,

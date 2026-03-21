@@ -1,10 +1,11 @@
 import Favorite from "../models/Favorite.js";
 
 /* ---------------- TOGGLE FAVORITE ---------------- */
-export const toggleFavoriteService = async (userId, postId) => {
+export const toggleFavoriteService = async (userId, target_id, target_type) => {
   const existing = await Favorite.findOne({
     user_id: userId,
-    post_id: postId,
+    target_id,
+    target_type,
   });
 
   if (existing) {
@@ -14,16 +15,26 @@ export const toggleFavoriteService = async (userId, postId) => {
 
   await Favorite.create({
     user_id: userId,
-    post_id: postId,
+    target_id,
+    target_type,
   });
 
   return { favorited: true };
 };
 
 /* ---------------- GET USER FAVORITES ---------------- */
-export const getUserFavoritesService = async (userId) => {
-  const favorites = await Favorite.find({ user_id: userId })
-    .populate("post_id")
+export const getUserFavoritesService = async (
+  userId,
+  target_type, // optional filter
+) => {
+  const query = { user_id: userId };
+
+  if (target_type) {
+    query.target_type = target_type;
+  }
+
+  const favorites = await Favorite.find(query)
+    .populate("target_id") // 🔥 dynamic populate
     .sort({ created_at: -1 });
 
   return favorites;

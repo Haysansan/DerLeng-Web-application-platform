@@ -8,10 +8,8 @@ import protect from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Toggle favorite
-router.post("/:postId", protect, toggleFavorite);
+router.post("/toggle", protect, toggleFavorite);
 
-// Get my favorites
 router.get("/", protect, getUserFavorites);
 
 export default router;

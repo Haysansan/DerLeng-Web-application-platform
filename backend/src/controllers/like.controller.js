@@ -1,15 +1,17 @@
 import likeService from "../services/like.service.js";
 
-// Toggle Like
 export const toggleLike = async (req, res) => {
   try {
+    const { target_id, target_type } = req.body;
+
     const result = await likeService.toggleLike(
-      req.params.post_id,
+      target_id,
+      target_type,
       req.user._id,
     );
 
     res.status(200).json({
-      message: result.liked ? "Post liked" : "Post unliked",
+      message: result.liked ? "Liked" : "Unliked",
       liked: result.liked,
     });
   } catch (error) {
@@ -19,13 +21,14 @@ export const toggleLike = async (req, res) => {
   }
 };
 
-// Get Likes Count
 export const getLikesCount = async (req, res) => {
   try {
-    const count = await likeService.getLikesCount(req.params.post_id);
+    const { target_id, target_type } = req.query;
+
+    const count = await likeService.getLikesCount(target_id, target_type);
 
     res.status(200).json({
-      post_id: req.params.post_id,
+      target_id,
       likes: count,
     });
   } catch (error) {

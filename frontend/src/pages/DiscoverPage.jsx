@@ -10,6 +10,7 @@ import CommunityCard from "../components/CommunityCard";
 
 export default function DiscoverPage() {
   const { categories, provinces, loading } = useDiscover();
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   const [communities, setCommunities] = useState([]);
@@ -27,6 +28,16 @@ export default function DiscoverPage() {
     fetchCommunityPosts();
   }, []);
 
+  const filteredCommunities = communities.filter((post) => {
+    const keyword = search.toLowerCase();
+
+    return (
+      post.title?.toLowerCase().includes(keyword) ||
+      post.content?.toLowerCase().includes(keyword) ||
+      post.province_id?.province_name?.toLowerCase().includes(keyword)
+    );
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* HERO */}
@@ -43,15 +54,16 @@ export default function DiscoverPage() {
         </div>
       </section>
 
-      {/* CATEGORY SECTION */}
       {/* SEARCH BAR */}
       <section className="px-6 py-6 bg-white">
         <div className="max-w-md mx-auto">
           <input
             type="text"
             placeholder="Search Community Tourism..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full border border-gray-300 rounded-full px-5 py-2
-      focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+  focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
           />
         </div>
       </section>
@@ -101,8 +113,8 @@ export default function DiscoverPage() {
         {communities.length === 0 ? (
           <p className="text-gray-400">No community posts yet.</p>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {communities.map((post) => (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {filteredCommunities.map((post) => (
               <CommunityCard
                 key={post._id}
                 post={post}

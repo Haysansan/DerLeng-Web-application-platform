@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
 
-const postLikeSchema = new mongoose.Schema(
+const likeSchema = new mongoose.Schema(
   {
-    post_id: {
+    target_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
       required: true,
+      refPath: "target_type", // 🔥 dynamic reference
+    },
+    target_type: {
+      type: String,
+      required: true,
+      enum: ["Post", "CommunityPost"], // add more later if needed
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +23,10 @@ const postLikeSchema = new mongoose.Schema(
   },
 );
 
-// Prevent duplicate likes (same user cannot like twice)
-postLikeSchema.index({ post_id: 1, user_id: 1 }, { unique: true });
+// prevent duplicate like
+likeSchema.index(
+  { target_id: 1, target_type: 1, user_id: 1 },
+  { unique: true },
+);
 
-export default mongoose.model("PostLike", postLikeSchema);
+export default mongoose.model("Like", likeSchema);
