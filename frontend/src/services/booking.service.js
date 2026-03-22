@@ -1,44 +1,86 @@
-
-
-// Create booking
 import api from "./api";
 
+/* ---------------- CREATE ---------------- */
 const createBooking = async (formData) => {
   const token = localStorage.getItem("token");
 
   const res = await api.post("/booking", formData, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data", // ✅ IMPORTANT
+      "Content-Type": "multipart/form-data",
     },
   });
 
   return res.data;
 };
 
-
-// Get all bookings (admin)
+/* ---------------- GET ALL ---------------- */
 const getAllBookings = async () => {
-  const res = await api.get("/booking");
+  const token = localStorage.getItem("token");
+
+  const res = await api.get("/booking", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return res.data.data;
 };
 
-// Get booking by ID
+/* ---------------- GET ONE ---------------- */
 const getBookingById = async (id) => {
-  const res = await api.get(`/booking/${id}`);
+  const token = localStorage.getItem("token");
+
+  const res = await api.get(`/booking/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return res.data.data;
 };
 
-// Update booking status (admin)
+/* ---------------- UPDATE ---------------- */
 const updateBookingStatus = async (id, status) => {
-  const res = await api.put(`/booking/${id}/status`, { status });
+  const token = localStorage.getItem("token");
+
+  const res = await api.put(
+    `/booking/${id}`,
+    { status },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
   return res.data;
 };
 
-// Delete booking (admin)
+/* ---------------- DELETE ---------------- */
 const deleteBooking = async (id) => {
-  const res = await api.delete(`/booking/${id}`);
+  const token = localStorage.getItem("token");
+
+  const res = await api.delete(`/booking/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return res.data;
+};
+
+/* ---------------- 📊 STATS ---------------- */
+export const getBookingStats = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await api.get("/booking/stats", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data.data;
 };
 
 export default {
@@ -47,4 +89,5 @@ export default {
   getBookingById,
   updateBookingStatus,
   deleteBooking,
+  getBookingStats,
 };

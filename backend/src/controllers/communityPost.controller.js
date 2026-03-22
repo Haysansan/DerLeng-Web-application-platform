@@ -32,15 +32,19 @@ export const createCommunityPost = async (req, res) => {
 
 export const getAllCommunityPosts = async (req, res) => {
   try {
-    const posts = await communityPostService.getAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
 
-    res.status(200).json({
-      data: posts,
+    const result = await communityPostService.getAll(page, limit);
+
+    res.json({
+      success: true,
+      data: result.posts,
+      pagination: result.pagination,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("GET COMMUNITY ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import communityService from "../services/community.service";
 import serviceService from "../services/service.service";
+import likeService from "../services/like.service";
+import commentService from "../services/comment.service";
+import { Heart, Send, Trash2 } from "lucide-react";
 
 import {
   ChevronLeft,
@@ -19,27 +22,80 @@ export default function CommunityPostDetail() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
+  const token = localStorage.getItem("token");
+  const currentUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
 
+        // ✅ ALL inside try
         const postData = await communityService.getCommunityPostById(id);
-        setPost(postData);
+        setPost(postData || { images: [] });
 
         const servicesData = await serviceService.getByCommunity(id);
         setServices(servicesData.data || servicesData.services || servicesData);
-        // setServices(servicesData);
+
+        const likeRes = await likeService.getLikesCount(id, "CommunityPost");
+        setLikes(likeRes?.likes || 0);
+
+        const commentsRes = await commentService.getComments(
+          id,
+          "CommunityPost",
+        );
+        setComments(commentsRes || []);
       } catch (err) {
-        console.error(err);
+        console.error("ERROR:", err);
       } finally {
-        setLoading(false);
+        setLoading(false); // ✅ ALWAYS RUN
       }
     };
 
     fetchData();
   }, [id]);
+
+  /* ❤️ LIKE */
+const handleLike = async () => {
+  if (!token) return alert("Please login");
+
+  try {
+    const res = await likeService.toggleLike({
+      target_id: id,
+      target_type: "CommunityPost",
+    });
+
+    setLiked(res.liked);
+    setLikes((prev) => (res.liked ? prev + 1 : prev - 1));
+  } catch (err) {
+    console.error("LIKE ERROR:", err);
+  }
+};
+
+  /* 💬 ADD COMMENT */
+  const handleAddComment = async () => {
+    if (!token) return alert("Please login");
+    if (!newComment.trim()) return;
+
+    const comment = await commentService.addComment({
+      target_id: id,
+      target_type: "CommunityPost",
+      content: newComment,
+    });
+
+    setComments((prev) => [comment, ...prev]);
+    setNewComment("");
+  };
+
+  /* ❌ DELETE COMMENT */
+  const handleDeleteComment = async (commentId) => {
+    await commentService.deleteComment(commentId, token);
+    setComments((prev) => prev.filter((c) => c._id !== commentId));
+  };
 
   const nextImage = () => {
     if (post?.images?.length > 0) {
@@ -77,22 +133,43 @@ export default function CommunityPostDetail() {
 
       <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
         {/* HEADER */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-[#002B11]">{post.title}</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+          {/* LEFT SIDE */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-[#002B11]">{post.title}</h1>
 
-          <div className="flex flex-wrap gap-3 text-gray-500 text-sm items-center">
-            <span className="flex items-center gap-1">
-              <MapPin size={14} />
-              {post.province_id?.province_name}
-            </span>
-
-            <span>
-              By{" "}
-              <span className="font-semibold text-gray-800">
-                {post.admin_id?.username}
+            <div className="flex flex-wrap gap-3 text-gray-500 text-sm items-center">
+              <span className="flex items-center gap-1">
+                <MapPin size={14} />
+                {post.province_id?.province_name}
               </span>
-            </span>
+
+              <span>
+                By{" "}
+                <span className="font-semibold text-gray-800">
+                  {post.admin_id?.username}
+                </span>
+              </span>
+            </div>
           </div>
+
+          {/* RIGHT SIDE (LIKE BUTTON) */}
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full transition duration-300 self-start"
+          >
+            <Heart
+              size={24}
+              className={liked ? "fill-red-500 text-red-500" : "text-gray-400"}
+            />
+            <span
+              className={`font-bold ${
+                liked ? "text-red-500" : "text-gray-600"
+              }`}
+            >
+              {likes}
+            </span>
+          </button>
         </div>
 
         {/* IMAGE CAROUSEL */}
@@ -232,6 +309,64 @@ export default function CommunityPostDetail() {
                 Book Now
               </button>
             </>
+          )}
+        </div>
+        {/* COMMENTS */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-1">
+            <h2 className="text-2xl font-bold text-[#002B11]">Comment</h2>
+            <span className="bg-gray-100 px-3 py-0.5 rounded-full text-sm font-bold">
+              {comments?.length || 0}
+            </span>
+          </div>
+
+          {/* INPUT */}
+          <div className="relative">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share your thoughts..."
+              className="w-full border-2 border-gray-100 rounded-2xl p-4 pr-16 outline-none"
+            />
+            <button
+              onClick={handleAddComment}
+              className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl hover:bg-[#008A3D] transition shadow-lg disabled:opacity-50"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+
+          {/* LIST */}
+          {comments?.length === 0 ? (
+            <p className="text-gray-400 text-center">No comments yet.</p>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment._id} className="flex gap-4">
+                <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center">
+                  {comment.user_id?.username?.charAt(0)}
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h4 className="font-bold">{comment.user_id?.username}</h4>
+                    <span className="text-xs text-gray-400">
+                      {new Date(comment.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <p>{comment.content}</p>
+
+                  {currentUser && comment.user_id?._id === currentUser.id && (
+                    <button
+                      onClick={() => handleDeleteComment(comment._id)}
+                      className="text-red-500 text-xs flex items-center gap-1"
+                    >
+                      <Trash2 size={12} /> Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>

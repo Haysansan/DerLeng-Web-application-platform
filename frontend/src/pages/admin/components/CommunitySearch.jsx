@@ -13,7 +13,7 @@ export default function CommunitySearch({ search, setSearch, onCreate }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search communities..."
-          className="w-full pl-10 py-3 border rounded-xl"
+          className="w-full pl-10 py-3 border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none rounded-xl"
         />
       </div>
 

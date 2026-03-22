@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit, Search, X, Heart } from "lucide-react";
 import api from "../../services/api";
 import PostForm from "../Post";
+import StoryCard from "../../components/admin/StoryCardAdmin";
+import { useNavigate, useParams } from "react-router-dom";
+import PostDetail from '../PostDetail'
 
 export default function Posts() {
   const [posts, setPosts] = useState([]);
@@ -12,8 +15,9 @@ export default function Posts() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [provinceFilter, setProvinceFilter] = useState("All");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
+ const [currentPage, setCurrentPage] = useState(1);
+ const [postsPerPage, setPostsPerPage] = useState(6);
+ const [totalPages, setTotalPages] = useState(1);
 
   const [showPostModal, setShowPostModal] = useState(false);
 
@@ -29,12 +33,20 @@ export default function Posts() {
   const [editValue, setEditValue] = useState("");
   const [postFilterMode, setPostFilterMode] = useState("all");
   const [likesCount, setLikesCount] = useState({});
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await api.get("/posts");
-        setPosts(response.data.data); 
+        setLoading(true);
+
+        const res = await api.get(
+          `/posts?page=${currentPage}&limit=${postsPerPage}`,
+        );
+
+        setPosts(res.data.data);
+        setTotalPages(res.data.pagination?.pages || 1);
       } catch (err) {
         console.error(err);
         setError("Failed to fetch posts");
@@ -44,7 +56,7 @@ export default function Posts() {
     };
 
     fetchPosts();
-  }, []);
+  }, [currentPage, postsPerPage]);
 
   useEffect(() => {
     const fetchLikes = async () => {
@@ -108,10 +120,6 @@ export default function Posts() {
     fetchMeta();
   }, []);
 
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
 
   if (loading) {
     return (
@@ -281,7 +289,7 @@ export default function Posts() {
           <input
             type="text"
             placeholder="Search by title..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-2 focus:ring-green-600 outline-none"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -291,7 +299,7 @@ export default function Posts() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-4 py-3 rounded-xl border"
+          className="px-4 py-3 rounded-xl border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none"
         >
           <option value="All">All Categories</option>
           {categories.map((cat) => (
@@ -305,7 +313,7 @@ export default function Posts() {
         <select
           value={provinceFilter}
           onChange={(e) => setProvinceFilter(e.target.value)}
-          className="px-4 py-3 rounded-xl border"
+          className="px-4 py-3 rounded-xl border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none"
         >
           <option value="All">All Provinces</option>
           {provinces.map((pro) => (
@@ -317,63 +325,26 @@ export default function Posts() {
       </div>
 
       {/* POSTS GRID */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {currentPosts.map((post) => (
-          <div
-            key={post._id}
-            className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition"
-          >
-            <img
-              src={
-                post.images && post.images.length > 0
-                  ? post.images[0]
-                  : "/placeholder.jpg"
-              }
-              alt={post.title}
-              className="h-48 w-full object-cover"
+      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {filteredPosts.map((post) => (
+          <div key={post._id} className="w-full [&>div]:max-w-none">
+            <StoryCard
+              post={post}
+              // 👉 open post (optional)
+              onClick={() => navigate(`/admin/posts/${post._id}`)}
+              // ❤️ like
+              onLike={(id) => console.log("Like", id)}
+              // ⭐ favorite
+              onFavorite={(id) => console.log("Favorite", id)}
+              // ✏️ edit
+              onEdit={(post) => {
+                console.log("Edit", post);
+                setShowPostModal(true);
+              }}
+              onDelete={(id) => {
+                handleDeletePost(id);
+              }}
             />
-
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
-
-              <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                {post.content}
-              </p>
-
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>@{post.user_id?.username || "Unknown"}</span>
-
-                <div className="flex gap-2">
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    {post.category_id?.category_name}
-                  </span>
-
-                  <span className="bg-gray-200 px-2 py-1 rounded-full">
-                    {post.province_id?.province_name}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center mt-4">
-                <div className="flex items-center gap-1 text-sm text-gray-600">
-                  <Heart size={16} className="text-red-500 fill-red-500" />
-                  {likesCount[post._id] || 0}
-                </div>
-
-                <div className="flex gap-3">
-                  <button className="text-blue-600 hover:text-blue-800">
-                    <Edit size={18} />
-                  </button>
-
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => handleDeletePost(post._id)}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         ))}
       </div>
@@ -596,6 +567,21 @@ export default function Posts() {
           </button>
         </div>
       </div>
+      {id && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="bg-white w-[95%] max-w-6xl h-[90vh] rounded-xl shadow-lg relative overflow-hidden">
+            {/* <button
+              onClick={() => navigate("/admin/posts")}
+              className="absolute top-4 right-4 z-50 bg-white p-2 rounded-full shadow"
+            >
+              ✖
+            </button> */}
+            <div className="h-full overflow-y-auto">
+              <PostDetail />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

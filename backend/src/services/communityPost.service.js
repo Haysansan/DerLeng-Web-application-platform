@@ -20,11 +20,26 @@ const create = async ({
   });
 };
 
-const getAll = async () => {
-  return await CommunityPost.find()
+const getAll = async (page = 1, limit = 8) => {
+  const skip = (page - 1) * limit;
+
+  const total = await CommunityPost.countDocuments();
+
+  const posts = await CommunityPost.find()
     .populate("admin_id", "username email role")
     .populate("province_id", "province_name")
-    .sort({ created_at: -1 });
+    .sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return {
+    posts,
+    pagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const getById = async (id) => {

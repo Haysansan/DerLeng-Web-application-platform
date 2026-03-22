@@ -188,7 +188,7 @@ useEffect(() => {
 
       {/* CONTENT */}
       <div>
-        <div className="flex items-center gap-2 mb-2 text-gray-600">
+        <div className="flex items-center gap-2 mb-2 text-gray-600 ">
           <MapPinned size={18} className="text-green-600" />
           <span>Describe the community...</span>
         </div>
@@ -198,7 +198,7 @@ useEffect(() => {
           value={community.content}
           onChange={handleChange}
           placeholder="Community description..."
-          className="w-full border p-4 rounded-lg h-40 focus:ring-1 focus:ring-green-600"
+          className="w-full border border-gray-300 focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none p-4 rounded-lg h-40"
         />
       </div>
 
@@ -212,7 +212,7 @@ useEffect(() => {
           <button
             type="button"
             onClick={() => setShowServiceModal(true)}
-            className="bg-green-800 text-white px-3 py-1 rounded hover:bg-green-600"
+            className="bg-green-800 text-white px-3 py-1 rounded cursor-pointer hover:bg-green-600"
           >
             + Add Service
           </button>
@@ -237,7 +237,7 @@ useEffect(() => {
                     ),
                   )
                 }
-                className="border p-1 rounded w-32"
+                className="border border-gray-400 focus:ring focus:ring-green-600 outline-none p-1 rounded w-32"
               />
 
               <input
@@ -250,7 +250,7 @@ useEffect(() => {
                     ),
                   )
                 }
-                className="border p-1 rounded w-20"
+                className="border border-gray-400 focus:ring focus:ring-green-600 outline-none p-1 rounded w-20"
               />
 
               <button
@@ -272,7 +272,7 @@ useEffect(() => {
           name="province"
           value={community.province}
           onChange={handleChange}
-          className="w-full border p-3 rounded-lg"
+          className="w-full border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none p-3 rounded-lg"
         >
           <option value="">Select province</option>
 
@@ -292,7 +292,7 @@ useEffect(() => {
           placeholder="Location description"
           value={community.location_description}
           onChange={handleChange}
-          className="border p-3 rounded-lg"
+          className="border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none p-3 rounded-lg"
         />
 
         <input
@@ -301,7 +301,7 @@ useEffect(() => {
           placeholder="Google Maps link"
           value={community.location_link}
           onChange={handleChange}
-          className="border p-3 rounded-lg"
+          className="border border-gray-400 focus:ring-2 focus:ring-green-600 outline-none p-3 rounded-lg"
         />
       </div>
 
@@ -309,7 +309,7 @@ useEffect(() => {
       <div>
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-semibold">
-            Gallery ({community.gallery.length}/10)
+            Photo ({community.gallery.length}/10)
           </h3>
 
           <label className="bg-green-800 text-white px-3 py-1 rounded cursor-pointer hover:bg-green-600">
@@ -359,7 +359,7 @@ useEffect(() => {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold hover:bg-green-600 disabled:opacity-50"
+        className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold cursor-pointer hover:bg-green-600 disabled:opacity-50"
       >
         {loading
           ? "Uploading..."

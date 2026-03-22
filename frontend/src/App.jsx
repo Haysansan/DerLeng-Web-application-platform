@@ -58,6 +58,7 @@ const App = () => {
         <Route path="posts/:id" element={<DetailPageWrapper />} />
         <Route path="posts/category/:categoryId" element={<PostListPage />} />
         <Route path="posts/province/:provinceId" element={<PostListPage />} />
+
         <Route path="community/:id" element={<CommunityPostDetail />} />
         <Route path="booking/:id" element={<BookingPage />} />
         <Route
@@ -85,9 +86,17 @@ const App = () => {
       >
         <Route index element={<Dashboard />} />
         <Route path="users" element={<Users />} />
-        <Route path="posts" element={<Posts />} />
+        {/* <Route path="posts" element={<Posts />} /> */}
+        <Route path="posts">
+          <Route index element={<Posts />} />
+          <Route path=":id" element={<Posts />} />
+        </Route>
         <Route path="products" element={<Products />} />
-        <Route path="communities" element={<Communities />} />
+        {/* <Route path="communities" element={<Communities />} /> */}
+        <Route path="communities">
+          <Route index element={<Communities />} />
+          <Route path=":id" element={<Communities />} />
+        </Route>
         <Route path="bookings" element={<CommunityBooking />} />
       </Route>
     </Routes>

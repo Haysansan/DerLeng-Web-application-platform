@@ -126,6 +126,30 @@ const deleteUser = async (id, currentUser) => {
   await User.findByIdAndDelete(id);
 };
 
+export const getUserStatsService = async () => {
+  const stats = await User.aggregate([
+    {
+      $match: {
+        created_at: { $exists: true, $ne: null }, // ✅ match your schema
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$created_at" },
+          month: { $month: "$created_at" },
+        },
+        totalUsers: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { "_id.year": 1, "_id.month": 1 },
+    },
+  ]);
+
+  return stats;
+};
+
 export default {
   getAllUsers,
   getUserById,
@@ -133,4 +157,5 @@ export default {
   deleteUser,
   requestEmailChange,
   verifyEmailChange,
+  getUserStatsService,
 };

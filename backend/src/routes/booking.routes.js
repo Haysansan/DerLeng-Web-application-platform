@@ -6,6 +6,7 @@ import {
   getBookingById,
   updateBookingStatus,
   deleteBooking,
+  getBookingStats,
 } from "../controllers/booking.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -26,6 +27,7 @@ router.post(
 
 // admin get all bookings
 router.get("/", protect, adminAuthorize, getAllBookings);
+router.get("/stats", protect, adminAuthorize, getBookingStats);
 
 // get single booking
 router.get("/:id", protect, getBookingById);
@@ -35,5 +37,6 @@ router.put("/:id/status", protect, adminAuthorize, updateBookingStatus);
 
 // admin delete booking
 router.delete("/:id", protect, adminAuthorize, deleteBooking);
+
 
 export default router;

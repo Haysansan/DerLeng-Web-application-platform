@@ -99,3 +99,13 @@ export const deleteUser = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getUserStats = async (req, res) => {
+  try {
+    const data = await userService.getUserStatsService();
+    res.json({ data });
+  } catch (err) {
+    console.error("USER STATS ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};

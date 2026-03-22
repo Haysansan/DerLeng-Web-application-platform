@@ -14,6 +14,8 @@ export default function DiscoverPage() {
   const navigate = useNavigate();
 
   const [communities, setCommunities] = useState([]);
+  const [likesMap, setLikesMap] = useState({});
+  const [favoritesMap, setFavoritesMap] = useState({});
 
   useEffect(() => {
     const fetchCommunityPosts = async () => {
@@ -27,6 +29,62 @@ export default function DiscoverPage() {
 
     fetchCommunityPosts();
   }, []);
+  useEffect(() => {
+    const fetchInteractions = async () => {
+      try {
+        const likesData = {};
+        const favoritesData = {};
+
+        await Promise.all(
+          communities.map(async (post) => {
+            try {
+              const likeRes = await api.get(`/likes/${post._id}`);
+              likesData[post._id] = likeRes.data.likes;
+
+              const favRes = await api.get(`/favorites/${post._id}`);
+              favoritesData[post._id] = favRes.data.isFavorite;
+            } catch (err) {
+              console.log("Interaction fetch error", err);
+            }
+          }),
+        );
+
+        setLikesMap(likesData);
+        setFavoritesMap(favoritesData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (communities.length > 0) {
+      fetchInteractions();
+    }
+  }, [communities]);
+
+  const handleLike = async (postId) => {
+    try {
+      await api.post(`/likes/${postId}`);
+
+      setLikesMap((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1,
+      }));
+    } catch (err) {
+      console.error("Like failed", err);
+    }
+  };
+  const handleFavorite = async (postId) => {
+    try {
+      await api.post(`/favorites/${postId}`);
+
+      setFavoritesMap((prev) => ({
+        ...prev,
+        [postId]: !prev[postId],
+      }));
+    } catch (err) {
+      console.error("Favorite failed", err);
+    }
+  };
 
   const filteredCommunities = communities.filter((post) => {
     const keyword = search.toLowerCase();
@@ -117,8 +175,15 @@ export default function DiscoverPage() {
             {filteredCommunities.map((post) => (
               <CommunityCard
                 key={post._id}
-                post={post}
+                post={{
+                  ...post,
+                  likes: likesMap[post._id] || 0,
+                  liked: false, // optional (if you track user like)
+                  isFavorite: favoritesMap[post._id] || false,
+                }}
                 onClick={() => navigate(`/community/${post._id}`)}
+                onLike={handleLike}
+                onFavorite={handleFavorite}
               />
             ))}
           </div>

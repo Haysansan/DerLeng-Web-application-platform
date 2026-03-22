@@ -42,6 +42,9 @@ export default function AdminBookingPage() {
     pending: bookings.filter((b) => b.status === "pending").length,
     approved: bookings.filter((b) => b.status === "approved").length,
     rejected: bookings.filter((b) => b.status === "rejected").length,
+    revenue: bookings
+      .filter((b) => b.status !== "rejected") // 🚀 KEY LINE
+      .reduce((sum, b) => sum + (b.total_price || 0), 0),
   };
 
   const updateStatus = async () => {
@@ -74,11 +77,14 @@ export default function AdminBookingPage() {
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <StatCard title="Total" value={stats.total} />
         <StatCard title="Pending" value={stats.pending} />
         <StatCard title="Approved" value={stats.approved} />
         <StatCard title="Rejected" value={stats.rejected} />
+
+        {/* ✅ NEW CARD */}
+        <StatCard title="Total Revenue" value={`$${stats.revenue}`} />
       </div>
 
       {/* FILTER */}
