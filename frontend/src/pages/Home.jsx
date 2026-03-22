@@ -22,7 +22,7 @@ export default function Home() {
       {/* Title */}
       <div className="w-full bg-white py-8 px-6">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-4xl sm:text-5xl font-bold text-center text-[#002B11]">
+          <h1 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center', color: '#002B11', fontFamily: "'Kantumruy Pro', sans-serif" }}>
             តោះដេីរលេង?
           </h1>
         </div>
