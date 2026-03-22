@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-
+/* Khmer Font */
+.font-khmer {
+  font-family: 'Kantumruy Pro', sans-serif;
+}
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
