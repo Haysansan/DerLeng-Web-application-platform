@@ -6,6 +6,7 @@ import {
   deleteUser,
   requestEmailChange,
   verifyEmailChange,
+  getUserStats,
 } from "../controllers/users.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -14,6 +15,7 @@ import adminAuthorize from "../middlewares/adminAuthorize.js";
 const router = express.Router();
 
 router.get("/", protect, adminAuthorize, getAllUsers);
+router.get("/stats", protect, adminAuthorize, getUserStats);
 router.get("/:id",protect, getUserById);
 router.put("/:id", protect, updateUser);
 router.delete("/:id", protect, deleteUser);

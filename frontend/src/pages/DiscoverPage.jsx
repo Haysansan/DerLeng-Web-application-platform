@@ -2,38 +2,102 @@ import { useDiscover } from "../hooks/useDiscover";
 import { categoryImages, provinceImages } from "../data/imageMap";
 import { normalize } from "../utils/normalize";
 import discoverBanner from "../assets/discover.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import communityService from "../services/community.service";
+import CommunityCard from "../components/CommunityCard";
 
 export default function DiscoverPage() {
-  const { categories, provinces: allProvinces, loading } = useDiscover();
+  const { categories, provinces, loading } = useDiscover();
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get("search");
-  const categoryFilter = searchParams.get("category");
-  const [provinces, setProvinces] = useState([]);
-  const [filteredProvinces, setFilteredProvinces] = useState([]);
+
+  const [communities, setCommunities] = useState([]);
+  const [likesMap, setLikesMap] = useState({});
+  const [favoritesMap, setFavoritesMap] = useState({});
 
   useEffect(() => {
-    setProvinces(allProvinces);
-    if (searchQuery) {
-      const filtered = allProvinces.filter((prov) =>
-        prov.province_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredProvinces(filtered);
-    } else if (categoryFilter) {
-      // Filter by category name
-      const filtered = allProvinces.filter((prov) =>
-        prov.category_name?.toLowerCase().includes(categoryFilter.toLowerCase())
-      );
-      setFilteredProvinces(filtered);
-    } else {
-      setFilteredProvinces(allProvinces);
+    const fetchCommunityPosts = async () => {
+      try {
+        const data = await communityService.getAllCommunityPosts();
+        setCommunities(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCommunityPosts();
+  }, []);
+  useEffect(() => {
+    const fetchInteractions = async () => {
+      try {
+        const likesData = {};
+        const favoritesData = {};
+
+        await Promise.all(
+          communities.map(async (post) => {
+            try {
+              const likeRes = await api.get(`/likes/${post._id}`);
+              likesData[post._id] = likeRes.data.likes;
+
+              const favRes = await api.get(`/favorites/${post._id}`);
+              favoritesData[post._id] = favRes.data.isFavorite;
+            } catch (err) {
+              console.log("Interaction fetch error", err);
+            }
+          }),
+        );
+
+        setLikesMap(likesData);
+        setFavoritesMap(favoritesData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (communities.length > 0) {
+      fetchInteractions();
     }
-  }, [allProvinces, searchQuery, categoryFilter]);
+  }, [communities]);
+
+  const handleLike = async (postId) => {
+    try {
+      await api.post(`/likes/${postId}`);
+
+      setLikesMap((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1,
+      }));
+    } catch (err) {
+      console.error("Like failed", err);
+    }
+  };
+  const handleFavorite = async (postId) => {
+    try {
+      await api.post(`/favorites/${postId}`);
+
+      setFavoritesMap((prev) => ({
+        ...prev,
+        [postId]: !prev[postId],
+      }));
+    } catch (err) {
+      console.error("Favorite failed", err);
+    }
+  };
+
+  const filteredCommunities = communities.filter((post) => {
+    const keyword = search.toLowerCase();
+
+    return (
+      post.title?.toLowerCase().includes(keyword) ||
+      post.content?.toLowerCase().includes(keyword) ||
+      post.province_id?.province_name?.toLowerCase().includes(keyword)
+    );
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* HERO */}
       <section className="relative w-full h-[250px]">
         <img
@@ -48,36 +112,51 @@ export default function DiscoverPage() {
         </div>
       </section>
 
-      {/* CATEGORY SECTION */}
+      {/* SEARCH BAR */}
       <section className="px-6 py-6 bg-white">
-        <h2 className="text-xl font-bold mb-4">Type of Place</h2>
+        <div className="max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Search Community Tourism..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border border-gray-300 rounded-full px-5 py-2
+  focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+          />
+        </div>
+      </section>
+
+      {/* PROVINCE (ROUND IMAGE ONLY) */}
+      <section className="px-6 py-6 bg-white">
+        <h2 className="text-xl font-semibold mb-4">Explore by Province</h2>
 
         {loading ? (
           <p>Loading...</p>
         ) : (
           <div className="flex space-x-4 overflow-x-auto">
-            {categories.map((cat) => {
-              const key = normalize(cat.category_name);
+            {provinces.map((prov) => {
+              const key = normalize(prov.province_name);
 
               return (
                 <div
-                  key={cat._id}
-                  onClick={() => navigate(`/posts/category/${cat._id}`)}
-                  className="flex flex-col items-center min-w-[90px]"
+                  key={prov._id}
+                  onClick={() => navigate(`/community/province/${prov._id}`)}
+                  className="flex flex-col items-center min-w-[90px] cursor-pointer"
                 >
-                  <div className="w-20 h-20 rounded-full overflow-hidden shadow">
+                  {/* ROUND IMAGE */}
+                  <div className="w-20 h-20 rounded-full overflow-hidden shadow hover:scale-105 transition">
                     <img
                       src={
-                        categoryImages[key] ||
-                        "https://via.placeholder.com/150"
+                        provinceImages[key] || "https://via.placeholder.com/150"
                       }
-                      alt={cat.category_name}
+                      alt={prov.province_name}
                       className="w-full h-full object-cover"
                     />
                   </div>
 
-                  <span className="mt-2 text-sm text-center">
-                    {cat.category_name}
+                  {/* NAME */}
+                  <span className="mt-2 text-sm text-center text-gray-700">
+                    {prov.province_name}
                   </span>
                 </div>
               );
@@ -85,59 +164,28 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+      {/* COMMUNITY SECTION */}
+      <section className="px-6 py-8">
+        <h2 className="text-2xl font-bold mb-6">Community Tourism</h2>
 
-      {/* PROVINCE SECTION */}
-      <section className="px-6 py-6 bg-white">
-        {searchQuery && (
-          <h2 className="text-xl font-bold mb-4">
-            Search results for "{searchQuery}"
-          </h2>
-        )}
-        {categoryFilter && (
-          <h2 className="text-xl font-bold mb-4">
-            {categoryFilter}
-          </h2>
-        )}
-        {!searchQuery && !categoryFilter && <h2 className="text-xl font-bold mb-4">Provinces</h2>}
-
-        {loading ? (
-          <p>Loading...</p>
-        ) : filteredProvinces.length === 0 ? (
-          <p className="text-gray-500">
-            {searchQuery
-              ? `No provinces found matching "${searchQuery}"`
-              : categoryFilter
-              ? `No provinces found for "${categoryFilter}"`
-              : "No provinces available"}
-          </p>
+        {communities.length === 0 ? (
+          <p className="text-gray-400">No community posts yet.</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {filteredProvinces.map((prov) => {
-              const key = normalize(prov.province_name);
-
-              return (
-                <div
-                  key={prov._id}
-                  onClick={() => navigate(`/posts/province/${prov._id}`)}
-                  className="rounded-lg shadow cursor-pointer"
-                >
-                  <div className="h-55 overflow-hidden rounded-t-lg">
-                    <img
-                      src={
-                        provinceImages[key] ||
-                        "https://via.placeholder.com/200"
-                      }
-                      alt={prov.province_name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="text-center py-5 font-semibold">
-                    {prov.province_name}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {filteredCommunities.map((post) => (
+              <CommunityCard
+                key={post._id}
+                post={{
+                  ...post,
+                  likes: likesMap[post._id] || 0,
+                  liked: false, // optional (if you track user like)
+                  isFavorite: favoritesMap[post._id] || false,
+                }}
+                onClick={() => navigate(`/community/${post._id}`)}
+                onLike={handleLike}
+                onFavorite={handleFavorite}
+              />
+            ))}
           </div>
         )}
       </section>

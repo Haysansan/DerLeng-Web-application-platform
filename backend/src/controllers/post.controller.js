@@ -40,12 +40,18 @@ export const createPost = async (req, res) => {
 // Get All Posts
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await postService.getAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+
+    const result = await postService.getAll(page, limit);
 
     res.status(200).json({
-      data: posts,
+      success: true,
+      data: result.posts,
+      pagination: result.pagination,
     });
   } catch (error) {
+    console.error("GET POSTS ERROR:", error);
     res.status(500).json({
       message: error.message,
     });

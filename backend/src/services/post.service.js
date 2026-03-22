@@ -29,12 +29,27 @@ const create = async ({
 };
 
 // Get all posts
-const getAll = async () => {
-  return await Post.find()
+const getAll = async (page = 1, limit = 8) => {
+  const skip = (page - 1) * limit;
+
+  const total = await Post.countDocuments();
+
+  const posts = await Post.find()
     .populate("user_id", "username email role")
     .populate("category_id", "category_name")
     .populate("province_id", "province_name")
-    .sort({ created_at: -1 });
+    .sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return {
+    posts,
+    pagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // Get single post
