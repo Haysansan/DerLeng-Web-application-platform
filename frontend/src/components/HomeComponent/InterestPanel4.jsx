@@ -1,23 +1,41 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import historical from "../../assets/bmc.png";
-import citylife from "../../assets/btb.jpg";
-import wild from "../../assets/kep.jpg";
+import numBanhJok from "../../assets/interestPanel/interest4/num-banh-jok.jpg";
+import lokLak from "../../assets/interestPanel/interest4/lok-lak.jpg";
+import amok from "../../assets/interestPanel/interest4/amok.jpg";
+import somlaw from "../../assets/interestPanel/interest4/somlaw-krerng.jpg";
+import curry from "../../assets/interestPanel/interest4/curry.jpg";
+import ahPing from "../../assets/interestPanel/interest4/ah-ping.jpg";
+import kuyTeav from "../../assets/interestPanel/interest4/kuyteav.jpg";
+import numPang from "../../assets/interestPanel/interest4/num-pang-with-pate.jpg";
+import somlor from "../../assets/interestPanel/interest4/Somlor-Korko.jpeg";
+import sachAng from "../../assets/interestPanel/interest4/sach-ang.jpg";
+import prahok from "../../assets/interestPanel/interest4/prahok-ktis.jpg";
+import mangoRice from "../../assets/interestPanel/interest4/mango-rice.jpg";
 
 export default function InterestPanel4() {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
-  const images = [historical, citylife, wild];
 
-  // Mock data for food items
-  // TODO: Replace with database query or API call
-  // Example: const { data: foods } = useFetch('/api/foods');
-  const baseInterests = Array.from({ length: 12 }, (_, i) => ({
+  const interestData = [
+    { title: "Phum Num Banh Chok: Famous Traditional Flavors", image: numBanhJok },
+    { title: "Lok Lak: Tender Beef with Fresh Lime Sauce", image: lokLak },
+    { title: "Amok: Creamy Coconut Curry in Banana Leaf", image: amok },
+    { title: "Samlor Machu: Sour Soup with Fresh Fish and Vegetables", image: somlaw },
+    { title: "Nom Banh Chok Sach Moan: Cambodian Rice Noodles with Chicken", image: curry },
+    { title: "Fried Spider: Local Delicacy with Crispy Texture", image: ahPing },
+    { title: "Kuy Teav: Traditional Noodle Soup", image: kuyTeav },
+    { title: "Num Pang: Cambodian Sandwich with Grilled Meat", image: numPang },
+    { title: "Samlor Korko: Palm Heart Soup", image: somlor },
+    { title: "Beef Skewers with Peanut Sauce: Street Food Classic", image: sachAng },
+    { title: "Fish Paste and Vegetables: Simple Local Dish", image: prahok },
+    { title: "Sticky Rice with Mango: Sweet Dessert Favorite", image: mangoRice },
+  ];
+
+  const baseInterests = interestData.map((item, i) => ({
     id: i + 1,
-    title: i % 3 === 0 ? "Phum Num Banh Chok: Famous Traditional Flavors" : 
-           i % 3 === 1 ? "Lok Lak: Tender Beef with Fresh Lime Sauce" : 
-           "Amok: Creamy Coconut Curry in Banana Leaf",
-    image: images[Math.floor(Math.random() * images.length)],
+    title: item.title,
+    image: item.image,
     rating: 4.8 + Math.random() * 0.2,
     reviews: Math.floor(Math.random() * 1000) + 500,
     price: Math.floor(Math.random() * 15) + 3,

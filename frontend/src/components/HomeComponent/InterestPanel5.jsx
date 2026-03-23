@@ -1,42 +1,38 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import historical from "../../assets/bmc.png";
-import citylife from "../../assets/btb.jpg";
-import wild from "../../assets/kep.jpg";
+import angkor from "../../assets/interestPanel/interest5/angkor.jpg";
+import bokor from "../../assets/interestPanel/interest5/bokor.jpg";
+import kohRong from "../../assets/interestPanel/interest5/koh-rong.jpg";
+import tonleSab from "../../assets/interestPanel/interest5/tonle-sab.jpg";
+import angkorView from "../../assets/interestPanel/interest5/Angkorview.jpg";
+import bokorView from "../../assets/interestPanel/interest5/bokorview.jpg";
+import tonleSabAlt from "../../assets/interestPanel/interest5/tonlesab.jpg";
+import kohRongAlt from "../../assets/interestPanel/interest5/kohrong.jpg";
 
 export default function InterestPanel5() {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
-  const images = [historical, citylife, wild];
 
-  // Mock data for landmark spots
-  // TODO: Replace with database query or API call
-  // Example: const { data: spots } = useFetch('/api/spots');
-  const baseInterests = Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    title: [
-      "Siem Reap, Angkor Wat",
-      "Phnom Penh, Royal Palace",
-      "Sihanoukville, Otres Beach",
-      "Battambang, Bamboo Train",
-      "Kampot, Bokor National Park",
-      "Kep, Crab Market",
-      "Kratie, Irrawaddy Dolphins",
-      "Mondulkiri, Sen Monorom",
-      "Ratanakiri, Yeak Loum Lake",
-      "Kampong Thom, Sambok Mountain",
-    ][i],
-    image: images[Math.floor(Math.random() * images.length)],
-  }));
+  const interests = [
+    { id: 1, title: "Angkor Wat", image: angkor },
+    { id: 2, title: "Bokor National Park", image: bokor },
+    { id: 3, title: "Koh Rong Island", image: kohRong },
+    { id: 4, title: "Tonlé Sap Lake", image: tonleSab },
+    { id: 5, title: "Angkor Temple View", image: angkorView },
+    { id: 6, title: "Bokor View", image: bokorView },
+    { id: 7, title: "Koh Rong Adventure", image: kohRongAlt },
+    { id: 8, title: "Tonlé Sab Wildlife", image: tonleSabAlt },
+  ];
 
   // Create infinite loop by repeating interests 3 times
-  const interests = [...baseInterests, ...baseInterests, ...baseInterests];
+  const baseInterests = interests;
+  const allInterests = [...baseInterests, ...baseInterests, ...baseInterests];
 
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
       const itemWidth = 240 + 16; // card width + gap
-      container.scrollLeft = itemWidth * 10;
+      container.scrollLeft = itemWidth * 8;
     }
   }, []);
 
@@ -53,17 +49,17 @@ export default function InterestPanel5() {
 
       // Reset scroll position for infinite loop
       setTimeout(() => {
-        if (container.scrollLeft >= itemWidth * 20) {
-          container.scrollLeft = itemWidth * 10;
+        if (container.scrollLeft >= itemWidth * 16) {
+          container.scrollLeft = itemWidth * 8;
         } else if (container.scrollLeft <= 0) {
-          container.scrollLeft = itemWidth * 10;
+          container.scrollLeft = itemWidth * 8;
         }
       }, 600);
     }
   };
 
   const handleCardClick = (title) => {
-    navigate(`/discover?filter=${encodeURIComponent(title)}`);
+    navigate(`/discover?category=${encodeURIComponent(title)}`);
   };
 
   return (
@@ -85,7 +81,7 @@ export default function InterestPanel5() {
           {/* Scrollable Container */}
           <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide flex-1">
             <div className="flex gap-4">
-              {interests.map((interest, index) => (
+              {allInterests.map((interest, index) => (
                 <div
                   key={index}
                   onClick={() => handleCardClick(interest.title)}
@@ -99,12 +95,9 @@ export default function InterestPanel5() {
                       className="w-full h-full object-cover"
                     />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60 group-hover:opacity-70 transition-opacity"></div>
-
-                    {/* Text Content - Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="text-base font-semibold text-white line-clamp-2 group-hover:text-[#00B050]">
+                    {/* Gradient Overlay - Bottom */}
+                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 via-black/60 to-transparent flex items-center px-4">
+                      <h3 className="text-white text-lg font-extrabold tracking-wide">
                         {interest.title}
                       </h3>
                     </div>

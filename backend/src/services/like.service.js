@@ -1,28 +1,34 @@
-import Post from "../models/Post.js";
-import PostLike from "../models/PostLike.js";
+import mongoose from "mongoose";
+import Like from "../models/PostLike.js";
 
-const toggleLike = async (post_id, user_id) => {
-  const post = await Post.findById(post_id);
-  if (!post) {
-    throw new Error("Post not found");
+const toggleLike = async (target_id, target_type, user_id) => {
+  if (!mongoose.Types.ObjectId.isValid(target_id)) {
+    throw new Error("Invalid target_id");
   }
 
-  const existingLike = await PostLike.findOne({ post_id, user_id });
+  const existingLike = await Like.findOne({
+    target_id,
+    target_type,
+    user_id,
+  });
 
   if (existingLike) {
-    // Unlike
-    await PostLike.deleteOne({ _id: existingLike._id });
+    await Like.deleteOne({ _id: existingLike._id });
+
     return { liked: false };
   } else {
-    // Like
-    await PostLike.create({ post_id, user_id });
+    await Like.create({
+      target_id,
+      target_type,
+      user_id,
+    });
+
     return { liked: true };
   }
 };
 
-const getLikesCount = async (post_id) => {
-  const count = await PostLike.countDocuments({ post_id });
-  return count;
+const getLikesCount = async (target_id, target_type) => {
+  return await Like.countDocuments({ target_id, target_type });
 };
 
 export default {

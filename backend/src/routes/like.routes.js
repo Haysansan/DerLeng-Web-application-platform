@@ -5,10 +5,8 @@ import protect from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Like / Unlike (Protected)
-router.post("/:post_id", protect, toggleLike);
+router.post("/toggle", protect, toggleLike);
 
-// Get like count
-router.get("/:post_id", getLikesCount);
+router.get("/count", getLikesCount);
 
 export default router;

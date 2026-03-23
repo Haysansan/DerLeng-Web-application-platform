@@ -1,0 +1,18 @@
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "profiles",
+    allowed_formats: ["jpg", "png", "jpeg"],
+  },
+});
+
+const uploadProfile = multer({
+  storage,
+  limits: { fileSize: 1 * 1024 * 1024 },
+});
+
+export default uploadProfile;

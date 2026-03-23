@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-
+/* Khmer Font */
+.font-khmer {
+  font-family: 'Kantumruy Pro', sans-serif;
+}
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -101,4 +104,13 @@ input:-webkit-autofill:active {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+.DayPicker {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.DayPicker-Day--selected {
+  background-color: #008A3D;
+  color: white;
 }

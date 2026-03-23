@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
 
-const postCommentSchema = new mongoose.Schema(
+const commentSchema = new mongoose.Schema(
   {
-    post_id: {
+    target_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
       required: true,
+      refPath: "target_type", // 🔥 dynamic reference
+    },
+    target_type: {
+      type: String,
+      required: true,
+      enum: ["Post", "CommunityPost"],
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +24,7 @@ const postCommentSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },
-  }
+  },
 );
 
-export default mongoose.model("PostComment", postCommentSchema);
+export default mongoose.model("Comment", commentSchema);

@@ -1,18 +1,17 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import historical from "../../assets/bmc.png";
-import citylife from "../../assets/btb.jpg";
-import wild from "../../assets/kep.jpg";
+import useTravelStories from "../../hooks/useTravelStories";
 
 export default function InterestPanel3() {
     const scrollContainerRef = useRef(null);
     const navigate = useNavigate();
-    const images = [historical, citylife, wild];
+    const { posts, loading } = useTravelStories();
 
-    const baseInterests = Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
-        title: "The Crab Market: Fresh Seafood and Famous Garlic Pepper Crabs",
-        image: images[Math.floor(Math.random() * images.length)],
+    // Map posts to interests with first image from each post
+    const baseInterests = posts.slice(0, 10).map((post) => ({
+        id: post._id,
+        title: post.title,
+        image: post.images && post.images.length > 0 ? post.images[0] : "",
     }));
 
     // Create infinite loop by repeating interests
@@ -49,24 +48,32 @@ export default function InterestPanel3() {
     };
 
     const handleCardClick = (interest) => {
-        navigate(`/stories/${interest.id}`, { state: { interest } });
+        navigate(`/posts/${interest.id}`);
     };
 
     return (
         <div className="w-full bg-white py-8 px-6">
             <div className="mx-auto max-w-7xl">
+                {/* Loading State */}
+                {loading && (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="w-10 h-10 border-4 border-[#008A3D] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
+
                 {/* Scroll Controls */}
-                <div className="flex items-center gap-4">
-                    {/* Left Button */}
-                    <button
-                        onClick={() => scroll("left")}
-                        className="flex-shrink-0 p-2 hover:bg-opacity-80 rounded-full transition-colors"
-                        aria-label="Scroll left"
-                    >
-                        <svg className="w-6 h-6 text-[#002B11]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
+                {!loading && (
+                    <div className="flex items-center gap-4">
+                        {/* Left Button */}
+                        <button
+                            onClick={() => scroll("left")}
+                            className="flex-shrink-0 p-2 hover:bg-opacity-80 rounded-full transition-colors"
+                            aria-label="Scroll left"
+                        >
+                            <svg className="w-6 h-6 text-[#002B11]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
 
                     {/* Scrollable Container */}
                     <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide flex-1">
@@ -107,7 +114,8 @@ export default function InterestPanel3() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
-                </div>
+                    </div>
+                )}
             </div>
 
             {/* Hide scrollbar styles */}

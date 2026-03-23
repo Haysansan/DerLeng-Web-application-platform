@@ -1,5 +1,6 @@
 import SearchBar from "../components/HomeComponent/SearchBar";
-import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
+import { DisplayBanner0 } from "../components/HomeComponent/DisplayBanner0";
+// import { DisplayBanner } from "../components/HomeComponent/DisplayBanner";
 import { DisplayBanner2 } from "../components/HomeComponent/DisplayBanner2";
 import Title from "../components/HomeComponent/Title";
 import { Title2 } from "../components/HomeComponent/Title2";
@@ -21,7 +22,7 @@ export default function Home() {
       {/* Title */}
       <div className="w-full bg-white py-8 px-6">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-4xl sm:text-5xl font-bold text-center text-[#002B11]">
+          <h1 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center', color: '#002B11', fontFamily: "'Kantumruy Pro', sans-serif" }}>
             តោះដេីរលេង?
           </h1>
         </div>
@@ -37,7 +38,7 @@ export default function Home() {
       {/* Display Banner */}
       <div className="w-full px-6 bg-white flex justify-center">
         <div className="w-full max-w-7xl">
-          <DisplayBanner />
+          <DisplayBanner0 />
         </div>
       </div>
 
@@ -84,8 +85,12 @@ export default function Home() {
       {/* Spacing between InterestPanel5 and DisplayBanner3 */}
       <div className="w-full h-8"></div>
 
-      {/* Interest Panel */}
-      <DisplayBanner3 />
+      {/* Display Banner */}
+      <div className="w-full px-6 bg-white flex justify-center">
+        <div className="w-full max-w-7xl">
+          <DisplayBanner3 />
+        </div>
+      </div>
 
       {/* Additional Content */}
       <div className="mx-auto max-w-7xl px-6 py-12">

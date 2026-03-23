@@ -5,11 +5,11 @@ import {
   getPostById,
   deletePost,
   updatePost,
-  getPostsByUser
+  getPostsByUser,
 } from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
-import {uploadPost} from "../middlewares/upload.middleware.js";
+import { uploadPost } from "../middlewares/upload.middleware.js";
 const router = express.Router();
 
 // Create post (Protected + Image upload)
@@ -28,7 +28,5 @@ router.get("/:id", getPostById);
 router.delete("/:id", protect, deletePost);
 
 router.put("/:id", protect, updatePost);
-
-
 
 export default router;

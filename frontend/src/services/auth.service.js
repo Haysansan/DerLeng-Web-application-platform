@@ -13,9 +13,8 @@ export const sendVerificationCode = async ({ email }) => {
 };
 
 // Register account with code verification
-export const registerAccount = async ({ name, username, email, password, code }) => {
+export const registerAccount = async ({ username, email, password, code }) => {
   const response = await api.post("/auth/register", {
-    name,
     username,
     email,
     password,

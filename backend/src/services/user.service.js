@@ -94,7 +94,17 @@ const updateUser = async (id, currentUser, updateData) => {
   if (updateData.username) {
     user.username = updateData.username;
   }
+  if (updateData.bio !== undefined) {
+  user.bio = updateData.bio;
+  }
 
+  if (updateData.city !== undefined) {
+    user.city = updateData.city;
+  }
+
+  if (updateData.website !== undefined) {
+    user.website = updateData.website;
+  }
   if (updateData.password) {
     user.password_hash = await bcrypt.hash(updateData.password, 10);
   }
@@ -111,6 +121,11 @@ const updateUser = async (id, currentUser, updateData) => {
     username: user.username,
     email: user.email,
     role: user.role,
+    bio: user.bio,
+    city: user.city,
+    website: user.website,
+    avatar: user.avatar,
+    cover: user.cover,
   };
 };
 const deleteUser = async (id, currentUser) => {
@@ -125,6 +140,77 @@ const deleteUser = async (id, currentUser) => {
 
   await User.findByIdAndDelete(id);
 };
+const updateUserImage = async (userId, type, imageUrl) => {
+  const user = await User.findById(userId);
+
+  if (!user) throw new Error("User not found");
+
+  if (type === "cover") {
+    user.cover = imageUrl;
+  } else {
+    user.avatar = imageUrl;
+  }
+
+  await user.save();
+
+  return {
+    id: user._id,
+    username: user.username,
+    email: user.email,
+    avatar: user.avatar,
+    cover: user.cover,
+    
+  };
+};
+
+const changePassword = async (userId, { currentPassword, newPassword }) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // ✅ Check current password
+  const isMatch = await bcrypt.compare(
+    currentPassword,
+    user.password_hash
+  );
+
+  if (!isMatch) {
+    throw new Error("Current password is incorrect");
+  }
+
+  // ✅ Hash new password
+  user.password_hash = await bcrypt.hash(newPassword, 10);
+
+  await user.save();
+
+  return { message: "Password updated successfully" };
+};
+
+export const getUserStatsService = async () => {
+  const stats = await User.aggregate([
+    {
+      $match: {
+        created_at: { $exists: true, $ne: null }, // ✅ match your schema
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$created_at" },
+          month: { $month: "$created_at" },
+        },
+        totalUsers: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { "_id.year": 1, "_id.month": 1 },
+    },
+  ]);
+
+  return stats;
+};
 
 export default {
   getAllUsers,
@@ -133,4 +219,7 @@ export default {
   deleteUser,
   requestEmailChange,
   verifyEmailChange,
+  getUserStatsService,
+  updateUserImage,
+  changePassword,
 };

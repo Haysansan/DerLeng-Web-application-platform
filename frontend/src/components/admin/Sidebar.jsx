@@ -7,6 +7,7 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  MapPin,
   LogOut,
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
@@ -47,6 +48,19 @@ export default function Sidebar() {
           to="."
           icon={LayoutDashboard}
           text="Dashboard"
+          collapsed={collapsed}
+        />
+        <SidebarItem
+          to="communities"
+          icon={MapPin}
+          text="Manage Community"
+          collapsed={collapsed}
+        />
+
+        <SidebarItem
+          to="bookings"
+          icon={MapPin}
+          text="Manage Booking"
           collapsed={collapsed}
         />
 

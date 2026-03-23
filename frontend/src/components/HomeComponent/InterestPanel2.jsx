@@ -1,19 +1,43 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
-import historical from "../../assets/bmc.png";
-import citylife from "../../assets/btb.jpg";
-import wild from "../../assets/kep.jpg";
+import toulsleng from "../../assets/interestPanel/interest2/toulsleng.jpg";
+import market from "../../assets/interestPanel/interest2/market.jpg";
+import redbus from "../../assets/interestPanel/interest2/redbus.jpg";
+import boatride from "../../assets/interestPanel/interest2/boatride.jpg";
+import cherie from "../../assets/interestPanel/interest2/cherie.jpg";
+import choeungeak from "../../assets/interestPanel/interest2/choeung-eak.jpg";
+import khmerarchitecture from "../../assets/interestPanel/interest2/khmer-architecture.jpg";
+import langkalane from "../../assets/interestPanel/interest2/langkalane.jpg";
+import bassaclane from "../../assets/interestPanel/interest2/basaclane.jpg";
+import neangneaki from "../../assets/interestPanel/interest2/neang-neaki.jpg";
+import kompongphluk from "../../assets/interestPanel/interest2/kompong-phluk.jpg";
+import songsaisland from "../../assets/interestPanel/interest2/songsa-island.jpg";
+
 
 export default function InterestPanel2() {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
-  const images = [historical, citylife, wild];
 
-  const baseInterests = Array.from({ length: 12 }, (_, i) => ({
+  const interestData = [
+    { title: "The Killing Field and Toul Sleng Genocide Museum (S21) Tour", image: toulsleng },
+    { title: "Angkor Wat Sunrise and Temple Complex Adventure", image: redbus },
+    { title: "Phnom Penh Central Market and Local Culture Experience", image: market },
+    { title: "Tonlé Sap Lake Floating Village Boat Ride", image: boatride },
+    { title: "Cherie Heritage Site and Ancient Temples", image: cherie },
+    { title: "Choeung Eak Waterfall and Jungle Trek", image: choeungeak },
+    { title: "Khmer Architecture and Historical Temple Tour", image: khmerarchitecture },
+    { title: "Lang Ka Lane Street Food and Night Market", image: langkalane },
+    { title: "Bassac Lane Art District and Street Culture", image: bassaclane },
+    { title: "Neang Neaki Mountain and Nature Adventure", image: neangneaki },
+    { title: "Kampong Phluk Mangrove Forest Kayak", image: kompongphluk },
+    { title: "Sihanoukville Beach and Island Hopping", image: songsaisland },
+  ];
+
+  const baseInterests = interestData.map((item, i) => ({
     id: i + 1,
-    title: "The Killing Field and Toul Sleng Genocide Museum (S21) Tour",
-    image: images[Math.floor(Math.random() * images.length)],
+    title: item.title,
+    image: item.image,
     rating: 4.9,
     reviews: 1534,
     price: 5,

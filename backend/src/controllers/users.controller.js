@@ -99,3 +99,53 @@ export const deleteUser = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getUserStats = async (req, res) => {
+  try {
+    const data = await userService.getUserStatsService();
+    res.json({ data });
+  } catch (err) {
+    console.error("USER STATS ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+export const uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const type = req.body.type; // avatar or cover
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const imageUrl = req.file.path;
+
+    const updatedUser = await userService.updateUserImage(
+      userId,
+      type,
+      imageUrl
+    );
+
+    res.status(200).json({
+      message: "Uploaded successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const result = await userService.changePassword(
+      req.user._id,
+      req.body
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};

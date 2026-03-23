@@ -1,12 +1,14 @@
 import commentService from "../services/comment.service.js";
 
-// Create comment
 export const createComment = async (req, res) => {
   try {
+    const { target_id, target_type, content } = req.body;
+
     const comment = await commentService.create({
-      post_id: req.body.post_id,
+      target_id,
+      target_type,
       user_id: req.user._id,
-      content: req.body.content,
+      content,
     });
 
     res.status(201).json({
@@ -20,10 +22,11 @@ export const createComment = async (req, res) => {
   }
 };
 
-// Get comments of a post
-export const getCommentsByPost = async (req, res) => {
+export const getComments = async (req, res) => {
   try {
-    const comments = await commentService.getByPost(req.params.post_id);
+    const { target_id, target_type } = req.query;
+
+    const comments = await commentService.getByTarget(target_id, target_type);
 
     res.status(200).json({
       data: comments,
@@ -35,7 +38,6 @@ export const getCommentsByPost = async (req, res) => {
   }
 };
 
-// Delete comment
 export const deleteComment = async (req, res) => {
   try {
     await commentService.remove(req.params.id, req.user._id);
