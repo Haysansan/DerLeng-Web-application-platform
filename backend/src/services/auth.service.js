@@ -28,6 +28,12 @@ const login = async ({ email, password }) => {
       username: user.username,
       email: user.email,
       role: user.role,
+      created_at: user.created_at,
+      avatar: user.avatar,
+      cover: user.cover,
+      bio: user.bio,
+      city: user.city,
+      website: user.website,
     },
   };
 };

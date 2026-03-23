@@ -15,8 +15,8 @@ export default function Register({ isOpen, onClose, switchToLogin }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md sm:max-w-lg md:max-w-2xl transition-all duration-300">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+      <div class="relative w-full max-w-md sm:max-w-lg md:max-w-2xl transition-all duration-300">
         <div className="bg-white overflow-hidden shadow-2xl flex flex-col md:flex-row rounded-l transition-all duration-300 max-h-[90vh]">
           
           {/* LEFT FORM */}
@@ -32,7 +32,6 @@ export default function Register({ isOpen, onClose, switchToLogin }) {
                 <>
                   <h2 className="text-sm font-bold text-[#002B11] mb-4 text-center">Sign Up</h2>
                   <div className="space-y-4">
-                    <InputField label="Name" value={form.name} onChange={val => handleChange("name", val)} error={errors.name} />
                     <InputField label="Username" value={form.username} onChange={val => handleChange("username", val)} error={errors.username} />
                     <InputField label="Email" value={form.email} onChange={val => handleChange("email", val)} error={errors.email} />
                     <PasswordField label="Password" value={form.password} onChange={val => handleChange("password", val)} show={showPassword} toggleShow={() => setShowPassword(!showPassword)} error={errors.password} />

@@ -9,7 +9,6 @@ export const useRegister = (switchToLogin) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({
-    name: "",
     username: "",
     email: "",
     password: "",
@@ -98,7 +97,6 @@ export const useRegister = (switchToLogin) => {
 
   const resetForm = () => {
     setForm({
-      name: "",
       username: "",
       email: "",
       password: "",

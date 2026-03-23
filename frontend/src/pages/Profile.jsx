@@ -5,11 +5,12 @@ import EditProfileModal from "../components/EditProfile.jsx";
 import ChangePasswordModal from "../components/ChangePassword.jsx";
 import { AuthContext } from "../context/AuthContext";
 import postService from "../services/post.service.js";
-import { formatDate } from "../utils/formatDate.js";
+import userService from "../services/user.service.js";
 import StoryCard from "../components/stories/StoryCard";
+import Spinner from "../components/Spinner.jsx"; // Your spinner component
 
 export default function Profile() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, setUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const defaultUser = {
@@ -29,105 +30,169 @@ export default function Profile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-    const fetchUserPosts = async () => {
-  if (!user?.id || !user?.token) return;
+  // NEW: spinner states
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  // inside the component
+  const creationDay = currentUser.created_at
+    ? (() => {
+        const d = new Date(currentUser.created_at);
+        const month = d.toLocaleString("en-US", { month: "short" });
+        const day = d.getDate();
+        const year = d.getFullYear();
+        return `${month} ${day} ${year}`;
+      })()
+    : "";
 
-  setLoadingPosts(true);
-  try {
-    const posts = await postService.getPostsByUser(user.id, user.token);
 
-    const postsWithLikes = await Promise.all(
-      posts.map(async (post) => {
-        const id = post._id || post.id;
-        const likes = await postService.getLikesCount(id);
+  const fetchUserPosts = async () => {
+    if (!user?.id || !user?.token) return;
 
-        return {
-          ...post,
-          _id: id,
-          images: post.images || [],
-          likes: likes || 0,
-          liked: false, // same behavior as TravelStories
-        };
-      })
-    );
+    setLoadingPosts(true);
+    try {
+      const posts = await postService.getPostsByUser(user.id, user.token);
+      const postsWithLikes = await Promise.all(
+        posts.map(async (post) => {
+          const id = post._id || post.id;
+          const likes = await postService.getLikesCount(id);
+          return {
+            ...post,
+            _id: id,
+            images: post.images || [],
+            likes: likes || 0,
+            liked: false,
+          };
+        })
+      );
+      setUserPosts(postsWithLikes);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
 
-    setUserPosts(postsWithLikes); // ✅ THIS LINE CHANGED
-  } catch (err) {
-    console.error(err.response?.data || err.message);
-  } finally {
-    setLoadingPosts(false);
-  }
-};
   useEffect(() => {
     if (user?.id) fetchUserPosts();
   }, [user]);
 
-  const handleEditCover = () => alert("Edit Cover Clicked (later open upload)");
-  const handleEditAvatar = () => alert("Edit Profile Picture Clicked (later open upload)");
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
-  const navigateToDetail = (postId) => {
-  navigate(`/posts/${postId}`); // make sure your route matches
-  };
-  const handleLike = async (postId) => {
-  const result = await postService.toggleLike(postId);
-  setUserPosts(prev =>
-    prev.map(p =>
-      (p._id || p.id) === postId
-        ? {
-            ...p,
-            liked: result.liked,
-            likes: result.liked ? (p.likes || 0) + 1 : (p.likes || 0) - 1
-          }
-        : p
-    )
-  );
-};
 
-const handleFavorite = (postId) => {
-  setUserPosts(prev =>
-    prev.map(p =>
-      (p._id || p.id) === postId
-        ? { ...p, isFavorite: !p.isFavorite }
-        : p
-    )
-  );
+  const navigateToDetail = (postId) => navigate(`/posts/${postId}`);
+
+  const handleLike = async (postId) => {
+    const result = await postService.toggleLike(postId);
+    setUserPosts((prev) =>
+      prev.map((p) =>
+        (p._id || p.id) === postId
+          ? {
+              ...p,
+              liked: result.liked,
+              likes: result.liked ? (p.likes || 0) + 1 : (p.likes || 0) - 1,
+            }
+          : p
+      )
+    );
   };
-  
-  if (!user) return <p className="text-center mt-20 text-gray-500">Please login first!</p>;
+
+  const handleFavorite = (postId) => {
+    setUserPosts((prev) =>
+      prev.map((p) =>
+        (p._id || p.id) === postId ? { ...p, isFavorite: !p.isFavorite } : p
+      )
+    );
+  };
+
+  // HANDLE AVATAR UPLOAD
+  const handleEditAvatar = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("type", "avatar");
+
+    const res = await userService.uploadProfileImage(formData, user.token);
+
+    setUser((prev) => {
+      const updated = { ...prev, avatar: res.data.avatar };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+    setIsUploadingAvatar(false);
+  };
+
+  // HANDLE COVER UPLOAD
+  const handleEditCover = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploadingCover(true);
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("type", "cover");
+
+    const res = await userService.uploadProfileImage(formData, user.token);
+
+    setUser((prev) => {
+      const updated = { ...prev, cover: res.data.cover };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+    setIsUploadingCover(false);
+  };
+
+  if (!user)
+    return (
+      <p className="text-center mt-20 text-gray-500">Please login first!</p>
+    );
 
   return (
     <div className="min-h-screen bg-white">
       {/* COVER */}
-      <div className="relative w-full h-[280px]">
-        <img
-          src="https://i.pinimg.com/736x/92/71/26/92712683c4f105a5e1664f14057c16bc.jpg"
-          alt="cover"
-          className="w-full h-full object-cover"
-        />
-        <button
-          onClick={handleEditCover}
-          className="absolute top-4 right-6 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
-          title="Edit Cover Photo"
-        >
+      <div className="relative w-full h-[280px] border-1 border-gray-200">
+        {isUploadingCover ? (
+    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+      <Spinner />
+    </div>
+  ) : currentUser.cover ? (
+    <img
+      src={`${currentUser.cover}?t=${Date.now()}`}
+      alt="cover"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <div className="text-gray-500 text-sm font-semibold text-center px-4 mt-30">
+      No cover image yet. Click to upload a cover!
+    </div>
+  )}
+        <label className="absolute top-4 right-6 bg-white p-2 rounded-full shadow-md cursor-pointer">
           <Camera size={18} className="text-gray-700" />
-        </button>
-        <div className="absolute left-16 -bottom-12">
+          <input type="file" hidden onChange={handleEditCover} />
+        </label>
+
+        {/* AVATAR */}
+        <div className="absolute left-16 -bottom-12 ">
           <div className="relative">
-            <img
-              src="https://i.pinimg.com/736x/e9/18/e6/e918e6b6ab0bc11dedd9975cad3c60a2.jpg"
-              alt="avatar"
-              className="w-28 h-28 rounded-full border-4 border-white object-cover"
-            />
-            <button
-              onClick={handleEditAvatar}
-              className="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition"
-              title="Edit Profile Picture"
-            >
+            {isUploadingAvatar ? (
+              <div className="w-28 h-28 flex items-center justify-center bg-gray-100 rounded-full  ">
+                <Spinner />
+              </div>
+            ) : (
+              <img
+                src={currentUser.avatar ? `${currentUser.avatar}?t=${Date.now()}` : "upload"}
+                alt="avatar"
+                className="w-28 h-28 rounded-full border-4 border-gray-100 object-cover"
+              />
+            )}
+            <label className="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow-md cursor-pointer">
               <Camera size={16} className="text-gray-700" />
-            </button>
+              <input type="file" hidden onChange={handleEditAvatar} />
+            </label>
           </div>
         </div>
       </div>
@@ -135,7 +200,6 @@ const handleFavorite = (postId) => {
       {/* USER INFO */}
       <div className="max-w-6xl mx-auto px-6 mt-10 sm:mt-12 md:mt-16 lg:mt-1">
         <h1 className="text-2xl font-bold">{currentUser.username}</h1>
-
         <div className="flex justify-start mt-2">
           <p className="text-gray-600 text-sm">
             Posts contributed: <span className="font-bold">{userPosts.length}</span> posts
@@ -167,7 +231,9 @@ const handleFavorite = (postId) => {
               Setting
               <ChevronDown
                 size={16}
-                className={`transition-transform duration-200 ${showSettingsDropdown ? "rotate-180" : ""}`}
+                className={`transition-transform duration-200 ${
+                  showSettingsDropdown ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -192,11 +258,8 @@ const handleFavorite = (postId) => {
                   >
                     Change Password
                   </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600">
-                    Delete Account
-                  </li>
                   <li
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer font-semibold"
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600 font-semibold"
                     onClick={handleLogout}
                   >
                     Logout
@@ -214,15 +277,38 @@ const handleFavorite = (postId) => {
             <h2 className="font-bold text-lg mb-4">Intro</h2>
             <p className="text-sm text-gray-600 mb-4">{currentUser.bio}</p>
             <ul className="text-sm text-gray-500 space-y-2">
-              <li>📍 {currentUser.location}</li>
-              <li>🗓 {formatDate(currentUser.created_at)}</li>
-              <li>🔗 {currentUser.website}</li>
+              <li>📍 {currentUser.city}</li>
+              <li>🗓 {creationDay}</li>
+              <li>
+  🔗{" "}
+  {currentUser.website ? (
+    <a
+      href={
+        currentUser.website.startsWith("http")
+          ? currentUser.website
+          : `https://${currentUser.website}`
+      }
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 hover:underline break-all"
+    >
+      {currentUser.website}
+    </a>
+  ) : (
+    "N/A"
+  )}
+</li>
             </ul>
 
             <div className="mt-6">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-bold text-sm">Photos</h3>
-                <button className="text-xs text-gray-500 hover:underline">View all</button>
+                <button
+                  onClick={() => setActiveTab("Photos")}
+                  className="text-xs text-gray-500 hover:underline cursor-pointer"
+                >
+                  View all
+                </button>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {userPosts
@@ -246,39 +332,11 @@ const handleFavorite = (postId) => {
             {activeTab === "My Posts" && (
               <div>
                 {loadingPosts ? (
-                  <p className="text-gray-500 text-center py-8">Loading posts...</p>
+                  <Spinner></Spinner>
                 ) : userPosts.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">No posts yet! Start creating your first travel story.</p>
                 ) : (
-                  // <div className="space-y-6">
-                  //   {userPosts.map((post) => (
-                  //     <div key={post.id} className="border rounded-lg p-4 shadow-sm bg-green">
-                  //       <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
-                  //       <p className="mb-2 whitespace-pre-line">{post.content}</p>
-                  //       {post.location_description && (
-                  //         <p className="text-gray-600 mb-2">📍 {post.location_description}</p>
-                  //       )}
-                  //       {post.trip_date && (
-                  //         <p className="text-gray-500 text-sm">
-                  //           🗓 {new Date(post.trip_date).toLocaleDateString()} | ⏱ {post.trip_duration} days | 💰 ${post.trip_cost}
-                  //         </p>
-                  //       )}
-                  //       {post.images && post.images.length > 0 && (
-                  //         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  //           {post.images.map((img, i) => (
-                  //             <img
-                  //               key={i}
-                  //               src={img}
-                  //               alt={`post-${post.title}-${i}`}
-                  //               className="w-full h-40 object-cover rounded-md"
-                  //             />
-                  //           ))}
-                  //         </div>
-                  //       )}
-                  //     </div>
-                  //   ))}
-                      // </div>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                     {userPosts.map((post) => (
                       <StoryCard
                         key={post._id || post.id}
@@ -297,7 +355,7 @@ const handleFavorite = (postId) => {
             {activeTab === "Photos" && (
               <div>
                 {loadingPosts ? (
-                  <p className="text-gray-500 text-center py-8">Loading photos...</p>
+                  <p className="text-gray-500 text-center py-8"><Spinner></Spinner></p>
                 ) : userPosts.length === 0 || userPosts.flatMap((post) => post.images || []).length === 0 ? (
                   <p className="text-gray-500 text-center py-8">No photos yet! Create a post with images.</p>
                 ) : (

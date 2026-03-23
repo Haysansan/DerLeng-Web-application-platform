@@ -105,3 +105,12 @@ input:-webkit-autofill:active {
     scrollbar-width: none;
   }
 }
+.DayPicker {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.DayPicker-Day--selected {
+  background-color: #008A3D;
+  color: white;
+}

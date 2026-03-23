@@ -1,6 +1,8 @@
 // src/pages/Post.jsx
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css'; // default styles
 import {
   Calendar,
   Clock,
@@ -11,6 +13,7 @@ import api from "../services/api.js";
 import { getCategories, getProvinces } from "../services/place.service";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import ButtonSpinner from "../components/ButtonSpinner.jsx";
 
 export default function PostForm() {
   const { user: currentUser } = useContext(AuthContext);
@@ -488,26 +491,7 @@ export default function PostForm() {
               disabled={isSubmitting}
             >
               {isSubmitting && (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
+                <ButtonSpinner size={1.25} color="white" />
               )}
               {isSubmitting ? "Publishing..." : "Publish Post"}
             </button>
