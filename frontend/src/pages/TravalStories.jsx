@@ -5,6 +5,7 @@ import useTravelStories from "../hooks/useTravelStories";
 import StoryCard from "../components/stories/StoryCard";
 import FeaturedStories from "../components/stories/FeaturedStories";
 import { Search } from "lucide-react";
+import Spinner from "../components/Spinner";
 
 export default function TravelStories() {
   const { posts, loading, toggleLikePost } = useTravelStories();
@@ -49,8 +50,7 @@ export default function TravelStories() {
   if (loading)
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-white">
-        <div className="w-10 h-10 border-4 border-[#008A3D] border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-gray-600 font-medium text-lg">Loading...</p>
+        <Spinner></Spinner>
       </div>
     );
 

@@ -23,12 +23,13 @@ const getLikesCount = async (postId) => {
 
 // services/postService.js
 
-export const getPostsByUser = async (userId, token) => {
+const getPostsByUser = async (userId, token) => {
   const res = await api.get(`/posts/user/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data.data || [];
 };
+
 export default {
   getAllPosts,
   toggleLike,

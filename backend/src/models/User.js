@@ -32,6 +32,18 @@ const userSchema = new mongoose.Schema(
       type: String, 
       default: "", 
     },
+    bio: {
+      type: String,
+      default: ""
+    },
+    city: {
+      type: String,
+      default: ""
+    },
+    website: {
+      type: String,
+      default: ""
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },
