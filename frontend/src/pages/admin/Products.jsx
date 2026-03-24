@@ -8,8 +8,8 @@ import {
   createProductCategory,
   updateProductCategory,
   deleteProductCategory,
+  updateProduct,
 } from "../../services/product.service.js";
-import API from "../../services/api.js";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -42,14 +42,24 @@ export default function Products() {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const [prodRes, catRes] = await Promise.all([
+      const [prodResult, catResult] = await Promise.allSettled([
         getProducts(),
         getProductCategory(),
       ]);
-      console.log("Product Res", prodRes.data);
-      console.log("Categories Res", catRes.data);
-      setProducts(prodRes.data.data || []);
-      setCategories(catRes.data.data || []);
+
+      if (prodResult.status === "fulfilled") {
+        const pData =
+          prodResult.value.data?.data || [];
+        setProducts(pData);
+      } else {
+        console.error("Products failed to load (404):", prodResult.reason);
+      }
+
+      if (catResult.status === "fulfilled") {
+        const cData = catResult.value.data?.data || [];
+        setCategories(cData);
+        // console.log("Categories loaded successfully:", cData);
+      } 
     } catch (err) {
       console.error("Failed to load data", err);
     } finally {
@@ -69,7 +79,7 @@ export default function Products() {
     formData.append("description", productForm.description || "");
     const categoryId =
       typeof productForm.product_category === "object"
-        ? productForm.product_category._id
+        ? productForm.product_category?._id
         : productForm.product_category;
     if (!categoryId) {
       alert("Please select a valid category!");
@@ -84,12 +94,16 @@ export default function Products() {
     }
 
     try {
-      const res = await createProduct(formData);
-      alert("Product saved successfully");
-      setProducts((prev) => [...prev, res.data.data]);
-      setShowModal(false);
+      if (editingProductId) {
+        await updateProduct(editingProductId, formData);
+      } else {
+        const  res = await createProduct(formData);
+        setProducts((prev) => [...prev, res.data.data]);
+      }
       // fetchInitialData(); // Refresh list
       resetForm();
+      setShowModal(false);
+      fetchInitialData();
     } catch (err) {
       console.error("Save Product Failed:", err.response?.data);
       alert(err.response?.data?.message || "Error saving product");
@@ -114,7 +128,7 @@ export default function Products() {
       price: "",
       description: "",
       product_category: "",
-      image: null,
+      images: [],
     });
     setEditingProductId(null);
   };
@@ -134,6 +148,7 @@ export default function Products() {
     } catch (err) {
       console.error("Create category failed:", err.response?.data);
       alert(err.response?.data?.message || "Create failed - check console");
+      fetchInitialData();
     }
   };
 
@@ -213,7 +228,7 @@ export default function Products() {
           <option value="All">All Categories</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat._id}>
-              {cat.product_category_name || cat.title}
+              {cat.product_category_name || cat.title || cat.name || "Unnamed"}
             </option>
           ))}
         </select>
@@ -237,7 +252,10 @@ export default function Products() {
               <div className="flex justify-between mt-4">
                 <button
                   onClick={() => {
-                    setProductForm(product);
+                    setProductForm({
+                      ...product,
+                      product_category: product.product_category?._id || product.product_category
+                    });
                     setEditingProductId(product._id);
                     setShowModal(true);
                   }}
@@ -297,7 +315,7 @@ export default function Products() {
               ) : (
                 <>
                   <span className="text-sm font-medium text-gray-700">
-                    {cat.product_category_name || cat.title}
+                    {cat.product_category_name || cat.title || cat.name || "Unnamed"}
                   </span>
                   <div className="flex gap-1 ml-2 border-l pl-2 border-gray-300">
                     <Edit

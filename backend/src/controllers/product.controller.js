@@ -2,14 +2,15 @@ import productService from "../services/product.service.js"
 
 export const getProducts = async (req, res) => {
   try {
-    const product = await productService.getAll(req.query);
+    const products = await productService.getAll(req.query);
+    const data = products || [];
     res.status(200).json({
       success: true,
-      coout: product.length,
-      data: product
+      count: data.length,
+      data: data
     });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       success: false,
       message: error.message
     });
