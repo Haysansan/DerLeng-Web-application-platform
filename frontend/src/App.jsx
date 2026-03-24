@@ -1,4 +1,4 @@
-//frontend\src\App.jsx
+// frontend/src/App.jsx
 import { Route, Routes } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart"; 
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";
@@ -30,14 +31,19 @@ import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 const App = () => {
   const location = useLocation();
   const state = location.state;
+
   return (
     <Routes>
       {/* Main Layout */}
       <Route path="/" element={<Master />}>
         <Route index element={<Home />} />
 
+        {/* SHOP */}
         <Route path="shop" element={<Shop />} />
         <Route path="shop/:id" element={<ProductDetail />} />
+
+        {/*  CART */}
+        <Route path="cart" element={<Cart />} />
 
         <Route path="about" element={<About />} />
         <Route path="faq" element={<FAQ />} />
@@ -45,6 +51,7 @@ const App = () => {
         <Route path="discover" element={<DiscoverPage />} />
 
         <Route path="post" element={<PostPageWrapper />} />
+
         <Route
           path="profile"
           element={
@@ -69,6 +76,7 @@ const App = () => {
         <Route path="stories" element={<div>Stories</div>} />
         <Route path="TravelStories" element={<TravelStories />} />
       </Route>
+
       {state?.backgroundLocation && (
         <Routes>
           <Route path="/booking/:id" element={<BookingPage />} />
@@ -86,17 +94,19 @@ const App = () => {
       >
         <Route index element={<Dashboard />} />
         <Route path="users" element={<Users />} />
-        {/* <Route path="posts" element={<Posts />} /> */}
+
         <Route path="posts">
           <Route index element={<Posts />} />
           <Route path=":id" element={<Posts />} />
         </Route>
+
         <Route path="products" element={<Products />} />
-        {/* <Route path="communities" element={<Communities />} /> */}
+
         <Route path="communities">
           <Route index element={<Communities />} />
           <Route path=":id" element={<Communities />} />
         </Route>
+
         <Route path="bookings" element={<CommunityBooking />} />
       </Route>
     </Routes>
