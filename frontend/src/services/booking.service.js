@@ -40,6 +40,18 @@ const getBookingById = async (id) => {
   return res.data.data;
 };
 
+const getMyBookings = async () => {
+  const token = localStorage.getItem("token");
+ 
+  const res = await api.get("/booking/my-bookings", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
 /* ---------------- UPDATE ---------------- */
 const updateBookingStatus = async (id, status) => {
   const token = localStorage.getItem("token");
@@ -90,4 +102,5 @@ export default {
   updateBookingStatus,
   deleteBooking,
   getBookingStats,
+  getMyBookings,
 };

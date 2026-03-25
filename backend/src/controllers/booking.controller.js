@@ -5,6 +5,7 @@ import {
   updateBookingStatusService,
   deleteBookingService,
   getBookingStatsService,
+  getBookingsByUserService,
 } from "../services/booking.service.js";
 
 /* ---------------- CREATE ---------------- */
@@ -64,6 +65,20 @@ export const getBookingById = async (req, res) => {
 
     res.json({ success: true, data: booking });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMyBookings = async (req, res) => {
+  try {
+    const bookings = await getBookingsByUserService(req.user._id);
+
+    res.json({
+      success: true,
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Get my bookings error:", error);
     res.status(500).json({ message: error.message });
   }
 };

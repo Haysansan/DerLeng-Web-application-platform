@@ -30,7 +30,7 @@ export const createBookingService = async ({
     0,
   );
 
-  let totalPrice = serviceTotal * number_of_people;
+  let totalPrice = serviceTotal * number_of_people * trip_duration;
 
   if (number_of_people >= 5) {
     totalPrice = totalPrice * 0.8;
@@ -70,6 +70,13 @@ export const getBookingByIdService = async (id) => {
     .populate("user_id")
     .populate("community_post_id")
     .populate("services");
+};
+
+export const getBookingsByUserService = async (userId) => {
+  return await Booking.find({ user_id: userId })
+    .populate("community_post_id", "title")
+    .populate("services")
+    .sort({ created_at: -1 }); // newest first
 };
 
 /* ---------------- UPDATE ---------------- */

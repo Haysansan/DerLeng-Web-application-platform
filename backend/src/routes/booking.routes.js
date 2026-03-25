@@ -7,6 +7,7 @@ import {
   updateBookingStatus,
   deleteBooking,
   getBookingStats,
+  getMyBookings,
 } from "../controllers/booking.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -28,6 +29,9 @@ router.post(
 // admin get all bookings
 router.get("/", protect, adminAuthorize, getAllBookings);
 router.get("/stats", protect, adminAuthorize, getBookingStats);
+
+// get booking by user
+router.get("/my-bookings", protect, getMyBookings);
 
 // get single booking
 router.get("/:id", protect, getBookingById);
