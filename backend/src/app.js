@@ -14,6 +14,7 @@ import productRoutes from "./routes/product.routes.js";
 import productCategoryRoutes from "./routes/productCategory.routes.js"
 import bookingRoutes from "./routes/booking.routes.js"
 import favoriteRoutes from "./routes/favorite.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 
 const app = express();
 
@@ -39,5 +40,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/productCategories", productCategoryRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/orders", orderRoutes);
 
 export default app;

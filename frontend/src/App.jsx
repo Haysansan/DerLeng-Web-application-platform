@@ -11,9 +11,9 @@ import TravelStories from "./pages/TravalStories.jsx";
 import FAQ from "./pages/FAQ.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
-import Shop from "./pages/Shop";
-import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart"; 
+import Shop from "./pages/Shop.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
+import Cart from "./pages/Cart.jsx"; 
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";

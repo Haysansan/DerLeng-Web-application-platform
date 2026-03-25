@@ -31,6 +31,13 @@ const bookingStorage = new CloudinaryStorage({
     allowed_formats: ["jpg", "png", "jpeg"],
   },
 });
+const orderStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "order",
+    allowed_formats: ["jpg", "png", "jpeg"],
+  },
+});
 
 export const uploadPost = multer({
   storage: postStorage,
@@ -46,5 +53,9 @@ export const uploadCommunity = multer({
 });
 export const uploadBooking = multer({
   storage: bookingStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+export const uploadOrder = multer({
+  storage: orderStorage,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
