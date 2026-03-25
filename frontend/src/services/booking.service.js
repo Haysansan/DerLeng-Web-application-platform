@@ -45,13 +45,13 @@ const updateBookingStatus = async (id, status) => {
   const token = localStorage.getItem("token");
 
   const res = await api.put(
-    `/booking/${id}`,
+    `/booking/${id}/status`, 
     { status },
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return res.data;

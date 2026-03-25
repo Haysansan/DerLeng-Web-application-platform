@@ -11,14 +11,16 @@ export default function BookingPage() {
 
   const navigate = useNavigate();
 
+  const [preview, setPreview] = useState(null);
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const [form, setForm] = useState({
     name: "",
     gender: "",
     age: "",
-    phone: "",
+    phone_number: "",
     province: "",
     booking_date: "",
     trip_duration: 1,
@@ -26,10 +28,33 @@ export default function BookingPage() {
     note: "",
   });
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name) newErrors.name = "Name is required";
+    if (!form.gender) newErrors.gender = "Gender is required";
+    if (!form.age) newErrors.age = "Age is required";
+    if (!form.phone_number) newErrors.phone_number = "Phone is required";
+    if (!form.province || form.province === "Select Province")
+      newErrors.province = "Location is required";
+    if (!form.booking_date) newErrors.booking_date = "Date is required";
+    if (!form.trip_duration) newErrors.trip_duration = "Duration is required";
+    if (!form.number_of_people)
+      newErrors.number_of_people = "People is required";
+    if (selectedServices.length === 0)
+      newErrors.services = "Select at least one service";
+    if (!transactionImage)
+      newErrors.transaction_image = "Transaction image required";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const [transactionImage, setTransactionImage] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const provinces = [
     "Phnom Penh",
     "Siem Reap",
@@ -59,9 +84,9 @@ export default function BookingPage() {
 
     let total = serviceTotal * form.number_of_people * form.trip_duration;
 
-   if (form.number_of_people >= 5) {
-     total = total * 0.8;
-   }
+    if (form.number_of_people >= 5) {
+      total = total * 0.8;
+    }
 
     setTotalPrice(total);
   }, [selectedServices, services, form.number_of_people, form.trip_duration]);
@@ -79,28 +104,18 @@ export default function BookingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.age || !form.gender) {
-      return alert("Please fill all required fields");
-    }
-
-    if (selectedServices.length === 0) {
-      return alert("Please select at least one service");
-    }
-
-    if (!transactionImage) {
-      return alert("Please upload transaction image");
-    }
+    if (!validateForm()) return;
 
     try {
+      setLoading(true);
       const formData = new FormData();
 
       formData.append("community_post_id", id);
-
       formData.append("services", JSON.stringify(selectedServices));
-
       formData.append("name", form.name);
       formData.append("age", form.age);
       formData.append("gender", form.gender);
+      formData.append("phone_number", form.phone_number);
       formData.append("current_location", form.province);
       formData.append("trip_duration", form.trip_duration);
       formData.append("number_of_people", form.number_of_people);
@@ -110,11 +125,10 @@ export default function BookingPage() {
 
       await bookingService.createBooking(formData);
       setShowSuccess(true);
-
-      // alert("Booking submitted successfully!");
     } catch (err) {
-      console.error("ERROR:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "Booking failed!");
+      alert("Booking failed!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,10 +178,14 @@ export default function BookingPage() {
 
               <input
                 name="name"
-                placeholder="Full name"
                 onChange={handleChange}
-                className="w-full border border-gray-400 rounded-lg p-3 mb-4 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.name ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name}</p>
+              )}
 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -214,11 +232,15 @@ export default function BookingPage() {
                 Phone Number
               </label>
               <input
-                name="phone"
-                placeholder="Phone number"
+                name="phone_number"
                 onChange={handleChange}
-                className="w-full border border-gray-400  rounded-lg p-3 mb-4 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.phone_number ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {errors.phone_number && (
+                <p className="text-red-500 text-xs">{errors.phone_number}</p>
+              )}
 
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Current Location <span className="text-red-500">*</span>
@@ -226,8 +248,13 @@ export default function BookingPage() {
               <select
                 name="province"
                 onChange={handleChange}
-                className="w-full border border-gray-400  rounded-lg p-3 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 ${
+                  errors.province ? "border-red-500" : "border-gray-400"
+                }`}
               >
+                {errors.province && (
+                  <p className="text-red-500 text-xs">{errors.province}</p>
+                )}
                 <option>Select Province</option>
                 {provinces.map((p) => (
                   <option key={p}>{p}</option>
@@ -248,8 +275,13 @@ export default function BookingPage() {
                 type="date"
                 name="booking_date"
                 onChange={handleChange}
-                className="w-full border border-gray-400  rounded-lg p-3 mb-4 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.booking_date ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {errors.booking_date && (
+                <p className="text-red-500 text-xs">{errors.booking_date}</p>
+              )}
 
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Trip Duration (days)
@@ -287,6 +319,9 @@ export default function BookingPage() {
                       </span>
                     </label>
                   ))}
+                {errors.services && (
+                  <p className="text-red-500 text-sm">{errors.services}</p>
+                )}
               </div>
             </div>
 
@@ -364,13 +399,15 @@ export default function BookingPage() {
                 <p className="text-sm text-gray-500">Click to upload image</p>
               </label>
 
-              {/* PREVIEW */}
               {transactionImage && (
                 <div className="mt-3 relative w-32">
                   <img
                     src={URL.createObjectURL(transactionImage)}
                     alt="Preview"
-                    className="w-32 h-32 object-cover rounded-lg border border-gray-300 "
+                    onClick={() =>
+                      setPreview(URL.createObjectURL(transactionImage))
+                    }
+                    className="w-32 h-32 object-cover rounded-lg border border-gray-300 cursor-zoom-in"
                   />
 
                   {/* REMOVE BUTTON */}
@@ -383,20 +420,51 @@ export default function BookingPage() {
                   </button>
                 </div>
               )}
+
+              {/* PREVIEW */}
+              {preview && (
+                <div
+                  className="fixed inset-0 bg-black/90 flex items-center justify-center z-[999]"
+                  onClick={() => setPreview(null)}
+                >
+                  <button
+                    onClick={() => setPreview(null)}
+                    className="absolute top-5 right-5 text-white text-3xl"
+                  >
+                    ✕
+                  </button>
+
+                  <img
+                    src={preview}
+                    onClick={(e) => e.stopPropagation()}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              )}
+              {errors.transaction_image && (
+                <p className="text-red-500 text-sm">
+                  {errors.transaction_image}
+                </p>
+              )}
             </div>
 
             {/* BUTTON */}
             <button
               onClick={handleSubmit}
-              className="w-full bg-green-900 hover:bg-green-800 text-white py-3 rounded-lg"
+              disabled={loading}
+              className={`w-full py-3 rounded-lg text-white transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-900 hover:bg-green-800 cursor-pointer"
+              }`}
             >
-              Complete Booking
+              {loading ? "Booking..." : "Complete Booking"}
             </button>
           </div>
         </div>
 
         {/* FOOTER */}
-        <div className="mt-16 bg-green-900 text-white text-center py-6 text-sm w-screen -mx-6">
+        <div className="mt-16 bg-green-900 text-white text-center py-6 text-sm">
           Thank you for choosing sustainable community tourism
         </div>
       </div>

@@ -11,7 +11,7 @@ const favoriteSchema = new mongoose.Schema(
     target_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      refPath: "target_type", // 🔥 dynamic
+      refPath: "target_type", 
     },
 
     target_type: {
@@ -25,7 +25,7 @@ const favoriteSchema = new mongoose.Schema(
   },
 );
 
-// ✅ prevent duplicate favorite
+
 favoriteSchema.index(
   { user_id: 1, target_id: 1, target_type: 1 },
   { unique: true },
