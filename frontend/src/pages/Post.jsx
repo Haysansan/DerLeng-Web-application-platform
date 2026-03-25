@@ -129,11 +129,18 @@ export default function PostForm() {
   const handlePublish = async () => {
     const newErrors = {};
 
-    ["title", "content", "province", "type", "startDate", "duration", "cost"].forEach(
-      (field) => {
-        if (!post[field]) newErrors[field] = `${getFieldLabel(field)} is required`;
-      }
-    );
+    [
+      "title",
+      "content",
+      "province",
+      "type",
+      "startDate",
+      "duration",
+      "cost",
+    ].forEach((field) => {
+      if (!post[field])
+        newErrors[field] = `${getFieldLabel(field)} is required`;
+    });
 
     if (post.gallery.length === 0) {
       newErrors.gallery = "Please add at least one image";
@@ -213,7 +220,9 @@ export default function PostForm() {
                     : "border-gray-300 focus:border-green-500"
                 }`}
               />
-              {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+              )}
             </header>
 
             <section className="space-y-4">
@@ -227,95 +236,107 @@ export default function PostForm() {
                 onChange={handleChange}
                 placeholder="Share your experience..."
                 className={`w-full h-80 border rounded-sm p-4 focus:ring-1 focus:outline-none ${
-                  errors.content ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
+                  errors.content
+                    ? "border-red-500 focus:ring-red-300"
+                    : "border-gray-300 focus:ring-green-500"
                 }`}
               />
-              {errors.content && <p className="text-red-500 text-xs mt-1">{errors.content}</p>}
+              {errors.content && (
+                <p className="text-red-500 text-xs mt-1">{errors.content}</p>
+              )}
             </section>
           </div>
 
           {/* RIGHT COLUMN */}
           <div className="space-y-8">
             {/* Trip Details */}
-<section>
-  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
-    Trip Details
-  </h3>
-  <div className="space-y-4 text-sm">
-    {/* Start Date */}
-    <div>
-      <div className="flex items-start space-x-3">
-        <Calendar size={18} className="mt-0.5" />
-        <input
-          type="date"
-          name="startDate"
-          value={post.startDate}
-          onChange={handleChange}
-          className={`block w-full border p-1 text-gray-600 rounded-sm ${
-            errors.startDate ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
-          }`}
-          max={new Date().toISOString().split("T")[0]}
-        />
-      </div>
-      <p
-        className={`text-xs mt-1 ${
-          errors.startDate ? "text-red-500" : "text-gray-400"
-        }`}
-      >
-        {errors.startDate ? errors.startDate : "Add start date to your trip"}
-      </p>
-    </div>
+            <section>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
+                Trip Details
+              </h3>
+              <div className="space-y-4 text-sm">
+                {/* Start Date */}
+                <div>
+                  <div className="flex items-start space-x-3">
+                    <Calendar size={18} className="mt-0.5" />
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={post.startDate}
+                      onChange={handleChange}
+                      className={`block w-full border p-1 text-gray-600 rounded-sm ${
+                        errors.startDate
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-green-500"
+                      }`}
+                      max={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                  <p
+                    className={`text-xs mt-1 ${
+                      errors.startDate ? "text-red-500" : "text-gray-400"
+                    }`}
+                  >
+                    {errors.startDate
+                      ? errors.startDate
+                      : "Add start date to your trip"}
+                  </p>
+                </div>
 
-    {/* Duration */}
-    <div>
-      <div className="flex items-start space-x-3">
-        <Clock size={18} className="mt-0.5" />
-        <input
-          type="text"
-          name="duration"
-          placeholder="Trip Duration (e.g., 2 days)"
-          value={post.duration}
-          onChange={handleChange}
-          className={`block w-full border p-1 text-gray-600 rounded-sm ${
-            errors.duration ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
-          }`}
-        />
-      </div>
-      <p
-        className={`text-xs mt-1 ${
-          errors.duration ? "text-red-500" : "text-gray-400"
-        }`}
-      >
-        {errors.duration ? errors.duration : "Duration of the trip"}
-      </p>
-    </div>
+                {/* Duration */}
+                <div>
+                  <div className="flex items-start space-x-3">
+                    <Clock size={18} className="mt-0.5" />
+                    <input
+                      type="text"
+                      name="duration"
+                      placeholder="Trip Duration (e.g., 2 days)"
+                      value={post.duration}
+                      onChange={handleChange}
+                      className={`block w-full border p-1 text-gray-600 rounded-sm ${
+                        errors.duration
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-green-500"
+                      }`}
+                    />
+                  </div>
+                  <p
+                    className={`text-xs mt-1 ${
+                      errors.duration ? "text-red-500" : "text-gray-400"
+                    }`}
+                  >
+                    {errors.duration ? errors.duration : "Duration of the trip"}
+                  </p>
+                </div>
 
-    {/* Cost */}
-    <div>
-      <div className="flex items-center space-x-3">
-        <DollarSign size={18} />
-        <input
-          type="number"
-          name="cost"
-          placeholder="Trip cost in USD"
-          value={post.cost}
-          onChange={handleChange}
-          className={`border rounded-sm p-1 w-full ${
-            errors.cost ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-green-500"
-          }`}
-          min="0"
-        />
-      </div>
-      <p
-        className={`text-xs mt-1 ${
-          errors.cost ? "text-red-500" : "text-gray-400"
-        }`}
-      >
-        {errors.cost ? errors.cost : "How much you spent"}
-      </p>
-    </div>
-  </div>
-</section>
+                {/* Cost */}
+                <div>
+                  <div className="flex items-center space-x-3">
+                    <DollarSign size={18} />
+                    <input
+                      type="number"
+                      name="cost"
+                      placeholder="Trip cost in USD"
+                      value={post.cost}
+                      onChange={handleChange}
+                      className={`border rounded-sm p-1 w-full ${
+                        errors.cost
+                          ? "border-red-500 focus:ring-red-300"
+                          : "border-gray-300 focus:ring-green-500"
+                      }`}
+                      min="0"
+                    />
+                  </div>
+                  <p
+                    className={`text-xs mt-1 ${
+                      errors.cost ? "text-red-500" : "text-gray-400"
+                    }`}
+                  >
+                    {errors.cost ? errors.cost : "How much you spent"}
+                  </p>
+                </div>
+              </div>
+            </section>
 
             {/* Province & Type */}
             <section className="space-y-4">
@@ -338,7 +359,9 @@ export default function PostForm() {
                     </option>
                   ))}
                 </select>
-                {errors.province && <p className="text-red-500 text-xs mt-1">{errors.province}</p>}
+                {errors.province && (
+                  <p className="text-red-500 text-xs mt-1">{errors.province}</p>
+                )}
               </div>
 
               <div>
@@ -360,7 +383,9 @@ export default function PostForm() {
                     </option>
                   ))}
                 </select>
-                {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type}</p>}
+                {errors.type && (
+                  <p className="text-red-500 text-xs mt-1">{errors.type}</p>
+                )}
               </div>
             </section>
 
@@ -381,7 +406,9 @@ export default function PostForm() {
                   />
                 </label>
               </div>
-              {errors.gallery && <p className="text-red-500 text-xs mb-2">{errors.gallery}</p>}
+              {errors.gallery && (
+                <p className="text-red-500 text-xs mb-2">{errors.gallery}</p>
+              )}
               <div className="flex flex-wrap gap-2">
                 {post.gallery.map((file, i) => (
                   <div key={i} className="relative h-24 w-24">
@@ -395,7 +422,9 @@ export default function PostForm() {
                       onClick={() =>
                         setPost((prev) => ({
                           ...prev,
-                          gallery: prev.gallery.filter((_, index) => index !== i),
+                          gallery: prev.gallery.filter(
+                            (_, index) => index !== i,
+                          ),
                         }))
                       }
                       className="absolute top-0 right-0 bg-red-400 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
@@ -429,7 +458,10 @@ export default function PostForm() {
                     placeholder="Location description"
                     value={newLocation.description}
                     onChange={(e) =>
-                      setNewLocation((prev) => ({ ...prev, description: e.target.value }))
+                      setNewLocation((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
                     }
                     className="w-full border border-gray-300 rounded-sm p-2"
                   />
@@ -438,7 +470,10 @@ export default function PostForm() {
                     placeholder="Google Maps link (optional)"
                     value={newLocation.link}
                     onChange={(e) =>
-                      setNewLocation((prev) => ({ ...prev, link: e.target.value }))
+                      setNewLocation((prev) => ({
+                        ...prev,
+                        link: e.target.value,
+                      }))
                     }
                     className="w-full border border-gray-300 rounded-sm p-2"
                   />
@@ -468,7 +503,9 @@ export default function PostForm() {
                       onClick={() =>
                         setPost((prev) => ({
                           ...prev,
-                          locations: prev.locations.filter((_, index) => index !== i),
+                          locations: prev.locations.filter(
+                            (_, index) => index !== i,
+                          ),
                         }))
                       }
                       className="text-red-500 text-xs font-bold hover:text-red-700 ml-2"

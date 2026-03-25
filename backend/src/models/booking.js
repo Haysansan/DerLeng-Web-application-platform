@@ -21,8 +21,12 @@ const bookingSchema = new mongoose.Schema(
       },
     ],
 
-    // Customer information
     name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    phone_number: {
       type: String,
       required: true,
       trim: true,
@@ -45,9 +49,9 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Trip information
+    
     trip_duration: {
-      type: Number, // number of days
+      type: Number, 
       required: true,
       min: 1,
     },

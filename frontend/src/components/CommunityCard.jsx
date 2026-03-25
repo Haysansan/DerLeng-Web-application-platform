@@ -1,4 +1,3 @@
-// export default CommunityCard;
 
 import { Star, Heart, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -68,8 +67,8 @@ const CommunityCard = ({ post, onClick, onFavorite, onLike }) => {
         >
           <Star
             size={18}
-            fill={post.isFavorite ? "#FFD700" : "none"}
-            className={post.isFavorite ? "text-yellow-400" : "text-white"}
+            fill={post.favorited ? "#FFD700" : "none"}
+            className={post.favorited ? "text-yellow-400" : "text-white"}
           />
         </button>
       </div>

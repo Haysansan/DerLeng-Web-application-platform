@@ -44,7 +44,7 @@
 //           setHover(false);
 //           setIndex(0);
 //         }}
-        
+
 //       >
 //         {/* Photo count */}
 //         <img
@@ -131,7 +131,6 @@
 import { Heart, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 
-
 const StoryCard = ({ post, onLike, onFavorite, onClick }) => {
   const images = post.images || [];
   const [index, setIndex] = useState(0);
@@ -172,7 +171,11 @@ const StoryCard = ({ post, onLike, onFavorite, onClick }) => {
         }}
       >
         <img
-          src={images.length > 0 ? images[index] : "https://via.placeholder.com/600"}
+          src={
+            images.length > 0
+              ? images[index]
+              : "https://via.placeholder.com/600"
+          }
           alt={post.title}
           className="w-full h-full object-cover transition duration-500"
         />
@@ -190,17 +193,21 @@ const StoryCard = ({ post, onLike, onFavorite, onClick }) => {
         >
           <Star
             size={18}
-            fill={post.isFavorite ? "#FFD700" : "none"}
-            stroke={post.isFavorite ? "#FFD700" : "white"}
+            fill={post.favorited ? "#FFD700" : "none"}
+            className={post.favorited ? "text-yellow-400" : "text-white"}
           />
         </button>
       </div>
 
       <div className="p-4 pt-1">
-        <p className="text-xs font-bold text-gray-800 uppercase tracking-wide mb-1">{post.title}</p>
+        <p className="text-xs font-bold text-gray-800 uppercase tracking-wide mb-1">
+          {post.title}
+        </p>
 
         <div className="flex justify-between items-center mb-1">
-          <p className="text-xs opacity-80">{post.category_id?.category_name || ""}</p>
+          <p className="text-xs opacity-80">
+            {post.category_id?.category_name || ""}
+          </p>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -213,14 +220,17 @@ const StoryCard = ({ post, onLike, onFavorite, onClick }) => {
               fill={post.liked ? "#ef4444" : "none"}
               className={post.liked ? "text-red-500" : "text-gray-400"}
             />
-            <span className={`text-sm font-bold ${post.liked ? "text-red-500" : "text-gray-700"}`}>
+            {/* <span className={`text-sm font-bold ${post.liked ? "text-red-500" : "text-gray-700"}`}>
               {post.likes || 0}
-            </span>
+            </span> */}
+            <span>{post.likes || 0}</span>
           </button>
         </div>
 
         <p className="text-xs text-gray-500 flex justify-between border-t border-gray-100 pt-1">
-          <span className="font-medium text-gray-700">By {post.user_id?.username || "Unknown"}</span>
+          <span className="font-medium text-gray-700">
+            By {post.user_id?.username || "Unknown"}
+          </span>
           <span>{creationDay}</span>
         </p>
       </div>

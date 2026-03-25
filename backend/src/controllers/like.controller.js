@@ -37,3 +37,19 @@ export const getLikesCount = async (req, res) => {
     });
   }
 };
+
+export const isLiked = async (req, res) => {
+  try {
+    const { target_id, target_type } = req.query;
+
+    const liked = await likeService.isLiked(
+      target_id,
+      target_type,
+      req.user._id,
+    );
+
+    res.json({ liked });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

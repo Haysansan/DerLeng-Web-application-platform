@@ -30,8 +30,18 @@ const toggleLike = async (target_id, target_type, user_id) => {
 const getLikesCount = async (target_id, target_type) => {
   return await Like.countDocuments({ target_id, target_type });
 };
+const isLiked = async (target_id, target_type, user_id) => {
+  const like = await Like.findOne({
+    target_id,
+    target_type,
+    user_id,
+  });
+
+  return !!like;
+};
 
 export default {
   toggleLike,
   getLikesCount,
+  isLiked,
 };

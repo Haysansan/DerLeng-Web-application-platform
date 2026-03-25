@@ -7,11 +7,14 @@ import { useEffect, useState } from "react";
 
 import communityService from "../services/community.service";
 import CommunityCard from "../components/CommunityCard";
+import likeService from "../services/like.service";
+import favoriteService from "../services/favorite.service";
 
 export default function DiscoverPage() {
   const { categories, provinces, loading } = useDiscover();
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const [likedMap, setLikedMap] = useState({});
 
   const [communities, setCommunities] = useState([]);
   const [likesMap, setLikesMap] = useState({});
@@ -33,23 +36,59 @@ export default function DiscoverPage() {
     const fetchInteractions = async () => {
       try {
         const likesData = {};
+        const likedData = {};
         const favoritesData = {};
+
+        const token = localStorage.getItem("token");
 
         await Promise.all(
           communities.map(async (post) => {
             try {
-              const likeRes = await api.get(`/likes/${post._id}`);
-              likesData[post._id] = likeRes.data.likes;
+              const likeRes = await likeService.getLikesCount(
+                post._id,
+                "CommunityPost",
+              );
 
-              const favRes = await api.get(`/favorites/${post._id}`);
-              favoritesData[post._id] = favRes.data.isFavorite;
-            } catch (err) {
-              console.log("Interaction fetch error", err);
-            }
+              likesData[post._id] = likeRes.likes;
+
+              if (token) {
+                const likedRes = await likeService.isLiked(
+                  post._id,
+                  "CommunityPost",
+                  token,
+                );
+
+                likedData[post._id] = likedRes.liked;
+              }
+            } catch {}
           }),
         );
 
+        if (token) {
+          const favorites = await favoriteService.getFavorites(
+            "CommunityPost",
+            token,
+          );
+          favorites.forEach((fav) => {
+            let id = null;
+
+            if (fav.target_id) {
+              if (typeof fav.target_id === "object" && fav.target_id._id) {
+                id = fav.target_id._id;
+              } else {
+                id = fav.target_id;
+              }
+            }
+
+            if (id) {
+              favoritesData[id.toString()] = true;
+            }
+          });
+          console.log("favorites:", favorites);
+          console.log("favoritesData:", favoritesData);
+        }
         setLikesMap(likesData);
+        setLikedMap(likedData);
         setFavoritesMap(favoritesData);
       } catch (err) {
         console.error(err);
@@ -62,29 +101,36 @@ export default function DiscoverPage() {
   }, [communities]);
 
   const handleLike = async (postId) => {
-    try {
-      await api.post(`/likes/${postId}`);
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Login first");
 
-      setLikesMap((prev) => ({
-        ...prev,
-        [postId]: (prev[postId] || 0) + 1,
-      }));
-    } catch (err) {
-      console.error("Like failed", err);
-    }
-  };
-  const handleFavorite = async (postId) => {
-    try {
-      await api.post(`/favorites/${postId}`);
+    const res = await likeService.toggleLike(postId, "CommunityPost", token);
 
-      setFavoritesMap((prev) => ({
-        ...prev,
-        [postId]: !prev[postId],
-      }));
-    } catch (err) {
-      console.error("Favorite failed", err);
-    }
+    setLikedMap((prev) => ({
+      ...prev,
+      [postId]: res.liked,
+    }));
+
+    setLikesMap((prev) => ({
+      ...prev,
+      [postId]: res.liked ? (prev[postId] || 0) + 1 : (prev[postId] || 1) - 1,
+    }));
   };
+const handleFavorite = async (postId) => {
+  const token = localStorage.getItem("token");
+  if (!token) return alert("Login first");
+
+  const res = await favoriteService.toggleFavorite(
+    postId,
+    "CommunityPost",
+    token,
+  );
+
+  setFavoritesMap((prev) => ({
+    ...prev,
+    [postId.toString()]: res.isFavorite, 
+  }));
+};
 
   const filteredCommunities = communities.filter((post) => {
     const keyword = search.toLowerCase();
@@ -178,8 +224,8 @@ export default function DiscoverPage() {
                 post={{
                   ...post,
                   likes: likesMap[post._id] || 0,
-                  liked: false, // optional (if you track user like)
-                  isFavorite: favoritesMap[post._id] || false,
+                  liked: likedMap[post._id] || false,
+                  favorited: favoritesMap[post._id.toString()] || false,
                 }}
                 onClick={() => navigate(`/community/${post._id}`)}
                 onLike={handleLike}
