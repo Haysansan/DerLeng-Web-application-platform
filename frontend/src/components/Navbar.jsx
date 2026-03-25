@@ -66,17 +66,19 @@ export default function Navbar() {
                 Stories
               </Link>
 
+              <Link to="/shop" className={`hover:text-[#002B11] hover:scale-110 transition-transform duration-200 ${
+                    location.pathname === "/shop" ? "text-[#002B11] font-bold text-lg " : "text-gray-700"
+                }`}>
+                Shop
+              </Link>
+
               <Link to="/about" className={`hover:text-[#002B11] hover:scale-110 transition-transform duration-200 ${
                     location.pathname === "/about" ? "text-[#002B11] font-bold text-lg" : "text-gray-700"
                 }`}>
                 About
               </Link>
 
-              <Link to="/shop" className={`hover:text-[#002B11] hover:scale-110 transition-transform duration-200 ${
-                    location.pathname === "/shop" ? "text-[#002B11] font-bold text-lg " : "text-gray-700"
-                }`}>
-                Shop
-              </Link>
+
             </nav>
 
             {/* Right Side */}
@@ -148,13 +150,15 @@ export default function Navbar() {
               Stories
             </Link>
 
+            <Link to="/shop" onClick={() => setMobileMenuOpen(false)}>
+              Shop
+            </Link>
+            
             <Link to="/about" onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
 
-            <Link to="/shop" onClick={() => setMobileMenuOpen(false)}>
-              Shop
-            </Link>
+
           </div>
         </>
       )}

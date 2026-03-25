@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart"; 
+// import Cart from "./pages/Cart"; 
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";
@@ -43,7 +43,7 @@ const App = () => {
         <Route path="shop/:id" element={<ProductDetail />} />
 
         {/*  CART */}
-        <Route path="cart" element={<Cart />} />
+        {/* <Route path="cart" element={<Cart />} /> */}
 
         <Route path="about" element={<About />} />
         <Route path="faq" element={<FAQ />} />
