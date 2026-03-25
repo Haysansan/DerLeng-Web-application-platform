@@ -5,12 +5,12 @@ const likeSchema = new mongoose.Schema(
     target_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      refPath: "target_type", // 🔥 dynamic reference
+      refPath: "target_type", 
     },
     target_type: {
       type: String,
       required: true,
-      enum: ["Post", "CommunityPost"], // add more later if needed
+      enum: ["Post", "CommunityPost"], 
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,

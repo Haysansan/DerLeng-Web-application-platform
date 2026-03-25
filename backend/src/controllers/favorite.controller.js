@@ -6,6 +6,7 @@ import {
 /* ---------------- TOGGLE ---------------- */
 export const toggleFavorite = async (req, res) => {
   try {
+    console.log("USER:", req.user);
     const userId = req.user.id;
     const { target_id, target_type } = req.body;
 

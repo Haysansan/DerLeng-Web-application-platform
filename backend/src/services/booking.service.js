@@ -1,4 +1,4 @@
-import Booking from "../models/Booking.js";
+import Booking from "../models/booking.js";
 import Service from "../models/Service.js";
 
 /* ---------------- CREATE BOOKING ---------------- */
@@ -7,6 +7,7 @@ export const createBookingService = async ({
   community_post_id,
   services,
   name,
+  phone_number,
   age,
   gender,
   current_location,
@@ -40,6 +41,7 @@ export const createBookingService = async ({
     community_post_id,
     services,
     name,
+    phone_number,
     age,
     gender,
     current_location,
@@ -80,13 +82,13 @@ export const deleteBookingService = async (id) => {
   return Booking.findByIdAndDelete(id);
 };
 
-/* ---------------- 📊 STATS (FIXED) ---------------- */
+/* ---------------- STATS (FIXED) ---------------- */
 export const getBookingStatsService = async () => {
   const stats = await Booking.aggregate([
     {
       $match: {
         created_at: { $exists: true, $ne: null },
-        status: { $ne: "rejected" }, // 🚀 IMPORTANT
+        status: { $ne: "rejected" }, 
       },
     },
     {

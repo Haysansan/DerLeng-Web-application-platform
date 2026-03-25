@@ -4,6 +4,7 @@ import postService from "../services/post.service";
 import commentService from "../services/comment.service";
 import {
   Heart,
+  Star,
   ChevronLeft,
   ChevronRight,
   MapPin,
@@ -12,6 +13,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import PostLoginPromptModal from "../components/PostLoginPromptModal";
+import likeService from "../services/like.service";
+import favoriteService from "../services/favorite.service";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -27,6 +30,7 @@ export default function PostDetail() {
 
   const token = localStorage.getItem("token");
   const currentUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const [favorited, setFavorited] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,8 +39,22 @@ export default function PostDetail() {
         const postData = await postService.getPostById(id);
         setPost(postData.data);
 
-        const likesCount = await postService.getLikesCount(id);
-        setLikes(likesCount);
+        const likeRes = await likeService.getLikesCount(id, "Post");
+        setLikes(likeRes.likes);
+
+        if (token) {
+          const likedRes = await likeService.isLiked(id, "Post", token);
+          setLiked(likedRes.liked);
+        }
+        if (token) {
+          const favRes = await favoriteService.getFavorites("Post", token);
+
+          const isFav = favRes.some(
+            (f) => f.target_id?._id?.toString() === id.toString(),
+          );
+
+          setFavorited(isFav);
+        }
 
         const commentsData = await commentService.getCommentsByPost(id);
         setComments(commentsData);
@@ -54,6 +72,15 @@ export default function PostDetail() {
       setCurrentImageIndex((prev) => (prev + 1) % post.images.length);
     }
   };
+  const handleFavorite = async () => {
+    if (!token) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const res = await favoriteService.toggleFavorite(id, "Post", token);
+    setFavorited(res.isFavorite);
+  };
 
   const handlePrevImage = () => {
     if (post.images?.length > 0) {
@@ -68,8 +95,10 @@ export default function PostDetail() {
       setShowLoginModal(true);
       return;
     }
+
     try {
-      const res = await postService.toggleLike(id);
+      const res = await likeService.toggleLike(id, "Post", token);
+
       setLiked(res.liked);
       setLikes((prev) => (res.liked ? prev + 1 : prev - 1));
     } catch (err) {
@@ -146,20 +175,34 @@ export default function PostDetail() {
               </span>
             </div>
           </div>
-          <button
-            onClick={handleLike}
-            className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full  transition duration-300 self-start"
-          >
-            <Heart
-              size={24}
-              className={liked ? "fill-red-500 text-red-500" : "text-gray-400"}
-            />
-            <span
-              className={`font-bold ${liked ? "text-red-500" : "text-gray-600"}`}
+          <div className="flex items-center gap-3 self-start ml-auto">
+            <button
+              onClick={handleLike}
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full  transition duration-300 self-start"
             >
-              {likes}
-            </span>
-          </button>
+              <Heart
+                size={24}
+                className={
+                  liked ? "fill-red-500 text-red-500" : "text-gray-400"
+                }
+              />
+              <span
+                className={`font-bold ${liked ? "text-red-500" : "text-gray-600"}`}
+              >
+                {likes}
+              </span>
+            </button>
+            <Star
+              size={24}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFavorite();
+              }}
+              className={`cursor-pointer transition hover:scale-110 ${
+                favorited ? "fill-yellow-400 text-yellow-400" : "text-gray-400"
+              }`}
+            />
+          </div>
         </div>
 
         {/* --- IMAGE CAROUSEL WITH BLUR EFFECT --- */}

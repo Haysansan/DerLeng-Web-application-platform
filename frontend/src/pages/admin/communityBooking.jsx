@@ -43,7 +43,7 @@ export default function AdminBookingPage() {
     approved: bookings.filter((b) => b.status === "approved").length,
     rejected: bookings.filter((b) => b.status === "rejected").length,
     revenue: bookings
-      .filter((b) => b.status !== "rejected") // 🚀 KEY LINE
+      .filter((b) => b.status !== "rejected") 
       .reduce((sum, b) => sum + (b.total_price || 0), 0),
   };
 
@@ -56,7 +56,7 @@ export default function AdminBookingPage() {
         statusValue,
       );
 
-      alert("Status updated!");
+      // alert("Status updated!");
       setSelectedBooking(null);
       fetchBookings();
     } catch (err) {
@@ -83,7 +83,7 @@ export default function AdminBookingPage() {
         <StatCard title="Approved" value={stats.approved} />
         <StatCard title="Rejected" value={stats.rejected} />
 
-        {/* ✅ NEW CARD */}
+        {/* NEW CARD */}
         <StatCard title="Total Revenue" value={`$${stats.revenue}`} />
       </div>
 
@@ -141,6 +141,7 @@ export default function AdminBookingPage() {
               <p>👥 {booking.number_of_people}</p>
               <p>📅 {booking.booking_date?.slice(0, 10)}</p>
               <p>🧳 {booking.trip_duration} days</p>
+              <p>📞 {booking.phone_number}</p> 
             </div>
 
             {/* POST */}
@@ -171,108 +172,124 @@ export default function AdminBookingPage() {
 
       {/* IMAGE PREVIEW MODAL */}
       {preview && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
-          <img src={preview} className="max-h-[80%] rounded" />
-          <button onClick={() => setPreview(null)}>Close</button>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[999]">
+          {/* CLOSE BUTTON */}
+          <button
+            onClick={() => setPreview(null)}
+            className="absolute top-5 right-5 text-white text-3xl"
+          >
+            ✕
+          </button>
+
+          {/* IMAGE */}
+          <img src={preview} className="max-w-full max-h-full object-contain" />
         </div>
       )}
 
-      {/* 🔥 DETAIL MODAL */}
+      {/*DETAIL MODAL */}
       {selectedBooking && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-xl p-6 relative">
-            {/* CLOSE */}
+        <div className="fixed inset-0 bg-black/70 z-50 flex flex-col">
+          {/* HEADER */}
+          <div className="flex justify-between items-center bg-white p-4 border border-grey-400">
+            <h2 className="text-xl font-bold">Booking Detail</h2>
             <button
               onClick={() => setSelectedBooking(null)}
-              className="absolute top-3 right-3 text-gray-500"
+              className="text-gray-500 text-xl"
             >
               ✕
             </button>
+          </div>
 
-            <h2 className="text-xl font-bold mb-4">Booking Detail</h2>
-
-            {/* INFO */}
-            <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-              <p>
-                <strong>Name:</strong> {selectedBooking.name}
-              </p>
-              <p>
-                <strong>Gender:</strong> {selectedBooking.gender}
-              </p>
-              <p>
-                <strong>Age:</strong> {selectedBooking.age}
-              </p>
-              <p>
-                <strong>Location:</strong> {selectedBooking.current_location}
-              </p>
-              <p>
-                <strong>People:</strong> {selectedBooking.number_of_people}
-              </p>
-              <p>
-                <strong>Duration:</strong> {selectedBooking.trip_duration} days
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {selectedBooking.booking_date?.slice(0, 10)}
-              </p>
-            </div>
-
-            {/* SERVICES */}
-            <div className="mb-4">
-              <strong>Services:</strong>
-              <ul className="list-disc ml-5 text-sm">
-                {selectedBooking.services?.map((s) => (
-                  <li key={s._id}>
-                    {s.name} (${s.price})
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* NOTE */}
-            {selectedBooking.note && (
-              <div className="mb-4">
-                <strong>Note:</strong>
-                <p className="text-sm text-gray-600">{selectedBooking.note}</p>
+          {/* CONTENT (SCROLLABLE) */}
+          <div className="flex-1 overflow-y-auto bg-white">
+            <div className="w-full bg-white p-6 pb-10">
+              {/* INFO */}
+              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                <p>
+                  <strong>Name:</strong> {selectedBooking.name}
+                </p>
+                <p>
+                  <strong>Gender:</strong> {selectedBooking.gender}
+                </p>
+                <p>
+                  <strong>Age:</strong> {selectedBooking.age}
+                </p>
+                <p>
+                  <strong>Location:</strong> {selectedBooking.current_location}
+                </p>
+                <p>
+                  <strong>People:</strong> {selectedBooking.number_of_people}
+                </p>
+                <p>
+                  <strong>Duration:</strong> {selectedBooking.trip_duration}{" "}
+                  days
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {selectedBooking.booking_date?.slice(0, 10)}
+                </p>
               </div>
-            )}
 
-            {/* IMAGE */}
-            <div className="mb-4">
-              <strong>Transaction:</strong>
-              <img
-                src={selectedBooking.transaction_image}
-                className="w-full max-h-[300px] object-cover rounded mt-2"
-              />
-            </div>
+              {/* SERVICES */}
+              <div className="mb-4">
+                <strong>Services:</strong>
+                <ul className="list-disc ml-5 text-sm">
+                  {selectedBooking.services?.map((s) => (
+                    <li key={s._id}>
+                      {s.name} (${s.price})
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            {/* PRICE */}
-            <div className="mb-4 font-semibold text-green-700">
-              Total: ${selectedBooking.total_price}
-            </div>
+              {/* NOTE */}
+              {selectedBooking.note && (
+                <div className="mb-4">
+                  <strong>Note:</strong>
+                  <p className="text-sm text-gray-600">
+                    {selectedBooking.note}
+                  </p>
+                </div>
+              )}
 
-            {/* STATUS DROPDOWN */}
-            <div className="flex items-center gap-3 mt-4">
-              <label className="font-medium">Status:</label>
+              {/* IMAGE */}
+              <div className="mb-4">
+                <strong>Transaction:</strong>
+                <img
+                  src={selectedBooking.transaction_image}
+                  onClick={() => setPreview(selectedBooking.transaction_image)}
+                  className="w-full max-h-[400px] object-cover rounded mt-2 cursor-pointer hover:opacity-80"
+                />
+              </div>
 
-              <select
-                value={statusValue}
-                onChange={(e) => setStatusValue(e.target.value)}
-                className="border p-2 rounded"
-              >
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="completed">Completed</option>
-              </select>
+              {/* PRICE */}
+              <div className="mb-4 font-semibold text-green-700 text-lg">
+                Total: ${selectedBooking.total_price}
+              </div>
 
-              <button
-                disabled={loadingId === selectedBooking._id}
-                onClick={updateStatus}
-                className="bg-green-600 text-white px-4 py-2 rounded"
-              >
-                {loadingId === selectedBooking._id ? "Saving..." : "Save"}
-              </button>
+              {/* STATUS */}
+              <div className="flex items-center gap-3 mt-4">
+                <label className="font-medium">Status:</label>
+
+                <select
+                  value={statusValue}
+                  onChange={(e) => setStatusValue(e.target.value)}
+                  className="border p-2 rounded"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="completed">Completed</option>
+                </select>
+
+                <button
+                  disabled={loadingId === selectedBooking._id}
+                  onClick={updateStatus}
+                  className="bg-green-600 text-white px-4 py-2 rounded"
+                >
+                  {loadingId === selectedBooking._id ? "Saving..." : "Save"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

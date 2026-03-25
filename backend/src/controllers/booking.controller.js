@@ -25,6 +25,7 @@ export const createBooking = async (req, res) => {
       community_post_id: req.body.community_post_id,
       services,
       name: req.body.name,
+      phone_number: req.body.phone_number,
       age: req.body.age,
       gender: req.body.gender,
       current_location: req.body.current_location,
@@ -91,7 +92,7 @@ export const deleteBooking = async (req, res) => {
   }
 };
 
-/* ---------------- 📊 STATS ---------------- */
+/* ----------------  STATS ---------------- */
 export const getBookingStats = async (req, res) => {
   try {
     const data = await getBookingStatsService();

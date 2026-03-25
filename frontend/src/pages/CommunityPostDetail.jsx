@@ -5,6 +5,7 @@ import serviceService from "../services/service.service";
 import likeService from "../services/like.service";
 import commentService from "../services/comment.service";
 import { Heart, Send, Trash2 } from "lucide-react";
+import favoriteService from "../services/favorite.service";
 
 import {
   ChevronLeft,
@@ -12,6 +13,7 @@ import {
   MapPin,
   ArrowLeft,
   DollarSign,
+  Star,
 } from "lucide-react";
 
 export default function CommunityPostDetail() {
@@ -26,6 +28,7 @@ export default function CommunityPostDetail() {
   const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [favorited, setFavorited] = useState(false);
 
   const token = localStorage.getItem("token");
   const currentUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -34,7 +37,6 @@ export default function CommunityPostDetail() {
       try {
         setLoading(true);
 
-        // ✅ ALL inside try
         const postData = await communityService.getCommunityPostById(id);
         setPost(postData || { images: [] });
 
@@ -49,34 +51,52 @@ export default function CommunityPostDetail() {
           "CommunityPost",
         );
         setComments(commentsRes || []);
+        const likedRes = await likeService.isLiked(id, "CommunityPost", token);
+
+        setLiked(likedRes.liked);
+
+        const favRes = await favoriteService.getFavorites(
+          "CommunityPost",
+          token,
+        );
+
+        const isFav = favRes.some(
+          (f) => f.target_id?._id?.toString() === id.toString(),
+        );
+
+        setFavorited(isFav);
       } catch (err) {
         console.error("ERROR:", err);
       } finally {
-        setLoading(false); // ✅ ALWAYS RUN
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [id]);
+  const handleFavorite = async () => {
+    if (!token) return alert("Please login");
 
-  /* ❤️ LIKE */
-const handleLike = async () => {
-  if (!token) return alert("Please login");
+    const res = await favoriteService.toggleFavorite(
+      id,
+      "CommunityPost",
+      token,
+    );
 
-  try {
-    const res = await likeService.toggleLike({
-      target_id: id,
-      target_type: "CommunityPost",
-    });
+    setFavorited(res.isFavorite);
+  };
+
+  /* LIKE */
+  const handleLike = async () => {
+    if (!token) return alert("Please login");
+
+    const res = await likeService.toggleLike(id, "CommunityPost", token);
 
     setLiked(res.liked);
     setLikes((prev) => (res.liked ? prev + 1 : prev - 1));
-  } catch (err) {
-    console.error("LIKE ERROR:", err);
-  }
-};
+  };
 
-  /* 💬 ADD COMMENT */
+  /*  ADD COMMENT */
   const handleAddComment = async () => {
     if (!token) return alert("Please login");
     if (!newComment.trim()) return;
@@ -91,7 +111,7 @@ const handleLike = async () => {
     setNewComment("");
   };
 
-  /* ❌ DELETE COMMENT */
+  /* DELETE COMMENT */
   const handleDeleteComment = async (commentId) => {
     await commentService.deleteComment(commentId, token);
     setComments((prev) => prev.filter((c) => c._id !== commentId));
@@ -126,7 +146,7 @@ const handleLike = async () => {
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
-        className="fixed top-20 right-4 md:left-6 md:right-auto z-50 bg-white shadow-md p-3 rounded-full hover:bg-gray-100 transition"
+        className="fixed top-20 right-4 md:left-6 md:right-auto z-50 bg-white shadow-md p-3 rounded-full hover:bg-gray-100 transition cursor-pointer"
       >
         <ArrowLeft size={22} />
       </button>
@@ -154,22 +174,42 @@ const handleLike = async () => {
           </div>
 
           {/* RIGHT SIDE (LIKE BUTTON) */}
-          <button
-            onClick={handleLike}
-            className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full transition duration-300 self-start"
-          >
-            <Heart
-              size={24}
-              className={liked ? "fill-red-500 text-red-500" : "text-gray-400"}
-            />
-            <span
-              className={`font-bold ${
-                liked ? "text-red-500" : "text-gray-600"
-              }`}
+          <div className="flex items-center gap-3 self-start ml-auto">
+            {/* LIKE */}
+            <button
+              onClick={handleLike}
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full transition duration-300 cursor-pointer"
             >
-              {likes}
-            </span>
-          </button>
+              <Heart
+                size={24}
+                className={
+                  liked ? "fill-red-500 text-red-500" : "text-gray-400"
+                }
+              />
+              <span
+                className={`font-bold ${
+                  liked ? "text-red-500" : "text-gray-600"
+                }`}
+              >
+                {likes}
+              </span>
+            </button>
+
+            {/* FAVORITE */}
+            <button
+              onClick={handleFavorite}
+              className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full flex items-center justify-center"
+            >
+              <Star
+                size={24}
+                className={
+                  favorited
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-gray-400"
+                }
+              />
+            </button>
+          </div>
         </div>
 
         {/* IMAGE CAROUSEL */}
@@ -196,14 +236,14 @@ const handleLike = async () => {
                   <>
                     <button
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/40 p-3 rounded-full"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/40 p-3 rounded-full cursor-pointer"
                     >
                       <ChevronLeft size={28} />
                     </button>
 
                     <button
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/40 p-3 rounded-full"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/40 p-3 rounded-full cursor-pointer"
                     >
                       <ChevronRight size={28} />
                     </button>
@@ -304,7 +344,7 @@ const handleLike = async () => {
               {/* Single Booking Button */}
               <button
                 onClick={() => navigate(`/booking/${post._id}`)}
-                className="w-full mt-3 bg-[#002B11] text-white py-2 rounded-lg hover:bg-green-700 transition"
+                className="w-full mt-3 bg-[#002B11] text-white py-2 rounded-lg hover:bg-green-700 transition cursor-pointer"
               >
                 Book Now
               </button>
@@ -330,7 +370,7 @@ const handleLike = async () => {
             />
             <button
               onClick={handleAddComment}
-              className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl hover:bg-[#008A3D] transition shadow-lg disabled:opacity-50"
+              className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl hover:bg-[#008A3D] transition shadow-lg disabled:opacity-50 cursor-pointer"
             >
               <Send size={18} />
             </button>

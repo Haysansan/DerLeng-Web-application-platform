@@ -5,13 +5,18 @@ import useTravelStories from "../hooks/useTravelStories";
 import StoryCard from "../components/stories/StoryCard";
 import FeaturedStories from "../components/stories/FeaturedStories";
 import { Search } from "lucide-react";
+import likeService from "../services/like.service";
+
 
 export default function TravelStories() {
-  const { posts, loading, toggleLikePost } = useTravelStories();
+  const { posts, loading, toggleLikePost, toggleFavoritePost } =
+    useTravelStories();
+  
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10; // adjust as needed
   const navigate = useNavigate();
+  // const [posts, setPosts] = useState([]);
 
   // Restore page + scroll on mount
   useEffect(() => {
@@ -61,8 +66,12 @@ export default function TravelStories() {
       <section className="px-8 py-4 max-w-[1600px] mx-auto sticky top-0 bg-white z-50 shadow-sm">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-[#002B11]">Travel Stories</h1>
-            <p className="text-gray-500">Discover experiences from our community</p>
+            <h1 className="text-3xl font-bold text-[#002B11]">
+              Travel Stories
+            </h1>
+            <p className="text-gray-500">
+              Discover experiences from our community
+            </p>
           </div>
 
           <div className="flex space-x-4 items-center w-full md:w-auto">
@@ -90,6 +99,7 @@ export default function TravelStories() {
             key={post._id}
             post={post}
             onLike={toggleLikePost}
+            onFavorite={toggleFavoritePost}
             onClick={() => handlePostClick(post._id)}
           />
         ))}
