@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { CircleUser, Bell, MessageCircleQuestionMark, ShoppingCart } from "lucide-react";
 import AuthModals from "./AuthModals";
@@ -15,6 +15,7 @@ export default function Navbar() {
   const { user } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
 
+  const location = useLocation();
   const navigate = useNavigate();
 
   const handleUserClick = () => {
@@ -24,6 +25,15 @@ export default function Navbar() {
 
   // Count total items
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleCartClick = () => {
+    if (location.pathname === "/cart") {
+      navigate(-1); // Go back if already on cart
+    } else {
+      navigate("/cart"); // Go to cart if anywhere else
+    }
+  };
+
 
   return (
     <>
@@ -72,7 +82,7 @@ export default function Navbar() {
 
               {/* 🛒 CART ICON */}
               <button
-                onClick={() => navigate("/cart")}
+                onClick={handleCartClick}
                 className="relative p-1 rounded-full hover:bg-gray-100 transition"
               >
                 <ShoppingCart className="w-6 h-6 text-[#002B11]" />
