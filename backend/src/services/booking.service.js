@@ -30,7 +30,7 @@ export const createBookingService = async ({
     0,
   );
 
-  let totalPrice = serviceTotal * number_of_people;
+  let totalPrice = serviceTotal * number_of_people * trip_duration;
 
   if (number_of_people >= 5) {
     totalPrice = totalPrice * 0.8;
@@ -53,11 +53,15 @@ export const createBookingService = async ({
     note,
   });
 
-  return booking;
+ return await Booking.findById(booking._id)
+   .populate("services")
+   .populate("community_post_id", "title")
+   .populate("user_id", "username");
 };
 
 /* ---------------- GET ALL ---------------- */
 export const getAllBookingsService = async () => {
+  
   return Booking.find()
     .populate("user_id", "username email")
     .populate("community_post_id", "title")
@@ -74,7 +78,10 @@ export const getBookingByIdService = async (id) => {
 
 /* ---------------- UPDATE ---------------- */
 export const updateBookingStatusService = async (id, status) => {
-  return Booking.findByIdAndUpdate(id, { status }, { new: true });
+  return Booking.findByIdAndUpdate(id, { status }, { new: true })
+    .populate("services")
+    .populate("user_id", "username")
+    .populate("community_post_id", "title");
 };
 
 /* ---------------- DELETE ---------------- */
@@ -88,7 +95,7 @@ export const getBookingStatsService = async () => {
     {
       $match: {
         created_at: { $exists: true, $ne: null },
-        status: { $ne: "rejected" }, 
+        status: { $ne: "rejected" },
       },
     },
     {

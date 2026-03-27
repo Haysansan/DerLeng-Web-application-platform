@@ -11,6 +11,8 @@ export default function AdminBookingPage() {
   const [statusValue, setStatusValue] = useState("");
 
   const [loadingId, setLoadingId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -25,6 +27,9 @@ export default function AdminBookingPage() {
 
     setBookings(sorted);
   };
+  const handleDelete = (id) => {
+    setDeleteId(id);
+  };
 
   // FILTER + SEARCH
   const filteredBookings = bookings.filter((b) => {
@@ -37,13 +42,28 @@ export default function AdminBookingPage() {
     return matchStatus && matchSearch;
   });
 
+  const confirmDelete = async () => {
+    try {
+      setDeleting(true);
+
+      await bookingService.deleteBooking(deleteId);
+
+      // remove from UI immediately
+      setBookings((prev) => prev.filter((b) => b._id !== deleteId));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setDeleting(false);
+      setDeleteId(null);
+    }
+  };
   const stats = {
     total: bookings.length,
     pending: bookings.filter((b) => b.status === "pending").length,
     approved: bookings.filter((b) => b.status === "approved").length,
     rejected: bookings.filter((b) => b.status === "rejected").length,
     revenue: bookings
-      .filter((b) => b.status !== "rejected") 
+      .filter((b) => b.status !== "rejected")
       .reduce((sum, b) => sum + (b.total_price || 0), 0),
   };
 
@@ -67,7 +87,7 @@ export default function AdminBookingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div>
       {/* HEADER */}
       <div>
         <h1 className="text-3xl font-bold text-green-900">
@@ -115,59 +135,112 @@ export default function AdminBookingPage() {
               setSelectedBooking(booking);
               setStatusValue(booking.status);
             }}
-            className="bg-white rounded-xl shadow p-5 border border-gray-200 flex flex-col gap-3 cursor-pointer hover:shadow-lg transition"
+            className="bg-white rounded-xl shadow p-5 border border-gray-200 flex flex-col gap-3 hover:shadow-lg transition cursor-pointer"
           >
-            {/* HEADER */}
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-lg">{booking.name}</h3>
+            {/* ALL TOP CONTENT */}
+            <div className="flex flex-col gap-3">
+              {/* HEADER */}
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-lg">{booking.name}</h3>
 
-              <span
-                className={`text-xs px-3 py-1 rounded-full ${
-                  booking.status === "pending" &&
-                  "bg-yellow-100 text-yellow-700"
-                } ${
-                  booking.status === "approved" && "bg-green-100 text-green-700"
-                } ${
-                  booking.status === "rejected" && "bg-red-100 text-red-700"
-                }`}
+                <span
+                  className={`text-xs px-3 py-1 rounded-full ${
+                    booking.status === "pending" &&
+                    "bg-yellow-100 text-yellow-700"
+                  } ${
+                    booking.status === "approved" &&
+                    "bg-green-100 text-green-700"
+                  } ${
+                    booking.status === "rejected" && "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {booking.status}
+                </span>
+              </div>
+
+              {/* INFO */}
+              <div className="text-sm text-gray-600 grid grid-cols-2 gap-2">
+                <p>📍 {booking.current_location}</p>
+                <p>👥 {booking.number_of_people}</p>
+                <p>📅 {booking.booking_date?.slice(0, 10)}</p>
+                <p>🧳 {booking.trip_duration} days</p>
+                <p className="col-span-2">📞 {booking.phone_number}</p>
+              </div>
+
+              {/* POST */}
+              <div className="text-sm">
+                <strong>Post:</strong> {booking.community_post_id?.title}
+              </div>
+
+              {/* SERVICES */}
+              <div className="text-sm">
+                <strong>Services:</strong>{" "}
+                {booking.services
+                  ?.slice(0, 2)
+                  .map((s) => s.name)
+                  .join(", ")}
+                {booking.services?.length > 2 && " ..."}
+              </div>
+
+              {/* PRICE */}
+              <div className="font-semibold text-green-700">
+                ${booking.total_price}
+              </div>
+            </div>
+
+            <div className="mt-auto flex justify-between items-end">
+              <img
+                src={booking.transaction_image}
+                alt="transaction"
+                className="w-24 h-24 object-cover rounded border"
+              />
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(booking._id);
+                }}
+                className="px-2 py-1 text-xs rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition"
               >
-                {booking.status}
-              </span>
+                🗑 Delete
+              </button>
             </div>
-
-            {/* INFO */}
-            <div className="text-sm text-gray-600 grid grid-cols-2 gap-2">
-              <p>📍 {booking.current_location}</p>
-              <p>👥 {booking.number_of_people}</p>
-              <p>📅 {booking.booking_date?.slice(0, 10)}</p>
-              <p>🧳 {booking.trip_duration} days</p>
-              <p>📞 {booking.phone_number}</p> 
-            </div>
-
-            {/* POST */}
-            <div className="text-sm">
-              <strong>Post:</strong> {booking.community_post_id?.title}
-            </div>
-
-            {/* SERVICES */}
-            <div className="text-sm">
-              <strong>Services:</strong>{" "}
-              {booking.services?.map((s) => s.name).join(", ")}
-            </div>
-
-            {/* PRICE */}
-            <div className="font-semibold text-green-700">
-              ${booking.total_price}
-            </div>
-
-            {/* IMAGE */}
-            <img
-              src={booking.transaction_image}
-              alt="transaction"
-              className="w-24 h-24 object-cover rounded border"
-            />
           </div>
         ))}
+        {deleteId && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 w-[320px] shadow-lg">
+              {/* TITLE */}
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Delete Booking
+              </h3>
+
+              {/* MESSAGE */}
+              <p className="text-sm text-black-500 mb-6">
+                Are you sure you want to delete this booking? This action cannot
+                be undone.
+              </p>
+
+              {/* ACTIONS */}
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="px-4 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm rounded-md bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* IMAGE PREVIEW MODAL */}
