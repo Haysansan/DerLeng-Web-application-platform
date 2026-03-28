@@ -27,6 +27,7 @@ import CommunityByProvince from "./pages/CommunityByProvince.jsx";
 import CommunityBooking from "./pages/admin/CommunityBooking";
 import PostPageWrapper from "./components/PostPageWrapper.jsx";
 import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
+import SearchResults from "./pages/SearchResults.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -34,8 +35,11 @@ const App = () => {
 
   return (
     <Routes>
+      
       {/* Main Layout */}
+      <Route path="/search" element={<SearchResults />} />
       <Route path="/" element={<Master />}>
+        
         <Route index element={<Home />} />
 
         {/* SHOP */}
@@ -51,7 +55,7 @@ const App = () => {
         <Route path="discover" element={<DiscoverPage />} />
 
         <Route path="post" element={<PostPageWrapper />} />
-
+        
         <Route
           path="profile"
           element={

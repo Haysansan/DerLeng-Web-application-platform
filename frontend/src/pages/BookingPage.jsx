@@ -478,7 +478,7 @@ export default function BookingPage() {
             <p className="text-gray-500 mb-4">Thank you for your booking!</p>
 
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/profile?tab=booking")}
               className="bg-green-700 text-white px-4 py-2 rounded-lg"
             >
               OK

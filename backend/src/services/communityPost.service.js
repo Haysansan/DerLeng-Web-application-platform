@@ -1,4 +1,5 @@
 import CommunityPost from "../models/CommunityPost.js";
+import mongoose from "mongoose";
 
 const create = async ({
   admin_id,
@@ -20,7 +21,7 @@ const create = async ({
   });
 };
 
-const getAll = async (page = 1, limit = 8) => {
+const getAll = async (page = 1, limit = 10) => {
   const skip = (page - 1) * limit;
 
   const total = await CommunityPost.countDocuments();
@@ -90,10 +91,41 @@ const update = async (post_id, admin_id, role, updateData) => {
   return updatedPost;
 };
 
+const getByProvince = async (provinceId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  // ✅ VALIDATION
+  if (!mongoose.Types.ObjectId.isValid(provinceId)) {
+    throw new Error("Invalid provinceId");
+  }
+
+  const filter = { province_id: provinceId };
+
+  const total = await CommunityPost.countDocuments(filter);
+
+  const posts = await CommunityPost.find(filter)
+    .populate("admin_id", "username email role")
+    .populate("province_id", "province_name")
+    .sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return {
+    posts,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      pages: Math.ceil(total / limit),
+    },
+  };
+};
+
 export default {
   create,
   getAll,
   getById,
   remove,
   update,
+  getByProvince,
 };

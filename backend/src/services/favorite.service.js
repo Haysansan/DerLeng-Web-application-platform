@@ -38,19 +38,43 @@ export const toggleFavoriteService = async (userId, target_id, target_type) => {
 };
 
 /* ---------------- GET USER FAVORITES ---------------- */
-export const getUserFavoritesService = async (
-  userId,
-  target_type, 
-) => {
+export const getUserFavoritesService = async (userId, target_type) => {
   const query = { user_id: userId };
 
   if (target_type) {
     query.target_type = target_type;
   }
 
-  const favorites = await Favorite.find(query)
-    .populate("target_id") 
+  // STEP 1: basic populate
+  let favorites = await Favorite.find(query)
+    .populate("target_id")
     .sort({ created_at: -1 });
+
+  // STEP 2: manual safe populate per type
+  favorites = await Promise.all(
+    favorites.map(async (fav) => {
+      const doc = fav.target_id;
+
+      if (!doc) return fav;
+
+      // ✅ POST
+      if (fav.target_type === "Post") {
+        await doc.populate([
+          { path: "user_id", select: "username" },
+          { path: "category_id", select: "category_name" },
+        ]);
+      }
+
+      // ✅ COMMUNITY POST (adjust fields here!)
+      if (fav.target_type === "CommunityPost") {
+        await doc.populate([
+          { path: "admin_id", select: "username" }, // ⚠️ adjust if needed
+        ]);
+      }
+
+      return fav;
+    })
+  );
 
   return favorites;
 };

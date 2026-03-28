@@ -1,31 +1,21 @@
-//frontend\src\components\stories\FeaturedStories.jsx
 import { ChevronRight, Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import postService from "../../services/post.service";
 
-const FeaturedStories = ({ posts = [], onFavorite }) => {
+const FeaturedStories = ({ posts = [], onLike, onFavorite }) => {
   const navigate = useNavigate();
 
   const [hovered, setHovered] = useState(null);
   const [indexMap, setIndexMap] = useState({});
-  const [localPosts, setLocalPosts] = useState([]);
 
-  const token = localStorage.getItem("token");
-
-  // sync posts
-  useEffect(() => {
-    setLocalPosts(posts);
-  }, [posts]);
-
-  // Top 3 liked posts
+  // Top 3 liked posts (current page)
   const featured = useMemo(() => {
-    return [...localPosts]
+    return [...posts]
       .sort((a, b) => (b.likes || 0) - (a.likes || 0))
       .slice(0, 3);
-  }, [localPosts]);
+  }, [posts]);
 
-  // Image slider on hover
+  // image slider on hover
   useEffect(() => {
     if (!hovered) return;
 
@@ -39,35 +29,10 @@ const FeaturedStories = ({ posts = [], onFavorite }) => {
         ...prev,
         [hovered]: ((prev[hovered] || 0) + 1) % images.length,
       }));
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [hovered, featured]);
-
-  // LIKE FUNCTION (same logic as PostDetail)
-  const handleLike = async (postId) => {
-    if (!token) return alert("Please log in to like posts");
-
-    try {
-      const res = await postService.toggleLike(postId);
-
-      setLocalPosts((prev) =>
-        prev.map((post) =>
-          post._id === postId
-            ? {
-                ...post,
-                liked: res.liked,
-                likes: res.liked
-                  ? (post.likes || 0) + 1
-                  : (post.likes || 0) - 1,
-              }
-            : post
-        )
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 h-[450px] w-full bg-black">
@@ -86,20 +51,23 @@ const FeaturedStories = ({ posts = [], onFavorite }) => {
             }}
             onClick={() => navigate(`/posts/${post._id}`)}
           >
-            {/* Image */}
+            {/* IMAGE */}
             <img
               src={images[index] || "https://via.placeholder.com/800x450"}
               alt={post.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              className="w-full h-full object-cover group-hover:scale-105 transition duration-700 pointer-events-none"
             />
+
+            {/* GRADIENT OVERLAY (RESTORED) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
             {/* LIKE BUTTON */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleLike(post._id);
-              }}
-              className="absolute top-4 left-4 z-40 flex items-center gap-2 px-3 py-2 bg-black/40 rounded-full backdrop-blur-md hover:bg-black/60 transition"
+                onLike?.(post._id);
+              }}              
+              className="absolute top-4 left-4 z-40 flex items-center gap-2 px-3 py-2 bg-black/40 rounded-full backdrop-blur-md hover:bg-black/60 transition"           
             >
               <Heart
                 size={18}
@@ -121,19 +89,19 @@ const FeaturedStories = ({ posts = [], onFavorite }) => {
             >
               <Star
                 size={18}
-                fill={post.isFavorite ? "#FFD700" : "none"}
-                stroke={post.isFavorite ? "#FFD700" : "white"}
+                fill={post.favorited ? "#FFD700" : "none"}
+                stroke={post.favorited ? "#FFD700" : "white"}
               />
             </button>
 
-            {/* Image count */}
+            {/* IMAGE COUNTER (RESTORED) */}
             {images.length > 1 && (
               <div className="absolute bottom-4 right-4 bg-black/40 text-white text-xs px-2 py-1 rounded-xl backdrop-blur">
                 {index + 1}/{images.length}
               </div>
             )}
 
-            {/* Text */}
+            {/* TEXT (RESTORED STYLE) */}
             <div className="absolute bottom-8 left-8 right-8 text-white z-30">
               <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
 
@@ -142,9 +110,6 @@ const FeaturedStories = ({ posts = [], onFavorite }) => {
                 <ChevronRight size={16} className="ml-1" />
               </div>
             </div>
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
           </div>
         );
       })}

@@ -1,14 +1,10 @@
+//frontend\src\services\post.service.js
 import api from "./api.js";
 
 /* ---------------- GET POST ---------------- */
 export const getPostById = async (postId) => {
   const res = await api.get(`/posts/${postId}`);
   return res.data;
-};
-
-const getAllPosts = async () => {
-  const res = await api.get("/posts");
-  return res.data.data;
 };
 
 /* ---------------- LIKE (UPDATED) ---------------- */
@@ -37,10 +33,28 @@ export const getPostsByUser = async (userId, token) => {
   return res.data.data || [];
 };
 
+const getAllPosts = async (page = 1, limit = 10, search = "") => {
+  const res = await api.get(`/posts?page=${page}&limit=${limit}&search=${search}`);
+  return { posts: res.data.data, pagination: res.data.pagination }
+}
+
+/* ---------------- UPDATE POST ---------------- */
+export const updatePost = async (postId, formData) => {
+  const res = await api.put(`/posts/${postId}`, formData);
+  return res.data;
+};
+/* ---------------- DELETE POST ---------------- */
+export const deletePost = async (postId) => {
+  const res = await api.delete(`/posts/${postId}`);
+  return res.data;
+};
+
 export default {
   getAllPosts,
   toggleLike,
   getLikesCount,
   getPostById,
   getPostsByUser,
+  updatePost,
+  deletePost,
 };

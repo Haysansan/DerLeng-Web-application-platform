@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-
+import { useEffect, useRef } from "react";
 export default function Tabs({
   activeTab,
   setActiveTab,
@@ -10,6 +10,18 @@ export default function Tabs({
   handleLogout,
 }) {
   const tabs = ["My Posts", "Photos", "Favorite", "Booking History", "Order History"];
+  const dropdownRef = useRef(null);
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowSettingsDropdown(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
 
   return (
     <div className="flex gap-8 mt-4 border-b border-gray-200 pb-2 text-sm font-semibold relative">
@@ -29,7 +41,7 @@ export default function Tabs({
       ))}
 
       {/* SETTINGS DROPDOWN */}
-      <div className="relative">
+      <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
           className="flex items-center gap-2 pb-2 text-gray-600 hover:text-black"

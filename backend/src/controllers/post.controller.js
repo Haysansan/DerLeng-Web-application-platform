@@ -41,9 +41,10 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
 
-    const result = await postService.getAll(page, limit);
+    const result = await postService.getAll(page, limit, search);
 
     res.status(200).json({
       success: true,
@@ -95,6 +96,7 @@ export const updatePost = async (req, res) => {
       req.user._id,
       req.user.role,
       req.body,
+      req.files // ✅ PASS FILES HERE
     );
 
     res.status(200).json({

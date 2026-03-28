@@ -21,6 +21,15 @@ const commentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    edited: {
+    type: Boolean,
+    default: false,
+    },
+    avatar: {
+    type: String,
+    default: "",
+    },
+
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },

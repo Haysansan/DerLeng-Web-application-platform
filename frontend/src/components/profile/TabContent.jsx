@@ -3,6 +3,7 @@ import StoryCard from "../stories/StoryCard.jsx";
 import Spinner from "../Spinner.jsx";
 import { Calendar, Users, DollarSign, CheckCircle, XCircle, Clock, MapPin } from "lucide-react";
 import BookingModal from "./BookingModal.jsx";
+import CommunityCard from "../CommunityCard.jsx";
 
 export default function TabContent({
   activeTab,
@@ -10,19 +11,24 @@ export default function TabContent({
   loadingPosts,
   userBookings,
   loadingBookings,
+  userFavorites ,
+  loadingFavorites,
   navigateToDetail,
   handleLike,
   handleFavorite,
   selectedBooking,
   setSelectedBooking,
-  setPreview
+  setPreview,
+  navigateToCommunityDetail,
+  onEdit,
+  onDelete,
 }) {
   return (
     <div className="md:col-span-3 rounded-lg shadow-md p-3">
       <h2 className="text-xl font-bold text-[#002B11] mb-2">{activeTab}</h2>
 
       {/* My Posts */}
-      {activeTab === "My Posts" && (
+         {activeTab === "My Posts" && (
         <div>
           {loadingPosts ? (
             <Spinner />
@@ -39,6 +45,8 @@ export default function TabContent({
                   onClick={() => navigateToDetail(post._id || post.id)}
                   onLike={handleLike}
                   onFavorite={handleFavorite}
+                  onEdit={onEdit}
+    onDelete={onDelete}
                 />
               ))}
             </div>
@@ -71,12 +79,44 @@ export default function TabContent({
             </div>
           )}
         </div>
-      )}
-
+          )}
+          
       {/* Favorite */}
-      {activeTab === "Favorite" && (
-        <p className="text-gray-500 text-center py-8">No favorite posts yet!</p>
-      )}
+{activeTab === "Favorite" && (
+  <div>
+    {loadingFavorites ? (
+      <Spinner />
+    ) : userFavorites.length === 0 ? (
+      <p className="text-gray-500 text-center py-8">No favorite posts yet!</p>
+    ) : (
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                  {/* POSTS FAVORITES */}
+{userFavorites.posts.map((post) => (
+  <StoryCard
+    key={post._id}
+    post={post}
+    onClick={() => navigateToDetail(post._id)}
+    onLike={(id) => handleLike(id, "Post")}
+    onFavorite={(id) => handleFavorite(id, "Post")}
+    onEdit={onEdit}
+    onDelete={onDelete}
+  />
+))}
+
+{/* COMMUNITY FAVORITES */}
+{userFavorites.communities.map((post) => (
+  <CommunityCard
+    key={post._id}
+    post={post}
+    onClick={() => navigateToCommunityDetail(post._id)}
+    onLike={(id) => handleLike(id, "CommunityPost")}
+    onFavorite={(id) => handleFavorite(id, "CommunityPost")}
+  />
+))}
+      </div>
+    )}
+  </div>
+)}
 
       {/* Booking History */}
       {activeTab === "Booking History" && (

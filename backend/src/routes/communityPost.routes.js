@@ -6,6 +6,7 @@ import {
   getCommunityPostById,
   deleteCommunityPost,
   updateCommunityPost,
+  getCommunityByProvince, 
 } from "../controllers/communityPost.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
@@ -23,10 +24,11 @@ router.post(
   createCommunityPost,
 );
 
-// Get all community posts
-router.get("/", getAllCommunityPosts);
+// MUST BE FIRST (safe route grouping)
+router.get("/province/:provinceId", getCommunityByProvince);
 
-// Get single community post
+// then normal routes
+router.get("/", getAllCommunityPosts);
 router.get("/:id", getCommunityPostById);
 
 // Update community post

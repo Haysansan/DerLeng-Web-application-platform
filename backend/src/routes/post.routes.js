@@ -15,6 +15,7 @@ const router = express.Router();
 // Create post (Protected + Image upload)
 router.post("/", protect, uploadPost.array("images", 5), createPost);
 
+router.put("/:id", protect, uploadPost.array("images", 5), updatePost);
 // Get all posts
 router.get("/", getAllPosts);
 
