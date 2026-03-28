@@ -6,7 +6,7 @@ import adminAuthorize from "../middlewares/adminAuthorize.js";
 
 const router = express.Router();
 
-router.post("/", uploadOrder.single("transaction_image"), protect, placeOrder);
+router.post("/",protect, uploadOrder.single("transaction_image"), placeOrder);
 router.get("/user/:userId", protect, getMyOrders);
 
 router.get("/admin/all", protect, adminAuthorize, getAdminOrders); 

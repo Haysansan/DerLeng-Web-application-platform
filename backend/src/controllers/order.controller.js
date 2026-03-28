@@ -14,7 +14,7 @@ export const placeOrder = async (req, res) => {
     const items = JSON.parse(req.body.items);
 
     const orderData = {
-      user: req.body.user_id,
+      user: req.body.user || req.body.user_id,
       items: items,
       total_price: req.body.total_price,
       shipping_address: req.body.shipping_address,

@@ -1,7 +1,12 @@
 import api from "./api";
 
-export const placeOrder = async (formData) => {
-  return await api.post("/orders", formData);
+export const placeOrder = async (formData, token) => {
+  return await api.post("/orders", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${token || localStorage.getItem("token")}`
+    }
+  });
 };
 
 export const getMyOrders = async (userId) => {

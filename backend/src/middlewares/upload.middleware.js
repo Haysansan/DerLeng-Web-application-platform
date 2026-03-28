@@ -34,7 +34,7 @@ const bookingStorage = new CloudinaryStorage({
 const orderStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "order",
+    folder: "orders",
     allowed_formats: ["jpg", "png", "jpeg"],
   },
 });

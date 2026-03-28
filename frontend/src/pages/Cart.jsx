@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react"; // Added useContext here
+import React, { useContext, useEffect, useState } from "react"; 
+import { AuthContext} from "../context/AuthContext"
 import { CartContext } from "../context/CartContext";
 import { placeOrder } from "../services/order.service";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import qrImage from "../assets/QR.jpg"
 
 export default function Cart() {
   const { cartItems, removeFromCart, clearCart, updateQuantity } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
@@ -36,14 +38,21 @@ export default function Cart() {
   };
 
   const handleCheckout = async () => {
+    const userId = user?.id || user?._id;
+    if (!userId) {
+      alert("User session not found. Please log in again.");
+      return;
+    }
+
     if (!address || !phone || !screenshot) {
       alert("Please fill in all fields and upload your payment screenshot.");
       return;
     }
 
-
     setLoading(true);
     const formData = new FormData();
+
+    formData.append("user", userId);
 
     const formattedItems = cartItems.map((item) => ({
       product: item._id, 
@@ -58,8 +67,12 @@ export default function Cart() {
     formData.append("transaction_image", screenshot);
 
     try {
-      const response = await placeOrder(formData);
-      if (/*{response.data.success}*/ response.status === 200 || response.status === 201 || response.data) {
+      // Add this right before "const response = await placeOrder..."
+      for (let [key, value] of formData.entries()) {
+        console.log(`Sending Field -> ${key}:`, value);
+      }
+      const response = await placeOrder(formData, user.token);
+      if (/*{response.data.success}*/ response.data) {
         setShowSuccess(true);
         clearCart();
       }
