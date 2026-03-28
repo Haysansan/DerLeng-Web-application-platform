@@ -27,6 +27,10 @@ export default function Navbar() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCartClick = () => {
+    if (!user) {
+      setIsLoginOpen(true);
+      return;
+    }
     if (location.pathname === "/cart") {
       navigate(-1); // Go back if already on cart
     } else {
@@ -87,7 +91,7 @@ export default function Navbar() {
               >
                 <ShoppingCart className="w-6 h-6 text-[#002B11]" />
 
-                {totalItems > 0 && (
+                {user && totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
                     {totalItems}
                   </span>

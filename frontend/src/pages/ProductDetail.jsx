@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { getProducts } from "../services/product.service";
 import { useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import AuthModals from "../components/AuthModals";
+import PostLoginPromptModal from "../components/PostLoginPromptModal";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -15,14 +17,20 @@ export default function ProductDetail() {
   const { user } = useContext(AuthContext);
 
   const [product, setProduct] = useState(null);
-  const [isPromptOpen, setIsPromptOpen] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await getProducts(); 
-        const found = res.data.data.find((p) => p._id === id);
-        setProduct(found);
+        // const product = res?.data?.data || []; //safty to check nested data
+        const found = res.data.data.find((p) => String(p._id) === String(id));
+        if (found) {
+          setProduct(found);
+        } else {
+          console.error("No Product found with ID:", id)
+        }
       } catch (err) {
         console.error(err);
       }
@@ -30,18 +38,18 @@ export default function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  const handleActionWithAuth = (actionType) => {
+  const handleActionWithAuth = (type) => {
     if (!user) {
-      setIsPromptOpen(true);
+      setShowPrompt(true);
       return;
     }
 
-    if (actionType === "BUY_NOW") {
-      addToCart(product);
-      navigate("/cart");
-    } else {
+    if (type === "add") {
       addToCart(product);
       alert("Added to cart!");
+    } else {
+      addToCart(product);
+      navigate("/cart");
     }
   }
   if (!product) {
@@ -55,7 +63,7 @@ export default function ProductDetail() {
   // };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-10">
+    <div className="max-w-6xl mx-auto px-6 py-12 ">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center text-gray-600 hover:text-green-600 mb-4 transition"
@@ -90,7 +98,7 @@ export default function ProductDetail() {
         <div className="flex gap-4 mb-8">
           {/* BUY NOW (GREEN) */}
           <button
-            onClick={() => handleActionWithAuth("BUY_NOW")}
+            onClick={() => handleActionWithAuth("buy")}
             className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition"
           >
             Buy Now
@@ -98,7 +106,7 @@ export default function ProductDetail() {
 
           {/* ADD TO CART (RED) */}
           <button
-            onClick={() => handleActionWithAuth("ADD_TO_CART")}
+            onClick={() => handleActionWithAuth("add")}
             className="bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition"
           >
             Add to Cart
@@ -107,15 +115,15 @@ export default function ProductDetail() {
 
         {/* The Modal */}
         <PostLoginPromptModal
-          isOpen={isPromptOpen}
-          onClose={() => setIsPromptOpen(false)}
-          onLogin={() => {
-            setIsPromptOpen(false);
-            // This assumes your login modal is handled globally or via navigation
-            navigate("/profile");
-          }}
+          isOpen={showPrompt}
           message="Please sign in to purchase or add items to your cart."
+          onClose={() => setShowPrompt(false)}
+          onLogin={() => {
+            setShowPrompt(false);
+            setShowLogin(true);
+          }}
         />
+        <AuthModals isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
         {/* DESCRIPTION SECTION */}
         {product.description && (
