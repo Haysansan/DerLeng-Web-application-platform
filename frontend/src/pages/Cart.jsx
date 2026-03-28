@@ -20,6 +20,12 @@ export default function Cart() {
     0,
   );
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -35,26 +41,17 @@ export default function Cart() {
       return;
     }
 
-    useEffect(() => {
-      return () => {
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-      };
-    }, [previewUrl]);
 
     setLoading(true);
     const formData = new FormData();
 
-    formData.append(
-      "items",
-      JSON.stringify(
-        cartItems.map((item) => ({
-          product: item._id,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      ),
-    );
+    const formattedItems = cartItems.map((item) => ({
+      product: item._id, 
+      quantity: item.quantity,
+      price: item.price || item.minPrice,
+    }));
 
+    formData.append("items", JSON.stringify(formattedItems));
     formData.append("total_price", totalPrice);
     formData.append("shipping_address", address);
     formData.append("phone_number", phone);
@@ -62,30 +59,31 @@ export default function Cart() {
 
     try {
       const response = await placeOrder(formData);
-      if (response.data.success) {
+      if (/*{response.data.success}*/ response.status === 200 || response.status === 201 || response.data) {
         setShowSuccess(true);
         clearCart();
       }
     } catch (error) {
+      console.error("Order Error", error.response?.data)
       alert(error.response?.data?.message || "Order failed");
     } finally {
       setLoading(false);
     }
   };
 
-if (cartItems.length === 0 && !showSuccess) {
-  return (
-    <div className="text-center py-20">
-      <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-      <button
-        onClick={() => navigate("/shop")}
-        className="text-green-600 underline"
-      >
-        Go to Shop
-      </button>
-    </div>
-  );
-}
+  if (cartItems.length === 0 && !showSuccess) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+        <button
+          onClick={() => navigate("/shop")}
+          className="text-green-600 underline"
+        >
+          Go to Shop
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">

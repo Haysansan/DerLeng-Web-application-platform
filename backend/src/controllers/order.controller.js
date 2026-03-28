@@ -2,7 +2,6 @@ import orderService from "../services/order.service.js";
 
 export const placeOrder = async (req, res) => {
   try {
-    // 1. Check if the payment screenshot was uploaded
     if (!req.file) {
       return res
         .status(400)
@@ -12,7 +11,6 @@ export const placeOrder = async (req, res) => {
         });
     }
 
-    // 2. Parse the items (frontend usually sends them as a JSON string in FormData)
     const items = JSON.parse(req.body.items);
 
     const orderData = {

@@ -14,11 +14,8 @@ import productRoutes from "./routes/product.routes.js";
 import productCategoryRoutes from "./routes/productCategory.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
-<<<<<<< HEAD
 import orderRoutes from "./routes/order.routes.js";
-=======
 import "./config/telegram.js";
->>>>>>> 6e762ee9f110790c606ae31d4594b18b0285e202
 
 const app = express();
 
