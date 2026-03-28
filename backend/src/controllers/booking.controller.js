@@ -6,20 +6,24 @@ import {
   deleteBookingService,
   getBookingStatsService,
 } from "../services/booking.service.js";
+import bot from "../config/telegram.js";
 
 /* ---------------- CREATE ---------------- */
 export const createBooking = async (req, res) => {
   try {
+    //  Validate image
     if (!req.file) {
       return res.status(400).json({
         message: "Transaction image is required",
       });
     }
 
+    //  Parse services safely
     const services = Array.isArray(req.body.services)
       ? req.body.services
       : JSON.parse(req.body.services);
 
+    //  STEP 1: CREATE BOOKING 
     const booking = await createBookingService({
       user_id: req.user._id,
       community_post_id: req.body.community_post_id,
@@ -36,13 +40,74 @@ export const createBooking = async (req, res) => {
       transaction_image: req.file.path,
     });
 
-    res.status(201).json({ success: true, data: booking });
+    //  STEP 2: FORMAT SERVICES 
+    let servicesText = "N/A";
+
+    if (booking.services && booking.services.length > 0) {
+      servicesText = booking.services
+        .map(
+          (service, index) =>
+            `${index + 1}. ${service.name} - $${service.price}`,
+        )
+        .join("\n");
+    }
+
+    //  STEP 3: TELEGRAM MESSAGE
+    const message = `
+📢 <b>NEW BOOKING</b>
+
+👤 <b>Name:</b> ${booking.name}
+📞 <b>Phone:</b> ${booking.phone_number}
+📍 <b>Location:</b> ${booking.current_location}
+
+👥 <b>People:</b> ${booking.number_of_people}
+⏳ <b>Duration:</b> ${booking.trip_duration} days
+💰 <b>Total:</b> $${booking.total_price}
+
+📅 <b>Date:</b> ${new Date(booking.booking_date).toDateString()}
+
+🧾 <b>Services:</b>
+${servicesText}
+
+📝 <b>Note:</b> ${booking.note || "N/A"}
+`;
+
+    //  STEP 4: SEND TO TELEGRAM
+    await bot.sendPhoto(
+      process.env.TELEGRAM_CHAT_ID,
+      booking.transaction_image,
+      {
+        caption: message,
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "✅ Approve",
+                callback_data: `approve_${booking._id}`,
+              },
+              {
+                text: "❌ Reject",
+                callback_data: `reject_${booking._id}`,
+              },
+            ],
+          ],
+        },
+      },
+    );
+
+    //  RESPONSE
+    res.status(201).json({
+      success: true,
+      data: booking,
+    });
   } catch (error) {
     console.error("Create booking error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
-
 /* ---------------- GET ALL ---------------- */
 export const getAllBookings = async (req, res) => {
   try {

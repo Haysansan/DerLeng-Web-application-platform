@@ -1,6 +1,5 @@
 // frontend/src/App.jsx
-import { Route, Routes } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 import Master from "./layout/Master";
 import Home from "./pages/Home";
@@ -9,7 +8,6 @@ import DiscoverPage from "./pages/DiscoverPage";
 import Profile from "./pages/Profile";
 import TravelStories from "./pages/TravalStories.jsx";
 import FAQ from "./pages/FAQ.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
 import Shop from "./pages/Shop.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
@@ -27,6 +25,7 @@ import CommunityByProvince from "./pages/CommunityByProvince.jsx";
 import CommunityBooking from "./pages/admin/CommunityBooking";
 import PostPageWrapper from "./components/PostPageWrapper.jsx";
 import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -38,7 +37,7 @@ const App = () => {
       <Route path="/" element={<Master />}>
         <Route index element={<Home />} />
 
-        {/* SHOP */}
+        {/* Shop */}
         <Route path="shop" element={<Shop />} />
         <Route path="shop/:id" element={<ProductDetail />} />
 
@@ -47,11 +46,15 @@ const App = () => {
 
         <Route path="about" element={<About />} />
         <Route path="faq" element={<FAQ />} />
-
         <Route path="discover" element={<DiscoverPage />} />
 
+        {/* Posts */}
         <Route path="post" element={<PostPageWrapper />} />
+        <Route path="posts/:id" element={<DetailPageWrapper />} />
+        <Route path="posts/category/:categoryId" element={<PostListPage />} />
+        <Route path="posts/province/:provinceId" element={<PostListPage />} />
 
+        {/* Profile */}
         <Route
           path="profile"
           element={
@@ -61,22 +64,17 @@ const App = () => {
           }
         />
 
-        {/* Posts */}
-        <Route path="posts/:id" element={<DetailPageWrapper />} />
-        <Route path="posts/category/:categoryId" element={<PostListPage />} />
-        <Route path="posts/province/:provinceId" element={<PostListPage />} />
-
+        {/* Community */}
         <Route path="community/:id" element={<CommunityPostDetail />} />
+        <Route path="community/province/:provinceId" element={<CommunityByProvince />} />
         <Route path="booking/:id" element={<BookingPage />} />
-        <Route
-          path="community/province/:provinceId"
-          element={<CommunityByProvince />}
-        />
 
+        {/* Other Pages */}
         <Route path="stories" element={<div>Stories</div>} />
         <Route path="TravelStories" element={<TravelStories />} />
       </Route>
 
+      {/* Modal-style Routes (optional background location) */}
       {state?.backgroundLocation && (
         <Routes>
           <Route path="/booking/:id" element={<BookingPage />} />

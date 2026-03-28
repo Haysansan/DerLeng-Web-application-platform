@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 export default function BookingPage() {
-  const { id } = useParams(); // community id
+  const { id } = useParams();
 
   const navigate = useNavigate();
 
@@ -32,22 +32,53 @@ export default function BookingPage() {
     const newErrors = {};
 
     if (!form.name) newErrors.name = "Name is required";
+
     if (!form.gender) newErrors.gender = "Gender is required";
-    if (!form.age) newErrors.age = "Age is required";
-    if (!form.phone_number) newErrors.phone_number = "Phone is required";
-    if (!form.province || form.province === "Select Province")
+
+    if (!form.age) {
+      newErrors.age = "Age is required";
+    } else if (form.age <= 0) {
+      newErrors.age = "Age must be greater than 0";
+    }
+
+    if (!form.phone_number) {
+      newErrors.phone_number = "Phone is required";
+    }
+
+    if (!form.province || form.province === "Select Province") {
       newErrors.province = "Location is required";
-    if (!form.booking_date) newErrors.booking_date = "Date is required";
-    if (!form.trip_duration) newErrors.trip_duration = "Duration is required";
-    if (!form.number_of_people)
-      newErrors.number_of_people = "People is required";
-    if (selectedServices.length === 0)
+    }
+
+    if (!form.booking_date) {
+      newErrors.booking_date = "Date is required";
+    } else {
+      const selectedDate = new Date(form.booking_date);
+      const today = new Date();
+
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        newErrors.booking_date = "Cannot select past date";
+      }
+    }
+
+    if (!form.trip_duration || form.trip_duration < 1) {
+      newErrors.trip_duration = "Duration must be at least 1 day";
+    }
+
+    if (!form.number_of_people || form.number_of_people < 1) {
+      newErrors.number_of_people = "Must be at least 1 person";
+    }
+
+    if (selectedServices.length === 0) {
       newErrors.services = "Select at least one service";
-    if (!transactionImage)
+    }
+
+    if (!transactionImage) {
       newErrors.transaction_image = "Transaction image required";
+    }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
@@ -215,6 +246,9 @@ export default function BookingPage() {
                     Female
                   </label>
                 </div>
+                {errors.gender && (
+                  <p className="text-red-500 text-xs">{errors.gender}</p>
+                )}
               </div>
 
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -223,10 +257,14 @@ export default function BookingPage() {
               <input
                 name="age"
                 type="number"
-                placeholder="Age"
                 onChange={handleChange}
-                className="w-full border border-gray-400  rounded-lg p-3 mb-4 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.age ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {errors.age && (
+                <p className="text-red-500 text-xs">{errors.age}</p>
+              )}
 
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Phone Number
@@ -269,11 +307,32 @@ export default function BookingPage() {
               </h3>
 
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Number of People <span className="text-red-500">*</span>
+              </label>
+
+              <input
+                type="number"
+                name="number_of_people"
+                value={form.number_of_people}
+                onChange={handleChange}
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.number_of_people ? "border-red-500" : "border-gray-400"
+                }`}
+              />
+
+              {errors.number_of_people && (
+                <p className="text-red-500 text-xs">
+                  {errors.number_of_people}
+                </p>
+              )}
+
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Trip Start <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
                 name="booking_date"
+                min={new Date().toISOString().split("T")[0]}
                 onChange={handleChange}
                 className={`w-full border rounded-lg p-3 mb-1 ${
                   errors.booking_date ? "border-red-500" : "border-gray-400"
@@ -291,8 +350,13 @@ export default function BookingPage() {
                 name="trip_duration"
                 value={form.trip_duration}
                 onChange={handleChange}
-                className="w-full border  border-gray-400 rounded-lg p-3 mb-4 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg p-3 mb-1 ${
+                  errors.trip_duration ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {errors.trip_duration && (
+                <p className="text-red-500 text-xs">{errors.trip_duration}</p>
+              )}
             </div>
 
             {/* SERVICES */}

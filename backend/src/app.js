@@ -11,10 +11,14 @@ import likeRoutes from "./routes/like.routes.js";
 import communityPostRoutes from "./routes/communityPost.routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import productRoutes from "./routes/product.routes.js";
-import productCategoryRoutes from "./routes/productCategory.routes.js"
-import bookingRoutes from "./routes/booking.routes.js"
+import productCategoryRoutes from "./routes/productCategory.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
+<<<<<<< HEAD
 import orderRoutes from "./routes/order.routes.js";
+=======
+import "./config/telegram.js";
+>>>>>>> 6e762ee9f110790c606ae31d4594b18b0285e202
 
 const app = express();
 
