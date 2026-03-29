@@ -4,14 +4,14 @@ const create = async (productData) => {
   return await Product.create(productData);
 };
 
-const getAll = async () => {
-  return await Product.find()
-  .populate("product_category_id", "product_category_name").sort({createdAt: -1 })
+const getAll = async (query) => {
+  return await Product.find(query)
+  .populate("product_category", "product_category_name").sort({createdAt: -1 })
 }
 
 const getById = async (id) => {
   const product = await Product.findById(id)
-    .populate("product_category_id", "product_category_name");
+    .populate("product_category", "product_category_name");
   
   if (!product) {
     throw new Error("Product not found");

@@ -143,6 +143,7 @@ export default function Posts() {
 
       setPosts((prev) => prev.filter((post) => post._id !== postId));
     } catch (error) {
+      console.error(error);
       alert("Failed to delete post");
     }
   };
@@ -169,6 +170,7 @@ export default function Posts() {
       await api.delete(`/categories/${id}`);
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
     } catch (err) {
+      console.error(err);
       alert("Delete failed");
     }
   };
@@ -186,6 +188,7 @@ export default function Posts() {
       setEditingCategoryId(null);
       setEditValue("");
     } catch (err) {
+      console.error(err);
       alert("Update failed");
     }
   };
@@ -198,6 +201,7 @@ export default function Posts() {
       setProvinces((prev) => [...prev, res.data.data]);
       setNewProvince("");
     } catch (err) {
+      console.error(err);
       alert("Failed to create province");
     }
   };
@@ -206,7 +210,8 @@ export default function Posts() {
     try {
       await api.delete(`/provinces/${id}`);
       setProvinces((prev) => prev.filter((pro) => pro._id !== id));
-    } catch (err) {
+    } catch (err) { 
+      console.error(err);
       alert("Delete failed");
     }
   };
@@ -224,6 +229,7 @@ export default function Posts() {
       setEditingProvinceId(null);
       setEditValue("");
     } catch (err) {
+      console.error(err);
       alert("Update failed");
     }
   };

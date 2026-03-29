@@ -2,12 +2,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function ProductCard({ product, priceOnly }) {
+export default function ProductCard({ product }) {
   const navigate = useNavigate();
-  const price = priceOnly ? product.minPrice : `${product.minPrice} - ${product.maxPrice}`;
+  const price = product.price;
 
  
-  const handleClick = () => navigate(`/shop/${product.id}`);
+  const handleClick = () => navigate(`/shop/${product._id}`);
 
   return (
     <div

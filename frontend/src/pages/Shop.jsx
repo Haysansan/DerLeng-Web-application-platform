@@ -1,42 +1,64 @@
 
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { products } from "../data/products";
+import { getProducts } from "../services/product.service"; 
 import shopBanner from "../assets/shop-banner.jpg";
 import ProductCard from "../components/shop/ProductCard";
 
 export default function Shop() {
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const navigate = useNavigate();
   const scrollRef = useRef(null);
+
+  // 1. Fetch products from Database on load
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await getProducts(); //
+        setProducts(res.data.data); // Adjust based on your API response structure
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+    fetchItems();
+  }, []);
 
   const categories = ["All", ...new Set(products.map((p) => p.type))];
 
   const handleSearch = () => {
     let filtered = products;
-    if (selectedCategory !== "All") filtered = filtered.filter(p => p.type === selectedCategory);
-    filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.catalogue.toLowerCase().includes(search.toLowerCase()));
+    if (selectedCategory !== "All")
+      filtered = filtered.filter((p) => p.type === selectedCategory);
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.catalogue.toLowerCase().includes(search.toLowerCase()),
+    );
     setResults(filtered);
   };
-
   const categoryProducts = selectedCategory === "All" ? [] : products.filter(p => p.type === selectedCategory);
 
   // Auto-scroll popular products
   useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
+    let filtered = products;
 
-    let scrollPos = 0;
-    const step = () => {
-      scrollPos += 0.5;
-      if (scrollPos >= scrollContainer.scrollWidth / 2) scrollPos = 0;
-      scrollContainer.scrollLeft = scrollPos;
-      requestAnimationFrame(step);
-    };
-    step();
-  }, []);
+    // Filter by Category
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((p) => p.type === selectedCategory);
+    }
+
+    // Filter by Search Text
+    if (search.trim() !== "") {
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          p.catalogue.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
+
+    setResults(filtered);
+  }, [search, selectedCategory, products]);
 
   return (
     <div className="w-full flex flex-col">
@@ -67,7 +89,7 @@ export default function Shop() {
             <h2 className="text-2xl font-bold text-[#002B11] mb-6">{selectedCategory} Products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {categoryProducts.map(product => (
-                <ProductCard key={product.id} product={product} priceOnly={true} />
+                <ProductCard key={product._id} product={product} priceOnly={true} />
               ))}
             </div>
           </section>
@@ -94,7 +116,7 @@ export default function Shop() {
           </div>
           {results.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {results.map(product => <ProductCard key={product.id} product={product} priceOnly={true} />)}
+              {results.map(product => <ProductCard key={product._id} product={product} priceOnly={true} />)}
             </div>
           )}
         </section>
@@ -103,7 +125,7 @@ export default function Shop() {
         <section>
           <h2 className="text-2xl font-bold text-[#002B11] mb-6">All Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {products.map(product => <ProductCard key={product.id} product={product} priceOnly={true} />)}
+            {products.map(product => <ProductCard key={product._id} product={product} priceOnly={true} />)}
           </div>
         </section>
       </div>

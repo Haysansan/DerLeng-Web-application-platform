@@ -1,6 +1,6 @@
 // src/components/PostLoginPromptModal.jsx
 import lockImage from "../assets/lock.png";
-export default function PostLoginPromptModal({ isOpen, onClose, onLogin }) {
+export default function PostLoginPromptModal({ isOpen, onClose, onLogin, message }) {
   if (!isOpen) return null;
 
   return (
@@ -40,7 +40,7 @@ export default function PostLoginPromptModal({ isOpen, onClose, onLogin }) {
 
         {/* Message */}
         <p className="text-gray-600 text-sm sm:text-base mb-6">
-          Please sign in to create a post.
+          {message || "Please sign in to continue."}
         </p>
 
         {/* Button */}

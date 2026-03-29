@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 import authRoutes from "./routes/auth.routes.js";
 import postRoutes from "./routes/post.routes.js";
@@ -14,6 +15,7 @@ import productRoutes from "./routes/product.routes.js";
 import productCategoryRoutes from "./routes/productCategory.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 import "./config/telegram.js";
 
 const app = express();
@@ -27,7 +29,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Server Static files (for ckoudinary/local images)
-app.use("/uploads", express.static("uploads"));
+const __dirname = path.resolve();
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -43,5 +46,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/productCategories", productCategoryRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/orders", orderRoutes);
 
 export default app;

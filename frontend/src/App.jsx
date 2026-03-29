@@ -9,9 +9,9 @@ import Profile from "./pages/Profile";
 import TravelStories from "./pages/TravalStories.jsx";
 import FAQ from "./pages/FAQ.jsx";
 import PostListPage from "./pages/PostListpage.jsx";
-import Shop from "./pages/Shop";
-import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart"; 
+import Shop from "./pages/Shop.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
+import Cart from "./pages/Cart.jsx"; 
 
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminLayout from "./layout/admin/AdminLayout.jsx";
@@ -26,6 +26,7 @@ import CommunityBooking from "./pages/admin/communityBooking";
 import PostPageWrapper from "./components/PostPageWrapper.jsx";
 import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Orders from "./pages/admin/Orders.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -41,8 +42,8 @@ const App = () => {
         <Route path="shop" element={<Shop />} />
         <Route path="shop/:id" element={<ProductDetail />} />
 
-        {/* Cart */}
-        <Route path="cart" element={<Cart />} />
+        {/*  CART */}
+        {<Route path="cart" element={<Cart />} />}
 
         <Route path="about" element={<About />} />
         <Route path="faq" element={<FAQ />} />
@@ -66,7 +67,10 @@ const App = () => {
 
         {/* Community */}
         <Route path="community/:id" element={<CommunityPostDetail />} />
-        <Route path="community/province/:provinceId" element={<CommunityByProvince />} />
+        <Route
+          path="community/province/:provinceId"
+          element={<CommunityByProvince />}
+        />
         <Route path="booking/:id" element={<BookingPage />} />
 
         {/* Other Pages */}
@@ -99,6 +103,7 @@ const App = () => {
         </Route>
 
         <Route path="products" element={<Products />} />
+        <Route path="orders" element={<Orders />} />
 
         <Route path="communities">
           <Route index element={<Communities />} />
