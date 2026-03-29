@@ -30,7 +30,6 @@ export default function Navbar() {
       <header className="w-full bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-16 items-center justify-between">
-
             {/* Logo */}
             <Link to="/" className="flex items-baseline gap-1">
               <img src={logo} alt="Derleng" className="h-10 sm:h-9 w-auto" />
@@ -48,26 +47,40 @@ export default function Navbar() {
 
             {/* Nav Links */}
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
-              <Link to="/discover" className="hover:text-[#002B11] hover:scale-110 transition">
+              <Link
+                to="/discover"
+                className="hover:text-[#002B11] hover:scale-110 transition"
+              >
                 Discover
               </Link>
-              <Link to="/post" className="hover:text-[#002B11] hover:scale-110 transition">
+              <Link
+                to="/post"
+                className="hover:text-[#002B11] hover:scale-110 transition"
+              >
                 Post
               </Link>
-              <Link to="/TravelStories" className="hover:text-[#002B11] hover:scale-110 transition">
+              <Link
+                to="/TravelStories"
+                className="hover:text-[#002B11] hover:scale-110 transition"
+              >
                 Stories
               </Link>
-              <Link to="/about" className="hover:text-[#002B11] hover:scale-110 transition">
+              <Link
+                to="/about"
+                className="hover:text-[#002B11] hover:scale-110 transition"
+              >
                 About
               </Link>
-              <Link to="/shop" className="hover:text-[#002B11] hover:scale-110 transition">
+              <Link
+                to="/shop"
+                className="hover:text-[#002B11] hover:scale-110 transition"
+              >
                 Shop
               </Link>
             </nav>
 
             {/* Right Side */}
             <div className="flex items-center gap-4">
-
               <LanguageDropdown />
 
               {/* 🛒 CART ICON */}
@@ -116,6 +129,7 @@ export default function Navbar() {
       <NotificationPanel
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
+        user={user}
       />
     </>
   );

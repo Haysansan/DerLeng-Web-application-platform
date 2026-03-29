@@ -7,6 +7,11 @@ import {
   getBookingStatsService,
 } from "../services/booking.service.js";
 import bot from "../config/telegram.js";
+import Notification from "../models/notification.js";
+import { generateInvoice } from "../utils/generateInvoice.js";
+import { sendEmailWithInvoice } from "../utils/sendEmail.js";
+import { sendNotification } from "../utils/socket.js";
+
 
 /* ---------------- CREATE ---------------- */
 export const createBooking = async (req, res) => {
@@ -136,13 +141,49 @@ export const getBookingById = async (req, res) => {
 /* ---------------- UPDATE ---------------- */
 export const updateBookingStatus = async (req, res) => {
   try {
-    const booking = await updateBookingStatusService(
-      req.params.id,
-      req.body.status,
-    );
+    const { status, admin_note } = req.body;
+
+    // 1️⃣ Update booking
+    const booking = await updateBookingStatusService(req.params.id, status);
+
+    // Save admin note (IMPORTANT)
+    booking.admin_note = admin_note || "";
+    await booking.save();
+
+    // ONLY when approved
+    if (status === "approved") {
+      // 2️⃣ Generate PDF (IN MEMORY)
+      const pdfBuffer = await generateInvoice(booking);
+
+      // 3️⃣ Send EMAIL
+      await sendEmailWithInvoice(booking.user_id.email, pdfBuffer);
+
+      // 4️⃣ Save notification (DB)
+      const notification = await Notification.create({
+        user_id: booking.user_id._id,
+        booking_id: booking._id, 
+        title: "Booking Approved 🎉",
+        message: `Your booking has been approved.\n\n${admin_note || ""}`,
+      });
+
+      // 5️⃣ Send real-time notification
+      sendNotification(booking.user_id._id.toString(), notification);
+    }
+    if (status === "completed") {
+      await Notification.deleteMany({
+        booking_id: booking._id,
+      });
+
+      // optional: real-time remove
+      sendNotification(booking.user_id._id.toString(), {
+        type: "REMOVE_NOTIFICATION",
+        booking_id: booking._id,
+      });
+    }
 
     res.json({ success: true, data: booking });
   } catch (error) {
+    console.error("Update status error:", error);
     res.status(500).json({ message: error.message });
   }
 };
