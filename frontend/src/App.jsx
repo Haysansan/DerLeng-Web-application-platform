@@ -22,7 +22,7 @@ import Communities from "./pages/admin/Community.jsx";
 import CommunityPostDetail from "./pages/CommunityPostDetail.jsx";
 import BookingPage from "./pages/BookingPage";
 import CommunityByProvince from "./pages/CommunityByProvince.jsx";
-import CommunityBooking from "./pages/admin/CommunityBooking";
+import CommunityBooking from "./pages/admin/communityBooking";
 import PostPageWrapper from "./components/PostPageWrapper.jsx";
 import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
