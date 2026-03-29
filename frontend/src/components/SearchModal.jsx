@@ -33,12 +33,12 @@ export default function SearchModal({ onClose }) {
   }, [query]);
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-[999] flex justify-center items-start pt-20">
+    <div className="fixed inset-0 bg-black/10 z-[999] flex justify-center items-start pt-1">
       
-      <div className="bg-white w-full max-w-xl rounded-xl shadow-lg p-4">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-4">
         
         {/* HEADER */}
-        <div className="flex items-center gap-2 border-b pb-3">
+        <div className="flex items-center gap-2 border border-green-300 rounded-2xl p-3 focus-within:ring-2 focus-within:ring-green-300 focus-within:border-green-300 transition">
           <Search size={18} />
 
           <input

@@ -6,12 +6,15 @@ import {
   deletePost,
   updatePost,
   getPostsByUser,
+  getTopPosts,
 } from "../controllers/post.controller.js";
 
 import protect from "../middlewares/auth.middleware.js";
 import { uploadPost } from "../middlewares/upload.middleware.js";
 const router = express.Router();
 
+//get top post
+router.get("/top", getTopPosts);
 // Create post (Protected + Image upload)
 router.post("/", protect, uploadPost.array("images", 5), createPost);
 

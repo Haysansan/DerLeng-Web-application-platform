@@ -1,3 +1,4 @@
+//frontend\src\components\stories\FeaturedStories.jsx
 import { ChevronRight, Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
@@ -10,10 +11,11 @@ const FeaturedStories = ({ posts = [], onLike, onFavorite }) => {
 
   // Top 3 liked posts (current page)
   const featured = useMemo(() => {
-    return [...posts]
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-      .slice(0, 3);
-  }, [posts]);
+  return posts
+    .slice() // safe shallow copy without breaking references
+    .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+    .slice(0, 3);
+}, [posts]);
 
   // image slider on hover
   useEffect(() => {
@@ -35,7 +37,7 @@ const FeaturedStories = ({ posts = [], onLike, onFavorite }) => {
   }, [hovered, featured]);
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 h-[450px] w-full bg-black">
+    <section className="grid grid-cols-1 md:grid-cols-3 h-[450px] w-full">
       {featured.map((post) => {
         const images = post.images || [];
         const index = indexMap[post._id] || 0;

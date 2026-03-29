@@ -127,3 +127,14 @@ export const getPostsByUser = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch user posts" });
   }
 };
+
+//get top 3 post
+export const getTopPosts = async (req, res) => {
+  try {
+    const posts = await postService.getTopPosts();
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch top posts" });
+  }
+};

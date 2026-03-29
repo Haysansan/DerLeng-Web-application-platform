@@ -1,5 +1,5 @@
 import Post from "../models/Post.js";
-
+import mongoose from "mongoose";
 const create = async ({
   user_id,
   category_id,
@@ -118,6 +118,43 @@ const update = async (post_id, user_id, role, updateData, files) => {
   );
 
   return updatedPost;
+}
+const getTopPosts = async () => {
+  return await Post.aggregate([
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "target_id",
+        as: "likesData",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: { $ifNull: ["$likesData", []] } },
+      },
+    },
+    {
+      $lookup: {
+        from: "users", // ✅ FIX USERNAME
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user_id",
+      },
+    },
+    {
+      $unwind: {
+        path: "$user_id",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $sort: { likesCount: -1 },
+    },
+    {
+      $limit: 3,
+    },
+  ]);
 };
 
 export default {
@@ -126,4 +163,5 @@ export default {
   getById,
   remove,
   update,
+  getTopPosts,
 };

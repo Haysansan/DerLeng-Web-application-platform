@@ -293,6 +293,7 @@ export default function TravelStories() {
     page,
     setPage,
     totalPages,
+    topPosts,
   } = useTravelStories();
 
   const navigate = useNavigate();
@@ -339,7 +340,7 @@ export default function TravelStories() {
     >
       <Toaster position="top-center" reverseOrder={false} />
       <FeaturedStories
-        posts={posts} 
+        posts={topPosts}
         onFavorite={toggleFavoritePost} 
         onLike={toggleLikePost}
       />
@@ -429,3 +430,175 @@ export default function TravelStories() {
   );
 }
 
+// // frontend/src/hooks/useTravelStories.js
+// import { useState, useEffect, useMemo } from "react";
+// import postService from "../services/post.service";
+// import likeService from "../services/like.service";
+// import favoriteService from "../services/favorite.service";
+// import toast from "react-hot-toast";
+
+// const useTravelStories = () => {
+//   const [posts, setPosts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   const [page, setPage] = useState(() => {
+//     return Number(localStorage.getItem("page")) || 1;
+//   });
+
+//   const [totalPages, setTotalPages] = useState(1);
+
+//   /* ================================
+//      SAVE PAGE
+//   ================================= */
+//   useEffect(() => {
+//     localStorage.setItem("page", page);
+//   }, [page]);
+
+//   /* ================================
+//      FETCH POSTS
+//   ================================= */
+//   const fetchPosts = async (pageNumber = 1) => {
+//     try {
+//       setLoading(true);
+
+//       const token = localStorage.getItem("token");
+
+//       const { posts: postData, pagination } =
+//         await postService.getAllPosts(pageNumber, 10);
+
+//       setTotalPages(pagination.pages);
+
+//       /* -------- FAVORITES MAP -------- */
+//       let favoritesMap = {};
+
+//       if (token) {
+//         const favorites = await favoriteService.getFavorites("Post", token);
+
+//         favorites.forEach((fav) => {
+//           const id = fav?.target_id?._id || fav?.target_id;
+//           if (id) favoritesMap[String(id)] = true;
+//         });
+//       }
+
+//       /* -------- MERGE DATA -------- */
+//       const postsWithData = await Promise.all(
+//         postData.map(async (post) => {
+//           const likeRes = await likeService.getLikesCount(post._id, "Post");
+
+//           let liked = false;
+
+//           if (token) {
+//             const likedRes = await likeService.isLiked(
+//               post._id,
+//               "Post",
+//               token
+//             );
+//             liked = likedRes.liked;
+//           }
+
+//           return {
+//             ...post,
+//             likes: likeRes.likes,
+//             liked,
+//             favorited: favoritesMap[post._id] || false,
+//           };
+//         })
+//       );
+
+//       setPosts(postsWithData);
+//     } catch (err) {
+//       console.error("Fetch posts error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchPosts(page);
+//   }, [page]);
+
+//   /* ================================
+//      LIKE POST (SYNC EVERYWHERE)
+//   ================================= */
+//   const toggleLikePost = async (postId) => {
+//     const token = localStorage.getItem("token");
+
+//     if (!token) {
+//       toast.error("Please login first");
+//       return;
+//     }
+
+//     try {
+//       const res = await likeService.toggleLike(postId, "Post", token);
+
+//       setPosts((prev) =>
+//         prev.map((p) =>
+//           p._id === postId
+//             ? {
+//                 ...p,
+//                 liked: res.liked,
+//                 likes: res.liked ? p.likes + 1 : p.likes - 1,
+//               }
+//             : p
+//         )
+//       );
+//     } catch (err) {
+//       console.error("Like error:", err);
+//     }
+//   };
+
+//   /* ================================
+//      FAVORITE POST (SYNC EVERYWHERE)
+//   ================================= */
+//   const toggleFavoritePost = async (postId) => {
+//     const token = localStorage.getItem("token");
+
+//     if (!token) {
+//       toast.error("Please login first");
+//       return;
+//     }
+
+//     try {
+//       const res = await favoriteService.toggleFavorite(
+//         postId,
+//         "Post",
+//         token
+//       );
+
+//       setPosts((prev) =>
+//         prev.map((p) =>
+//           p._id === postId
+//             ? { ...p, favorited: res.isFavorite }
+//             : p
+//         )
+//       );
+//     } catch (err) {
+//       console.error("Favorite error:", err);
+//     }
+//   };
+
+//   /* ================================
+//      FEATURED POSTS (AUTO SYNC 🔥)
+//   ================================= */
+//   const topPosts = useMemo(() => {
+//     return [...posts]
+//       .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+//       .slice(0, 3);
+//   }, [posts]);
+
+//   /* ================================
+//      RETURN
+//   ================================= */
+//   return {
+//     posts,
+//     loading,
+//     page,
+//     setPage,
+//     totalPages,
+//     toggleLikePost,
+//     toggleFavoritePost,
+//     topPosts, // 🔥 now auto updates
+//   };
+// };
+
+// export default useTravelStories;

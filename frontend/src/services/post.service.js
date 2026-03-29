@@ -1,6 +1,6 @@
 //frontend\src\services\post.service.js
 import api from "./api.js";
-
+import axios from "axios";
 /* ---------------- GET POST ---------------- */
 export const getPostById = async (postId) => {
   const res = await api.get(`/posts/${postId}`);
@@ -49,6 +49,12 @@ export const deletePost = async (postId) => {
   return res.data;
 };
 
+const getTopPosts = async () => {
+  const res = await api.get("/posts/top");
+  return res.data;
+};
+
+
 export default {
   getAllPosts,
   toggleLike,
@@ -57,4 +63,5 @@ export default {
   getPostsByUser,
   updatePost,
   deletePost,
+  getTopPosts,
 };
