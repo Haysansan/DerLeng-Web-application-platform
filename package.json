@@ -22,6 +22,7 @@
   "homepage": "https://github.com/Undertale-12357/DerLeng-Web-application-platform#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
