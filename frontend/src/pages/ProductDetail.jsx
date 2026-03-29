@@ -46,7 +46,6 @@ export default function ProductDetail() {
 
     if (type === "add") {
       addToCart(product);
-      alert("Added to cart!");
     } else {
       addToCart(product);
       navigate("/cart");

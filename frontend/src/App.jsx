@@ -26,6 +26,7 @@ import CommunityBooking from "./pages/admin/CommunityBooking";
 import PostPageWrapper from "./components/PostPageWrapper.jsx";
 import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Orders from "./pages/admin/Orders.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -66,7 +67,10 @@ const App = () => {
 
         {/* Community */}
         <Route path="community/:id" element={<CommunityPostDetail />} />
-        <Route path="community/province/:provinceId" element={<CommunityByProvince />} />
+        <Route
+          path="community/province/:provinceId"
+          element={<CommunityByProvince />}
+        />
         <Route path="booking/:id" element={<BookingPage />} />
 
         {/* Other Pages */}
@@ -99,6 +103,7 @@ const App = () => {
         </Route>
 
         <Route path="products" element={<Products />} />
+        <Route path="orders" element={<Orders />} />
 
         <Route path="communities">
           <Route index element={<Communities />} />

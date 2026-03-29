@@ -164,7 +164,10 @@ export default function Cart() {
               placeholder="Phone Number"
               className="w-full p-3 bg-gray-50 rounded-xl border focus:outline-green-500"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 10) setPhone(value);
+              }}
             />
             <textarea
               placeholder="Delivery Address"

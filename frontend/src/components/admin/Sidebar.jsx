@@ -9,6 +9,7 @@ import {
   ChevronRight,
   MapPin,
   LogOut,
+  ShoppingBag,
 } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -68,6 +69,13 @@ export default function Sidebar() {
           to="products"
           icon={Package}
           text="Manage Product"
+          collapsed={collapsed}
+        />
+
+        <SidebarItem
+          to="orders"
+          icon={ShoppingBag}
+          text="Manage Orders"
           collapsed={collapsed}
         />
 
