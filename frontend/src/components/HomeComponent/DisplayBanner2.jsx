@@ -6,7 +6,7 @@ export const DisplayBanner2 = () => {
   const navigate = useNavigate();
 
   const handleBestStories = () => {
-    navigate("/stories");
+    navigate("/TravelStories");
   };
 
   return (

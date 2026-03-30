@@ -138,3 +138,52 @@ export const getTopPosts = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch top posts" });
   }
 };
+
+//get post by category
+export const getPostsByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const result = await postService.getPostsByCategory(
+      categoryId,
+      page,
+      limit
+    );
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getPostsByProvince = async (req, res) => {
+  try {
+    const { provinceId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find({ province_id: provinceId })
+      .skip(skip)
+      .limit(Number(limit))
+      .sort({ created_at: -1 });
+
+    const total = await Post.countDocuments({
+      province_id: provinceId,
+    });
+
+    res.json({
+      data: posts,
+      pagination: {
+        total,
+        page: Number(page),
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

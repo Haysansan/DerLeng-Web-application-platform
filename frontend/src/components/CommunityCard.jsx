@@ -94,7 +94,7 @@ const CommunityCard = ({ post, onClick, onFavorite, onLike }) => {
             className="flex items-center gap-1"
           >
             <Heart
-              size={16}
+              size={18}
               fill={post.liked ? "#ef4444" : "none"}
               className={post.liked ? "text-red-500" : "text-gray-400"}
             />
@@ -102,15 +102,15 @@ const CommunityCard = ({ post, onClick, onFavorite, onLike }) => {
           </button>
 
           {/* COMMENTS */}
-          <div className="flex items-center gap-1 text-gray-500">
+          {/* <div className="flex items-center gap-1 text-gray-500">
             <MessageCircle size={16} />
             <span className="text-xs">{post.comments_count || 0}</span>
-          </div>
+          </div> */}
         </div>
 
         {/* FOOTER */}
-        <div className="flex justify-between border-t pt-2 mt-2 text-xs text-gray-500">
-          <span>{post.admin_id?.username || "Admin"}</span>
+        <div className="flex justify-between border-t border-gray-100 pt-2 mt-2 text-xs  ">
+          <span className="font-medium text-gray-700">By {post.admin_id?.username || "Admin"}</span>
           <span>{creationDay}</span>
         </div>
       </div>

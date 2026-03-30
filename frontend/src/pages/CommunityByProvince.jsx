@@ -93,7 +93,27 @@ export default function CommunityByProvince() {
     handleLike,
     handleFavorite,
   } = useCommunityInteractions(communities);
+  const getPagination = (current, total) => {
+  const delta = 2;
+  const range = [];
 
+  for (
+    let i = Math.max(2, current - delta);
+    i <= Math.min(total - 1, current + delta);
+    i++
+  ) {
+    range.push(i);
+  }
+
+  if (current - delta > 2) range.unshift("...");
+  if (current + delta < total - 1) range.push("...");
+
+  range.unshift(1);
+  if (total !== 1) range.push(total);
+
+  return range;
+  };
+  const pages = getPagination(page, pagination?.pages || 1);
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Communities</h1>
@@ -120,7 +140,7 @@ export default function CommunityByProvince() {
           </div>
 
           {/* PAGINATION */}
-          <div className="flex justify-center items-center gap-4 mt-6">
+          {/* <div className="flex justify-center items-center gap-4 mt-6">
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
@@ -136,11 +156,51 @@ export default function CommunityByProvince() {
             <button
               disabled={page >= (pagination?.pages || 1)}
               onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+              className="px-4 py-2 bg-green-500 text-white rounded disabled:opacity-50"
             >
               Next
             </button>
-          </div>
+          </div> */}
+            <div className="flex items-center justify-center gap-2 mt-6">
+
+  {/* Prev */}
+  <button
+    disabled={page === 1}
+    onClick={() => setPage((p) => p - 1)}
+    className="px-3 py-1 rounded bg-gray-200 disabled:opacity-40"
+  >
+    Prev
+  </button>
+
+  {/* Pages */}
+  {pages.map((p, idx) =>
+    p === "..." ? (
+      <span key={idx} className="px-2 text-gray-400">
+        ...
+      </span>
+    ) : (
+      <button
+        key={idx}
+        onClick={() => setPage(p)}
+        className={`px-3 py-1 rounded ${
+          page === p ? "bg-green-500 text-white" : "bg-gray-100"
+        }`}
+      >
+        {p}
+      </button>
+    )
+  )}
+
+  {/* Next */}
+  <button
+    disabled={page >= (pagination?.pages || 1)}
+    onClick={() => setPage((p) => p + 1)}
+    className="px-3 py-1 rounded bg-gray-200 disabled:opacity-40"
+  >
+    Next
+  </button>
+
+</div>
         </>
       )}
     </div>

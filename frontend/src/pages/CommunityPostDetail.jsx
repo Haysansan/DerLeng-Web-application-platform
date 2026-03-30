@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import communityService from "../services/community.service";
 import serviceService from "../services/service.service";
 import likeService from "../services/like.service";
@@ -22,6 +22,12 @@ import {
 export default function CommunityPostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+  const page = location.state?.page || 1;
+  navigate(`/discover?page=${page}`);
+};
 
   const [post, setPost] = useState({});
   const [services, setServices] = useState([]);
@@ -195,7 +201,7 @@ export default function CommunityPostDetail() {
     <>
       {/* BACK BUTTON */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={handleBack}
         className="fixed top-20 right-4 md:left-6 md:right-auto z-50 bg-white shadow-md p-3 rounded-full hover:bg-gray-100 transition cursor-pointer"
       >
         <ArrowLeft size={22} />

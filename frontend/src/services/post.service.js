@@ -55,6 +55,21 @@ const getTopPosts = async () => {
 };
 
 
+const getPostsByCategory = async (categoryId, page = 1, limit = 10) => {
+  const res = await api.get(
+    `/posts/category/${categoryId}?page=${page}&limit=${limit}`
+  );
+
+  return res.data; // { data, pagination }
+};
+
+const getPostsByProvince = async (provinceId, page = 1, limit = 10) => {
+  const res = api.get(
+    `/posts/province/${provinceId}?page=${page}&limit=${limit}`
+  );
+  return res.data;
+};
+
 export default {
   getAllPosts,
   toggleLike,
@@ -64,4 +79,6 @@ export default {
   updatePost,
   deletePost,
   getTopPosts,
+  getPostsByCategory,
+  getPostsByProvince,
 };

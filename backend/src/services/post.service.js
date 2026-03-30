@@ -157,6 +157,57 @@ const getTopPosts = async () => {
   ]);
 };
 
+
+const getPostsByCategory = async (categoryId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const posts = await Post.find({ category_id: categoryId })
+    .populate("user_id", "username")
+    .populate("category_id", "category_name")
+    .populate("province_id", "province_name")
+    .sort({ created_at: -1 }) // ✅ IMPORTANT (you used created_at)
+    .skip(skip)
+    .limit(parseInt(limit));
+
+  const total = await Post.countDocuments({
+    category_id: categoryId,
+  });
+
+  return {
+    data: posts,
+    pagination: {
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+const getPostsByFilter = async ({ categoryId, provinceId, page, limit }) => {
+  const filter = {};
+
+  if (categoryId) filter.category_id = categoryId;
+  if (provinceId) filter.province_id = provinceId;
+
+  const skip = (page - 1) * limit;
+
+  const posts = await Post.find(filter)
+    .populate("category_id")
+    .populate("province_id")
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Post.countDocuments(filter);
+
+  return {
+    data: posts,
+    pagination: {
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 export default {
   create,
   getAll,
@@ -164,4 +215,6 @@ export default {
   remove,
   update,
   getTopPosts,
+  getPostsByCategory,
+  getPostsByFilter,
 };

@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Title */}
-      <div className="w-full bg-white py-8 px-6">
+      <div className="w-full bg-white py-8 px-2">
         <div className="mx-auto max-w-7xl">
           <h1 style={{ fontSize: '3rem', fontWeight: 'bold', textAlign: 'center', color: '#002B11', fontFamily: "'Kantumruy Pro', sans-serif" }}>
             តោះដេីរលេង?
@@ -29,7 +29,7 @@ export default function Home() {
       </div>
 
       {/* SearchBar Section */}
-      <div className="w-full py-8 px-6 bg-white flex justify-center">
+      <div className="w-full py-4 px-4 bg-white flex justify-center">
         <div className="w-full max-w-7xl">
           <SearchBar />
         </div>
