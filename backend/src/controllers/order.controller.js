@@ -1,7 +1,6 @@
 import orderService from "../services/order.service.js";
 import Order from "../models/order.js";
 import { sendOrderStatusEmail } from "../utils/email.utils.js";
-import { getIO } from "../utils/socket_order.js";
 
 export const placeOrder = async (req, res) => {
   try {
@@ -83,21 +82,12 @@ export const updateOrderStatus = async (req, res) => {
         .json({ success: false, message: "Order not found" });
     }
 
-    if (order.user && order.user.email) {
+    if (order.user?.email) {
       await sendOrderStatusEmail(order.user.email, {
         orderId: order._id.toString(),
         status: order.status,
         username: order.user.username,
         totalPrice: order.total_price,
-      });
-    }
-
-    if (order.user?._id) {
-      const io = getIO();
-      io.to(order.user._id.toString()).emit("orderUpdate", {
-        message: `Your order #${order._id.slice(-6)} is now ${status}!`,
-        status: status,
-        orderId: order._id,
       });
     }
 
