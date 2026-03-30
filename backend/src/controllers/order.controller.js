@@ -1,7 +1,7 @@
 import orderService from "../services/order.service.js";
 import Order from "../models/order.js"
 import { sendOrderStatusEmail } from "../utils/email.utils.js";
-import { getIO } from "../utils/socket.js";
+import { getIO } from "../utils/socket_order.js";
 
 export const placeOrder = async (req, res) => {
   try {
