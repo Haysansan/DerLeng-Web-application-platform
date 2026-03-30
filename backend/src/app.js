@@ -19,14 +19,29 @@ import orderRoutes from "./routes/order.routes.js";
 import "./config/telegram.js";
 import notificationRoutes from "./routes/notification.routes.js";
 
-
 const app = express();
 
 // Middlewares
-app.use(cors({
-    origin: "https://derleng-website-9648zasiv-haysansans-projects.vercel.app",
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://derleng-website-9648zasiv-haysansans-projects.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow Postman
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
-}));
+  }),
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

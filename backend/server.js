@@ -25,7 +25,7 @@ dotenv.config();
 import http from "http";
 import connectDB from "./src/config/db.js";
 import app from "./src/app.js";
-import { initSocket } from "./src/utils/socket.js";
+import { initSocket } from "./src/utils/socket_booking.js";
 
 // connect DB
 connectDB();
