@@ -56,7 +56,7 @@ export const createBookingService = async ({
  return await Booking.findById(booking._id)
    .populate("services")
    .populate("community_post_id", "title")
-   .populate("user_id", "username");
+   .populate("user_id", "username email");
 };
 
 /* ---------------- GET ALL ---------------- */
@@ -72,16 +72,24 @@ export const getAllBookingsService = async () => {
 export const getBookingByIdService = async (id) => {
   return Booking.findById(id)
     .populate("user_id")
-    .populate("community_post_id")
+    .populate("community_post_id", "title")
     .populate("services");
 };
 
 /* ---------------- UPDATE ---------------- */
 export const updateBookingStatusService = async (id, status) => {
-  return Booking.findByIdAndUpdate(id, { status }, { new: true })
+  const booking = await Booking.findById(id)
     .populate("services")
-    .populate("user_id", "username")
+    .populate("user_id", "username email")
     .populate("community_post_id", "title");
+
+  if (!booking) throw new Error("Booking not found");
+
+  booking.status = status;
+
+  await booking.save(); 
+
+  return booking;
 };
 
 /* ---------------- DELETE ---------------- */

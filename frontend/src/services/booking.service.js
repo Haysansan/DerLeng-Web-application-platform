@@ -17,6 +17,7 @@ const createBooking = async (formData) => {
 /* ---------------- GET ALL ---------------- */
 const getAllBookings = async () => {
   const token = localStorage.getItem("token");
+  console.log("TOKEN:", token);
 
   const res = await api.get("/booking", {
     headers: {
@@ -41,12 +42,12 @@ const getBookingById = async (id) => {
 };
 
 /* ---------------- UPDATE ---------------- */
-const updateBookingStatus = async (id, status) => {
+const updateBookingStatus = async (id, data) => {
   const token = localStorage.getItem("token");
 
   const res = await api.put(
-    `/booking/${id}/status`, 
-    { status },
+    `/booking/${id}/status`,
+    data, 
     {
       headers: {
         Authorization: `Bearer ${token}`,
