@@ -1,5 +1,5 @@
 import Post from "../models/Post.js";
-
+import mongoose from "mongoose";
 const create = async ({
   user_id,
   category_id,
@@ -29,12 +29,22 @@ const create = async ({
 };
 
 // Get all posts
-const getAll = async (page = 1, limit = 8) => {
+const getAll = async (page = 1, limit = 10, search ="" ) => {
   const skip = (page - 1) * limit;
+    //search 
+    const query = search
+    ? {
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { content: { $regex: search, $options: "i" } },
+          { location_description: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
 
-  const total = await Post.countDocuments();
-
-  const posts = await Post.find()
+  const total = await Post.countDocuments(query);
+  
+  const posts = await Post.find(query)
     .populate("user_id", "username email role")
     .populate("category_id", "category_name")
     .populate("province_id", "province_name")
@@ -82,29 +92,129 @@ const remove = async (post_id, user_id, role) => {
   await Post.findByIdAndDelete(post_id);
 };
 
-const update = async (post_id, user_id, role, updateData) => {
+const update = async (post_id, user_id, role, updateData, files) => {
   const post = await Post.findById(post_id);
 
   if (!post) {
     throw new Error("Post not found");
   }
 
-  // Allow owner OR admin
   if (post.user_id.toString() !== user_id.toString() && role !== "admin") {
     throw new Error("Not authorized to edit this post");
   }
 
-  const updatedPost = await Post.findByIdAndUpdate(post_id, updateData, {
-    new: true,
-  });
+  const updatedFields = {
+    ...updateData,
+  };
+
+  if (files && files.length > 0) {
+    updatedFields.images = files.map((f) => f.path);
+  }
+
+  const updatedPost = await Post.findByIdAndUpdate(
+    post_id,
+    updatedFields,
+    { new: true }
+  );
 
   return updatedPost;
+}
+const getTopPosts = async () => {
+  return await Post.aggregate([
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "target_id",
+        as: "likesData",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: { $ifNull: ["$likesData", []] } },
+      },
+    },
+    {
+      $lookup: {
+        from: "users", // ✅ FIX USERNAME
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user_id",
+      },
+    },
+    {
+      $unwind: {
+        path: "$user_id",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $sort: { likesCount: -1 },
+    },
+    {
+      $limit: 3,
+    },
+  ]);
 };
 
+
+const getPostsByCategory = async (categoryId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const posts = await Post.find({ category_id: categoryId })
+    .populate("user_id", "username")
+    .populate("category_id", "category_name")
+    .populate("province_id", "province_name")
+    .sort({ created_at: -1 }) // ✅ IMPORTANT (you used created_at)
+    .skip(skip)
+    .limit(parseInt(limit));
+
+  const total = await Post.countDocuments({
+    category_id: categoryId,
+  });
+
+  return {
+    data: posts,
+    pagination: {
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+const getPostsByFilter = async ({ categoryId, provinceId, page, limit }) => {
+  const filter = {};
+
+  if (categoryId) filter.category_id = categoryId;
+  if (provinceId) filter.province_id = provinceId;
+
+  const skip = (page - 1) * limit;
+
+  const posts = await Post.find(filter)
+    .populate("category_id")
+    .populate("province_id")
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Post.countDocuments(filter);
+
+  return {
+    data: posts,
+    pagination: {
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 export default {
   create,
   getAll,
   getById,
   remove,
   update,
+  getTopPosts,
+  getPostsByCategory,
+  getPostsByFilter,
 };

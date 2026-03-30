@@ -4,13 +4,13 @@ export const createComment = async (req, res) => {
   try {
     const { target_id, target_type, content } = req.body;
 
-    const comment = await commentService.create({
+    let comment = await commentService.create({
       target_id,
       target_type,
       user_id: req.user._id,
       content,
     });
-
+    comment = await comment.populate("user_id", "username avatar");
     res.status(201).json({
       message: "Comment added successfully",
       data: comment,
@@ -54,12 +54,14 @@ export const deleteComment = async (req, res) => {
 
 export const updateComment = async (req, res) => {
   try {
-    const updatedComment = await commentService.update(
+    let updatedComment = await commentService.update(
       req.params.id,
       req.user._id,
       req.body.content,
     );
 
+    updatedComment = await updatedComment.populate("user_id", "username avatar");
+    
     res.status(200).json({
       message: "Comment updated successfully",
       data: updatedComment,

@@ -1,3 +1,4 @@
+//frontend\src\pages\admin\Posts.jsx
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit, Search, X, Heart } from "lucide-react";
 import api from "../../services/api";

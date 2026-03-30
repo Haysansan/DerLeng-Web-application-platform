@@ -34,7 +34,7 @@ const create = async ({ target_id, target_type, user_id, content }) => {
 // ✅ GET COMMENTS
 const getByTarget = async (target_id, target_type) => {
   return await Comment.find({ target_id, target_type })
-    .populate("user_id", "username")
+    .populate("user_id", "username avatar")
     .sort({ created_at: -1 });
 };
 
@@ -55,6 +55,9 @@ const remove = async (comment_id, user_id) => {
 
 // ✅ UPDATE COMMENT
 const update = async (comment_id, user_id, content) => {
+  if (!content || !content.trim()) {
+    throw new Error("Content cannot be empty");
+  }
   const comment = await Comment.findById(comment_id);
 
   if (!comment) {
@@ -66,9 +69,11 @@ const update = async (comment_id, user_id, content) => {
   }
 
   comment.content = content;
+  comment.edited = true;
+
   await comment.save();
 
-  return comment;
+  return await comment.populate("user_id", "username");
 };
 
 export default {

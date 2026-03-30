@@ -155,7 +155,7 @@ export default function Login({ isOpen, onClose, switchToRegister }) {
             </svg>
             <div className="relative z-10 text-center px-4">
               <h1 className="text-white text-3xl italic opacity-80 leading-tight" style={{ fontFamily: "Georgia, serif", textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}>
-                Welcome to our website
+                Welcome to DERLENG
               </h1>
             </div>
           </div>

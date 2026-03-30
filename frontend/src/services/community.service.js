@@ -1,9 +1,12 @@
 import api from "./api.js";
 
 // Get all community posts
-const getAllCommunityPosts = async () => {
-  const res = await api.get("/community-posts");
-  return res.data.data || res.data;
+const getAllCommunityPosts = async (page = 1, limit = 10) => {
+  const res = await api.get(
+    `/community-posts?page=${page}&limit=${limit}`
+  );
+
+  return res.data; // now includes posts + pagination
 };
 
 // Get community post by ID
@@ -47,10 +50,18 @@ const deleteCommunityPost = async (id, token) => {
   return res.data;
 };
 
+const getByProvince = async (provinceId, page = 1, limit = 10) => {
+  const res = await api.get(
+    `/community-posts/province/${provinceId}?page=${page}&limit=${limit}`
+  );
+
+  return res.data;
+};
 export default {
   getAllCommunityPosts,
   getCommunityPostById,
   createCommunityPost,
   updateCommunityPost,
   deleteCommunityPost,
+  getByProvince,
 };

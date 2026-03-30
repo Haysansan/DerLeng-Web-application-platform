@@ -27,7 +27,7 @@ export const toggleFavorite = async (req, res) => {
 /* ---------------- GET FAVORITES ---------------- */
 export const getUserFavorites = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { target_type } = req.query; // optional filter
 
     const favorites = await getUserFavoritesService(
@@ -35,7 +35,11 @@ export const getUserFavorites = async (req, res) => {
       target_type
     );
 
-    res.json({ data: favorites });
+    res.json({
+      success: true,
+      count: favorites.length,
+      data: favorites,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -8,7 +8,7 @@ import ButtonSpinner from "./ButtonSpinner.jsx";
 export default function EditProfileModal({ isOpen, onClose, userData }) {
   const { user, setUser } = useContext(AuthContext);
 
-  if (!isOpen) return null;
+  
 
   const [formData, setFormData] = useState({
     username: userData?.username || "",
@@ -18,7 +18,7 @@ export default function EditProfileModal({ isOpen, onClose, userData }) {
   });
 
   const [loading, setLoading] = useState(false);
-
+  if (!isOpen) return null;
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };

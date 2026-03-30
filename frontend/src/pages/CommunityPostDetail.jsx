@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import communityService from "../services/community.service";
 import serviceService from "../services/service.service";
 import likeService from "../services/like.service";
 import commentService from "../services/comment.service";
-import { Heart, Send, Trash2 } from "lucide-react";
+import { Heart, Layers, MapPinned, Send, ShieldCheck, Trash2 } from "lucide-react";
 import favoriteService from "../services/favorite.service";
 
 import {
@@ -14,11 +14,20 @@ import {
   ArrowLeft,
   DollarSign,
   Star,
+  Calendar,
+  EllipsisVertical,
+  Pencil,
 } from "lucide-react";
 
 export default function CommunityPostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+  const page = location.state?.page || 1;
+  navigate(`/discover?page=${page}`);
+};
 
   const [post, setPost] = useState({});
   const [services, setServices] = useState([]);
@@ -29,6 +38,9 @@ export default function CommunityPostDetail() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [favorited, setFavorited] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   const token = localStorage.getItem("token");
   const currentUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -74,6 +86,11 @@ export default function CommunityPostDetail() {
 
     fetchData();
   }, [id]);
+
+  const toggleMenu = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+
   const handleFavorite = async () => {
     if (!token) return alert("Please login");
 
@@ -98,23 +115,62 @@ export default function CommunityPostDetail() {
 
   /*  ADD COMMENT */
   const handleAddComment = async () => {
-    if (!token) return alert("Please login");
+    if (!token) {
+      setShowLoginModal(true);
+      return;
+    }
     if (!newComment.trim()) return;
 
-    const comment = await commentService.addComment({
-      target_id: id,
-      target_type: "CommunityPost",
-      content: newComment,
-    });
+    try {
+      const comment = await commentService.addComment({
+        target_id: id,
+        target_type: "CommunityPost",
+        content: newComment,
+      });
 
-    setComments((prev) => [comment, ...prev]);
-    setNewComment("");
+      setComments((prev) => [comment, ...prev]);
+      setNewComment("");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /* DELETE COMMENT */
   const handleDeleteComment = async (commentId) => {
     await commentService.deleteComment(commentId, token);
     setComments((prev) => prev.filter((c) => c._id !== commentId));
+  };
+
+  const handleEditClick = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditContent(comment.content);
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editContent.trim()) return;
+
+    try {
+      const updated = await commentService.updateComment(
+        commentId,
+        editContent
+      );
+
+      setComments((prev) =>
+        prev.map((c) =>
+          c._id === commentId ? updated : c
+        )
+      );
+
+      setEditingCommentId(null);
+      setEditContent("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditContent("");
   };
 
   const nextImage = () => {
@@ -145,7 +201,7 @@ export default function CommunityPostDetail() {
     <>
       {/* BACK BUTTON */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={handleBack}
         className="fixed top-20 right-4 md:left-6 md:right-auto z-50 bg-white shadow-md p-3 rounded-full hover:bg-gray-100 transition cursor-pointer"
       >
         <ArrowLeft size={22} />
@@ -159,7 +215,7 @@ export default function CommunityPostDetail() {
             <h1 className="text-3xl font-bold text-[#002B11]">{post.title}</h1>
 
             <div className="flex flex-wrap gap-3 text-gray-500 text-sm items-center">
-              <span className="flex items-center gap-1">
+              <span className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
                 <MapPin size={14} />
                 {post.province_id?.province_name}
               </span>
@@ -277,63 +333,93 @@ export default function CommunityPostDetail() {
           )}
         </div>
 
-        {/* COMMUNITY DESCRIPTION */}
-        <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-gray-800">
-            About this Community
-          </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-            {post.content}
-          </p>
-        </div>
+          {/* COMMUNITY DESCRIPTION */}
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold text-gray-800">
+              About this Community
+            </h2>
 
-        {/* LOCATION */}
-        <div className="p-4 border border-green-500 rounded-xl bg-white shadow-md space-y-2">
-          <h2 className="text-xl font-bold text-gray-800">Location</h2>
+            <p className="text-gray-600 whitespace-pre-line leading-relaxed">
+              {post.content}
+            </p>
+          </div>
 
-          <p className="text-gray-600">
-            {post.location_description || "No description"}
-          </p>
+          {/* LOCATION */}
+          <div className="p-5 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-md ring-1 ring-gray-100 space-y-5">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <MapPinned size={18} className="text-green-500" />
+              Trip Details
+            </h2>
 
-          {post.location_link && (
-            <a
-              href={post.location_link}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-            >
-              View Map
-            </a>
-          )}
+            <p className="text-gray-600">
+              {post.location_description || "No description"}
+            </p>
+
+            {post.location_link ? (
+              <div className="relative group rounded-xl overflow-hidden shadow-md ring-1 ring-gray-100 h-80">
+                <a
+                  href={post.location_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full h-full"
+                >
+                  <iframe
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(
+                      post.location_description || post.province_id?.province_name
+                    )}&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                  />
+
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
+                    <div className="bg-white/90 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
+                      <MapPinned size={14} className="text-red-500" />
+                      View Location
+                    </div>
+                  </div>
+                </a>
+              </div>
+            ) : null}
+          </div>
+
         </div>
 
         {/* SERVICES */}
-        <div className="p-4 border border-green-500 rounded-xl bg-white shadow-md space-y-4">
-          <h2 className="text-xl font-bold text-gray-800">
+        <div className="p-5 rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 space-y-5">
+
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <Layers size={18} className="text-green-500" />
             Community Services
           </h2>
 
           {!Array.isArray(services) || services.length === 0 ? (
-            <p className="text-gray-400 italic">No services available</p>
+            <p className="text-gray-400 italic text-sm text-center py-4">
+              No services available
+            </p>
           ) : (
             <>
-              {/* Service List */}
               <div className="space-y-3">
                 {services.map((service) => (
                   <div
                     key={service._id}
-                    className="border-b border-gray-300 last:border-none pb-3"
+                    className="flex justify-between items-start gap-4 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition"
                   >
-                    <h3 className="font-semibold text-gray-800">
-                      {service.name}
-                    </h3>
+                    <div>
+                      <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                        <ShieldCheck size={15} className="text-green-600" />
+                        {service.name}
+                      </h3>
 
-                    <p className="text-sm text-gray-500">
-                      {service.description}
-                    </p>
+                      <p className="text-xs text-gray-500 mt-1 leading-snug">
+                        {service.description}
+                      </p>
+                    </div>
 
-                    <div className="flex items-center gap-1 text-green-600 font-bold text-sm">
+                    <div className="flex items-center gap-1 text-green-600 font-bold text-sm whitespace-nowrap">
                       <DollarSign size={14} />
                       {service.price}
                     </div>
@@ -341,73 +427,170 @@ export default function CommunityPostDetail() {
                 ))}
               </div>
 
-              {/* Single Booking Button */}
               <button
                 onClick={() => navigate(`/booking/${post._id}`)}
-                className="w-full mt-3 bg-[#002B11] text-white py-2 rounded-lg hover:bg-green-700 transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-[#008A3D] cursor-pointer hover:bg-[#006F31] text-white py-2.5 rounded-xl transition"
               >
+                <Calendar size={16} />
                 Book Now
               </button>
             </>
           )}
         </div>
+
         {/* COMMENTS */}
         <div className="space-y-6">
           <div className="flex items-center gap-1">
             <h2 className="text-2xl font-bold text-[#002B11]">Comment</h2>
             <span className="bg-gray-100 px-3 py-0.5 rounded-full text-sm font-bold">
-              {comments?.length || 0}
+              {comments.length}
             </span>
           </div>
 
-          {/* INPUT */}
-          <div className="relative">
+          <div className="relative group">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Share your thoughts..."
-              className="w-full border-2 border-gray-100 rounded-2xl p-4 pr-16 outline-none"
+              className="w-full rounded-2xl p-4 pr-16 text-sm bg-white border border-gray-100 
+               shadow-sm outline-none resize-none transition
+               focus:shadow-md focus:border-gray-200"
             />
+
             <button
               onClick={handleAddComment}
-              className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl hover:bg-[#008A3D] transition shadow-lg disabled:opacity-50 cursor-pointer"
+              className="absolute bottom-4 right-4 bg-[#002B11] text-white p-2.5 rounded-xl 
+               hover:opacity-90 transition shadow-md disabled:opacity-50"
+              disabled={!newComment.trim()}
             >
               <Send size={18} />
             </button>
           </div>
 
-          {/* LIST */}
-          {comments?.length === 0 ? (
-            <p className="text-gray-400 text-center">No comments yet.</p>
-          ) : (
-            comments.map((comment) => (
-              <div key={comment._id} className="flex gap-4">
-                <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center">
-                  {comment.user_id?.username?.charAt(0)}
-                </div>
-
-                <div className="flex-1">
-                  <div className="flex justify-between">
-                    <h4 className="font-bold">{comment.user_id?.username}</h4>
-                    <span className="text-xs text-gray-400">
-                      {new Date(comment.created_at).toLocaleDateString()}
-                    </span>
+          <div className="space-y-4">
+            {comments.length === 0 ? (
+              <p className="text-gray-400 text-center py-8 italic">
+                No comments yet.
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <div
+                  key={comment._id}
+                  className="flex gap-4 p-4 rounded-2xl bg-white border border-gray-50 
+                     hover:border-gray-100 transition shadow-sm"
+                >
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                    {comment.user_id?.avatar ? (
+                      <img
+                        src={comment.user_id.avatar}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center 
+                              bg-[#008A3D] text-white font-semibold uppercase">
+                        {comment.user_id.username?.charAt(0)}
+                      </div>
+                    )}
                   </div>
 
-                  <p>{comment.content}</p>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs text-gray-500 font-semibold">
+                          @{comment.user_id.username}
+                        </h4>
 
-                  {currentUser && comment.user_id?._id === currentUser.id && (
-                    <button
-                      onClick={() => handleDeleteComment(comment._id)}
-                      className="text-red-500 text-xs flex items-center gap-1"
-                    >
-                      <Trash2 size={12} /> Delete
-                    </button>
-                  )}
+                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                          ·{" "}
+                          {new Date(comment.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+
+                          {comment.edited && (
+                            <span className="text-[10px] text-gray-400 italic">
+                              (edited)
+                            </span>
+                          )}
+                        </span>
+                      </div>
+
+                      {currentUser && comment.user_id?._id === currentUser.id && (
+                        <div className="relative">
+                          <button
+                            onClick={() => toggleMenu(comment._id)}
+                            className="text-gray-900 hover:text-gray-700 p-1"
+                          >
+                            <EllipsisVertical size={16} />
+                          </button>
+
+                          {openMenuId === comment._id && (
+                            <div className="absolute right-0 mt-2 w-28 bg-white rounded-lg shadow-lg z-10">
+                              <button
+                                onClick={() => {
+                                  handleEditClick(comment);
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full flex items-center gap-2 px-2 py-1 text-xs hover:bg-gray-100"
+                              >
+                                <Pencil size={14} />
+                                Edit
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  handleDeleteComment(comment._id);
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full flex items-center gap-2 px-2 py-1 text-xs text-red-500 hover:bg-gray-100"
+                              >
+                                <Trash2 size={14} />
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-gray-600 text-sm leading-relaxed ">
+                      {comment.content}
+                    </p>
+
+                    {editingCommentId === comment._id && (
+                      <div className="flex flex-col gap-2 mt-2">
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="w-full rounded-xl p-3 text-sm bg-white shadow-sm border border-gray-100
+                             focus:ring-2 focus:ring-gray-200 focus:border-gray-400 outline-none transition"
+                          autoFocus
+                        />
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleUpdateComment(comment._id)}
+                            className="text-green-600 text-xs"
+                          >
+                            Save
+                          </button>
+
+                          <button
+                            onClick={handleCancelEdit}
+                            className="text-gray-400 text-xs"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </>

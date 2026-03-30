@@ -76,6 +76,13 @@ export const getBookingByIdService = async (id) => {
     .populate("services");
 };
 
+export const getBookingsByUserService = async (userId) => {
+  return await Booking.find({ user_id: userId })
+    .populate("community_post_id", "title")
+    .populate("services")
+    .sort({ created_at: -1 }); // newest first
+};
+
 /* ---------------- UPDATE ---------------- */
 export const updateBookingStatusService = async (id, status) => {
   const booking = await Booking.findById(id)

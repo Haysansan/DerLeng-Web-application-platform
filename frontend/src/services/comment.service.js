@@ -25,8 +25,18 @@ export const deleteComment = async (commentId) => {
   return res.data.message;
 };
 
+/* ---------------- UPDATE COMMENT ---------------- */
+export const updateComment = async (commentId, content) => {
+  const res = await api.put(`/comments/${commentId}`, {
+    content,
+  });
+  return res.data.data;
+};
+
+
 export default {
   getComments,
   addComment,
   deleteComment,
+  updateComment,
 };

@@ -28,14 +28,18 @@ import DetailPageWrapper from "./components/DetailPageWrapper.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Orders from "./pages/admin/Orders.jsx";
 
+
 const App = () => {
   const location = useLocation();
   const state = location.state;
 
   return (
     <Routes>
+      
       {/* Main Layout */}
+      
       <Route path="/" element={<Master />}>
+        
         <Route index element={<Home />} />
 
         {/* Shop */}
@@ -56,6 +60,7 @@ const App = () => {
         <Route path="posts/province/:provinceId" element={<PostListPage />} />
 
         {/* Profile */}
+        
         <Route
           path="profile"
           element={

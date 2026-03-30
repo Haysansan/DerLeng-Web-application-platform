@@ -101,7 +101,7 @@ const CommunityCard = ({
             className="flex items-center gap-1"
           >
             <Heart
-              size={16}
+              size={18}
               fill={post.liked ? "#ef4444" : "none"}
               className={post.liked ? "text-red-500" : "text-gray-400"}
             />

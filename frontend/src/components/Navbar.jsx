@@ -139,6 +139,87 @@ export default function Navbar() {
       </header>
 
       <AuthModals isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      {/* Mobile Slide Menu */}
+      {mobileMenuOpen && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-40 transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Menu */}
+          <div className="fixed top-0 right-0 h-full w-72 bg-white/90 backdrop-blur-xl shadow-2xl z-50 p-6 flex flex-col transform transition-transform duration-300 translate-x-0">
+
+            {/* Close */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-[#002B11]">Menu</h2>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-xl hover:bg-green-100 transition active:scale-95"
+              >
+                <X className="w-6 h-6 text-[#002B11]" />
+              </button>
+            </div>
+
+            {/* Links */}
+            <nav className="flex flex-col gap-2 text-[#002B11]">
+
+              <Link
+                to="/discover"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-100 transition font-medium"
+              >
+                Discover
+              </Link>
+
+              <Link
+                to="/post"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-100 transition font-medium"
+              >
+                Post
+              </Link>
+
+              <Link
+                to="/TravelStories"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-100 transition font-medium"
+              >
+                Stories
+              </Link>
+
+              <Link
+                to="/shop"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-100 transition font-medium"
+              >
+                Shop
+              </Link>
+
+              <Link
+                to="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-100 transition font-medium"
+              >
+                About
+              </Link>
+
+            </nav>
+
+            {/* Bottom section (optional) */}
+            <div className="mt-auto pt-6 border-t border-green-100 text-sm text-gray-400">
+              © 2026 DERLENG
+            </div>
+
+          </div>
+        </>
+      )}
+
+      <AuthModals
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+      />
 
       <NotificationPanel
         isOpen={showNotifications}

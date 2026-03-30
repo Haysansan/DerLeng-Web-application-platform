@@ -1,4 +1,37 @@
-//C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\hooks\useDiscover.js
+// //C:\Users\DELL\Documents\Cadt\cadty3t2\latestlast\DerLeng-Web-application-platform\frontend\src\hooks\useDiscover.js
+// import { useEffect, useState } from "react";
+// import { getCategories, getProvinces } from "../services/place.service";
+
+// export function useDiscover() {
+//   const [categories, setCategories] = useState([]);
+//   const [provinces, setProvinces] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+
+//         const cats = await getCategories();
+//         const provs = await getProvinces();
+
+//         setCategories(cats);
+//         setProvinces(provs);
+//       } catch (err) {
+//         console.error("Fetch error:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   return { categories, provinces, loading };
+// }
+
+
+//frontend\src\hooks\useDiscover.js
 import { useEffect, useState } from "react";
 import { getCategories, getProvinces } from "../services/place.service";
 
@@ -12,13 +45,23 @@ export function useDiscover() {
       try {
         setLoading(true);
 
-        const cats = await getCategories();
-        const provs = await getProvinces();
+        const catsRes = await getCategories();
+        const provsRes = await getProvinces();
 
-        setCategories(cats);
-        setProvinces(provs);
+        
+
+        // ✅ SAFE NORMALIZATION
+        setCategories(
+          catsRes?.data || catsRes?.categories || catsRes || []
+        );
+
+        setProvinces(
+          provsRes?.data || provsRes?.provinces || provsRes || []
+        );
       } catch (err) {
         console.error("Fetch error:", err);
+        setCategories([]);
+        setProvinces([]);
       } finally {
         setLoading(false);
       }

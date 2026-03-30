@@ -41,9 +41,10 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
 
-    const result = await postService.getAll(page, limit);
+    const result = await postService.getAll(page, limit, search);
 
     res.status(200).json({
       success: true,
@@ -95,6 +96,7 @@ export const updatePost = async (req, res) => {
       req.user._id,
       req.user.role,
       req.body,
+      req.files // ✅ PASS FILES HERE
     );
 
     res.status(200).json({
@@ -125,3 +127,63 @@ export const getPostsByUser = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch user posts" });
   }
 };
+
+//get top 3 post
+export const getTopPosts = async (req, res) => {
+  try {
+    const posts = await postService.getTopPosts();
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch top posts" });
+  }
+};
+
+//get post by category
+export const getPostsByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const result = await postService.getPostsByCategory(
+      categoryId,
+      page,
+      limit
+    );
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getPostsByProvince = async (req, res) => {
+  try {
+    const { provinceId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find({ province_id: provinceId })
+      .skip(skip)
+      .limit(Number(limit))
+      .sort({ created_at: -1 });
+
+    const total = await Post.countDocuments({
+      province_id: provinceId,
+    });
+
+    res.json({
+      data: posts,
+      pagination: {
+        total,
+        page: Number(page),
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

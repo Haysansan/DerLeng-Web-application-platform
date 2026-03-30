@@ -33,7 +33,7 @@ export const createCommunityPost = async (req, res) => {
 export const getAllCommunityPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
+    const limit = parseInt(req.query.limit) || 10;
 
     const result = await communityPostService.getAll(page, limit);
 
@@ -95,6 +95,26 @@ export const updateCommunityPost = async (req, res) => {
     });
   } catch (error) {
     res.status(403).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getCommunityByProvince = async (req, res) => {
+  try {
+    const { provinceId } = req.params;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const result = await communityPostService.getByProvince(
+      provinceId,
+      page,
+      limit
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
       message: error.message,
     });
   }
