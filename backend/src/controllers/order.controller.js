@@ -1,16 +1,14 @@
 import orderService from "../services/order.service.js";
-import Order from "../models/order.js"
+import Order from "../models/order.js";
 import { sendOrderStatusEmail } from "../utils/email.utils.js";
 
 export const placeOrder = async (req, res) => {
   try {
     if (!req.file) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Payment screenshot is required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Payment screenshot is required",
+      });
     }
 
     const items = JSON.parse(req.body.items);
@@ -33,7 +31,7 @@ export const placeOrder = async (req, res) => {
 
 export const getMyOrders = async (req, res) => {
   try {
-    const { userId } = req.params; 
+    const { userId } = req.params;
 
     const orders = await Order.find({ user: userId })
       .populate("items.product", "name image")
@@ -75,11 +73,13 @@ export const updateOrderStatus = async (req, res) => {
     const order = await Order.findByIdAndUpdate(
       orderId,
       { status },
-      { new: true }
+      { new: true },
     ).populate("user", "username email");
 
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     if (order.user?.email) {
@@ -87,7 +87,7 @@ export const updateOrderStatus = async (req, res) => {
         orderId: order._id.toString(),
         status: order.status,
         username: order.user.username,
-        totalPrice: order.total_price
+        totalPrice: order.total_price,
       });
     }
 
@@ -96,4 +96,4 @@ export const updateOrderStatus = async (req, res) => {
     console.error("Email Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};

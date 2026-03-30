@@ -10,8 +10,7 @@ import bot from "../config/telegram.js";
 import Notification from "../models/notification.js";
 import { generateInvoice } from "../utils/generateInvoice.js";
 import { sendEmailWithInvoice } from "../utils/sendEmail.js";
-import { sendNotification } from "../utils/socket.js";
-
+import { sendNotification } from "../utils/socket_booking.js";
 
 /* ---------------- CREATE ---------------- */
 export const createBooking = async (req, res) => {
@@ -28,7 +27,7 @@ export const createBooking = async (req, res) => {
       ? req.body.services
       : JSON.parse(req.body.services);
 
-    //  STEP 1: CREATE BOOKING 
+    //  STEP 1: CREATE BOOKING
     const booking = await createBookingService({
       user_id: req.user._id,
       community_post_id: req.body.community_post_id,
@@ -45,7 +44,7 @@ export const createBooking = async (req, res) => {
       transaction_image: req.file.path,
     });
 
-    //  STEP 2: FORMAT SERVICES 
+    //  STEP 2: FORMAT SERVICES
     let servicesText = "N/A";
 
     if (booking.services && booking.services.length > 0) {
@@ -161,7 +160,7 @@ export const updateBookingStatus = async (req, res) => {
       // 4️⃣ Save notification (DB)
       const notification = await Notification.create({
         user_id: booking.user_id._id,
-        booking_id: booking._id, 
+        booking_id: booking._id,
         title: "Booking Approved 🎉",
         message: `Your booking has been approved.\n\n${admin_note || ""}`,
       });
