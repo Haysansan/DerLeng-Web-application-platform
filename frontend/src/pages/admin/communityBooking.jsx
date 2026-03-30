@@ -13,6 +13,7 @@ export default function AdminBookingPage() {
   const [loadingId, setLoadingId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [adminNote, setAdminNote] = useState("");
 
   useEffect(() => {
     fetchBookings();
@@ -71,10 +72,10 @@ export default function AdminBookingPage() {
     try {
       setLoadingId(selectedBooking._id);
 
-      await bookingService.updateBookingStatus(
-        selectedBooking._id,
-        statusValue,
-      );
+      await bookingService.updateBookingStatus(selectedBooking._id, {
+        status: statusValue,
+        admin_note: adminNote,
+      });
 
       // alert("Status updated!");
       setSelectedBooking(null);
@@ -134,6 +135,7 @@ export default function AdminBookingPage() {
             onClick={() => {
               setSelectedBooking(booking);
               setStatusValue(booking.status);
+              setAdminNote(booking.admin_note || ""); 
             }}
             className="bg-white rounded-xl shadow p-5 border border-gray-200 flex flex-col gap-3 hover:shadow-lg transition cursor-pointer"
           >
@@ -338,6 +340,15 @@ export default function AdminBookingPage() {
               {/* PRICE */}
               <div className="mb-4 font-semibold text-green-700 text-lg">
                 Total: ${selectedBooking.total_price}
+              </div>
+              <div className="mt-4">
+                <label className="font-medium">Admin Note:</label>
+                <textarea
+                  value={adminNote}
+                  onChange={(e) => setAdminNote(e.target.value)}
+                  className="w-full border p-2 rounded mt-1"
+                  placeholder="Write extra info for user..."
+                />
               </div>
 
               {/* STATUS */}

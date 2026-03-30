@@ -49,9 +49,8 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     },
 
-    
     trip_duration: {
-      type: Number, 
+      type: Number,
       required: true,
       min: 1,
     },
@@ -80,6 +79,14 @@ const bookingSchema = new mongoose.Schema(
     transaction_image: {
       type: String,
       required: true,
+    },
+    admin_note: {
+      type: String,
+      default: "",
+    },
+    invoice: {
+      type: String,
+      default: "",
     },
 
     status: {

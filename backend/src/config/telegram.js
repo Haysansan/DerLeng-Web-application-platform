@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Init bot
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {
-  polling: true,
-});
+// const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {
+//   polling: true,
+// });
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 
 // Admin IDs (from .env)
 const ADMIN_IDS = process.env.TELEGRAM_ADMIN_IDS.split(",").map((id) =>
