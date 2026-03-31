@@ -24,10 +24,11 @@ const app = express();
 // Middlewares
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://derleng-website.vercel.app/",
+  "https://derleng-website.vercel.app",
   "https://derleng-website.onrender.com",
 ];
 
+app.options("*", cors());
 app.use(
   cors({
     origin: function (origin, callback) {
